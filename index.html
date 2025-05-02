@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario Mamparas</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@1.0.16/dist/browser-image-compression.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="script.js" type="module"></script>
+</head>
+<body>
+  <div class="main-container">
+    <!-- FORMULARIO -->
+    <div class="form-container">
+      <h2>Mamparas - Registro</h2>
+      <form id="formulario">
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" name="fecha" required />
+
+        <label for="hora">Hora:</label>
+        <input type="time" id="hora" name="hora" required />
+
+        <label for="operador">Operador:</label>
+        <input type="text" id="operador" name="operador" required />
+
+        <label for="empresa">Empresa:</label>
+        <input type="text" id="empresa" name="empresa" required />
+
+        <label for="placa">Placa:</label>
+        <input type="text" id="placa" name="placa" required />
+
+        <label for="chofer">Chofer:</label>
+        <input type="text" id="chofer" name="chofer" required />
+
+        <label for="separacion_lateral">Separación Lateral (cm):</label>
+        <input type="number" id="separacion_lateral" name="separacion_lateral" required />
+
+        <label for="separacion_central">Separación Central (cm):</label>
+        <input type="number" id="separacion_central" name="separacion_central" required />
+
+        <label for="medida_lateral">Foto Lateral:</label>
+        <input type="file" id="medida_lateral" name="medida_lateral" accept="image/*" required />
+
+        <label for="medida_altura">Foto Altura:</label>
+        <input type="file" id="medida_altura" name="medida_altura" accept="image/*" required />
+
+        <label for="medida_central">Foto Central:</label>
+        <input type="file" id="medida_central" name="medida_central" accept="image/*" required />
+
+        <label for="observacion">Operación:</label>
+        <select id="observacion" name="observacion" required>
+          <option value="EMBARQUE">Embarque</option>
+          <option value="DESCARGA">Descarga</option>
+        </select>
+
+        <button type="submit">Registrar</button>
+      </form>
+    </div>
+
+    <!-- BUSCADOR Y TABLA -->
+    <div class="records-container">
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Buscar por placa..." />
+      </div>
+      <div class="table-container">
+        <table id="tabla-registros">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Operador</th>
+              <th>Empresa</th>
+              <th>Placa</th>
+              <th>Chofer</th>
+              <th>Lat</th>
+              <th>Cent</th>
+              <th>Lateral</th>
+              <th>Altura</th>
+              <th>Central</th>
+              <th>Obs.</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <span id="closeModal" class="close">&times;</span>
+    <img class="modal-content" id="modalImage" />
+  </div>
+</body>
+</html>

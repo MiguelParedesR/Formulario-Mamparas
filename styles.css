@@ -1,0 +1,191 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #fff9f2;
+  color: #333;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: row;
+  padding: 20px;
+  gap: 30px;
+}
+
+.form-container {
+  width: 25%; /* Más compacto que antes */
+  padding: 20px;
+  background-color: #fff5e6;
+  border-right: 2px solid orange;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+.form-container h2, .form-container h3 {
+  margin-top: 0;
+  color: #ff8000;
+}
+
+.form-container label {
+  display: block;
+  margin: auto;
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.form-container input,
+.form-container select,
+.form-container button {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.form-container input[type="file"] {
+  padding: 4px;
+}
+
+.form-container button {
+  background-color: orange;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-container button:hover {
+  background-color: #cc6600;
+}
+
+.main-container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  align-items: flex-start;
+}
+
+
+h2 {
+  color: #e67e22;
+  margin-bottom: 15px;
+}
+
+form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+input[type="number"],
+select,
+input[type="file"] {
+  width: 100%;
+  padding: 6px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  background-color: #e67e22;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #d35400;
+}
+
+.search-container {
+  margin-bottom: 10px;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.table-container {
+  max-height: 800px;
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 25px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+img {
+  width: 50px;
+  cursor: pointer;
+}
+
+/*****************************************************/
+/* Modal general */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.9); /* Fondo oscuro */
+}
+
+/* Imagen dentro del modal */
+.modal-content {
+  display: block;
+  margin: auto;
+  max-width: 95vw;
+  max-height: 95vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Botón de cerrar */
+.close {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  color: #fff;
+  font-size: 35px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.close:hover,
+.close:focus {
+  color: orange;
+  text-decoration: none;
+  cursor: pointer;
+}
+
