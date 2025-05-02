@@ -55,6 +55,8 @@
         </select>
 
         <button type="submit">Registrar</button>
+        <button id="exportarExcel" style="margin-bottom: 10px;">📥 Exportar a Excel</button>
+
       </form>
     </div>
 
@@ -62,6 +64,7 @@
     <div class="records-container">
       <div class="search-container">
         <input type="text" id="searchInput" placeholder="Buscar por placa..." />
+        
       </div>
       <div class="table-container">
         <table id="tabla-registros">
@@ -84,7 +87,7 @@
           <tbody></tbody>
         </table>
       </div>
-    </div>
+    </div>    
   </div>
 
   <!-- Modal -->
@@ -92,6 +95,7 @@
     <span id="closeModal" class="close">&times;</span>
     <img class="modal-content" id="modalImage" />
   </div>
+  
   <!-- Modal de Proceso -->
 <div id="feedbackModal" class="feedback-modal">
   <div class="feedback-content">
@@ -99,6 +103,5 @@
     <div id="feedbackMessage" class="message" style="display: none;"></div>
   </div>
 </div>
-
 </body>
 </html>
