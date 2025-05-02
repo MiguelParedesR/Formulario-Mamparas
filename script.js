@@ -41,8 +41,8 @@ async function subirImagen(nombreCampo, archivo) {
 
   const { error } = await supabase.storage.from('mamparas').upload(nombreArchivo, archivo);
   if (error) {
-    alert(`Error al subir ${nombreCampo}: ${error.message}`);
-    return null;
+    mostrarModal('error', '😢 Lo sentimos, ocurrió un error. Recarga la página para intentarlo de nuevo.');
+
   }
 
   const { data: publicUrlData } = supabase.storage.from('mamparas').getPublicUrl(nombreArchivo);
@@ -76,10 +76,10 @@ form.addEventListener('submit', async function (e) {
 
   const { error } = await supabase.from('registros').insert([datos]);
   if (error) return alert('Error: ' + error.message);
-
-  alert('Registro guardado con éxito');
+  mostrarModal('success', '✅ Registro guardado con éxito');
   form.reset();
   cargarRegistros();
+
 });
 
 async function cargarRegistros(filtro = '') {
@@ -118,3 +118,23 @@ searchInput.addEventListener('input', () => {
   const filtro = searchInput.value.toUpperCase();
   cargarRegistros(filtro);
 });
+function mostrarModal(tipo, mensaje) {
+  const modal = document.getElementById('feedbackModal');
+  const loader = document.getElementById('loadingAnimation');
+  const msg = document.getElementById('feedbackMessage');
+
+  modal.style.display = 'flex';
+  loader.style.display = 'block';
+  msg.style.display = 'none';
+
+  setTimeout(() => {
+    loader.style.display = 'none';
+    msg.style.display = 'block';
+    msg.textContent = mensaje;
+    msg.className = `message ${tipo}`;
+  }, 2000); // Simula carga
+
+  setTimeout(() => {
+    modal.style.display = 'none';
+  }, 5000); // Se oculta después de mostrar el mensaje
+}
