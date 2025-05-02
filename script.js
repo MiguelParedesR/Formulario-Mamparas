@@ -1,4 +1,5 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const ExcelJS = window.ExcelJS;
 
 const supabase = createClient(
   'https://qjefbngewwthawycvutl.supabase.co',
@@ -25,7 +26,6 @@ document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') modal.style.display = 'none';
 });
 
-// 🔧 Función para sanitizar nombres de archivos
 function sanitizeFileName(fileName) {
   return fileName.replace(/[^\w.\-]/g, '_');
 }
@@ -42,7 +42,6 @@ async function subirImagen(nombreCampo, archivo) {
   const { error } = await supabase.storage.from('mamparas').upload(nombreArchivo, archivo);
   if (error) {
     mostrarModal('error', '😢 Lo sentimos, ocurrió un error. Recarga la página para intentarlo de nuevo.');
-
   }
 
   const { data: publicUrlData } = supabase.storage.from('mamparas').getPublicUrl(nombreArchivo);
@@ -79,7 +78,6 @@ form.addEventListener('submit', async function (e) {
   mostrarModal('success', '✅ Registro guardado con éxito');
   form.reset();
   cargarRegistros();
-
 });
 
 async function cargarRegistros(filtro = '') {
@@ -118,6 +116,7 @@ searchInput.addEventListener('input', () => {
   const filtro = searchInput.value.toUpperCase();
   cargarRegistros(filtro);
 });
+
 function mostrarModal(tipo, mensaje) {
   const modal = document.getElementById('feedbackModal');
   const loader = document.getElementById('loadingAnimation');
@@ -132,9 +131,114 @@ function mostrarModal(tipo, mensaje) {
     msg.style.display = 'block';
     msg.textContent = mensaje;
     msg.className = `message ${tipo}`;
-  }, 2000); // Simula carga
+  }, 2000);
 
   setTimeout(() => {
     modal.style.display = 'none';
-  }, 5000); // Se oculta después de mostrar el mensaje
+  }, 5000);
 }
+
+// ✅ FUNCIONES PARA EXPORTACIÓN A EXCEL CON MINIATURAS
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('exportarExcel').addEventListener('click', exportarExcel);
+});
+
+async function exportarExcel() {
+  const { data, error } = await supabase.from('registros').select('*');
+  if (error) {
+    alert('😢 Error al obtener los datos');
+    return;
+  }
+
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Registros');
+
+  worksheet.columns = [
+    { header: 'Fecha', key: 'fecha', width: 15 },
+    { header: 'Hora', key: 'hora', width: 10 },
+    { header: 'Operador', key: 'operador', width: 20 },
+    { header: 'Empresa', key: 'empresa', width: 20 },
+    { header: 'Placa', key: 'placa', width: 10 },
+    { header: 'Chofer', key: 'chofer', width: 20 },
+    { header: 'Medida Lateral', key: 'medida_lateral', width: 15 },
+    { header: 'Medida Central', key: 'medida_central', width: 15 },
+    { header: 'Medida Altura', key: 'medida_altura', width: 15 },
+    { header: 'Observación', key: 'observacion', width: 30 },
+  ];
+
+  for (const [index, row] of data.entries()) {
+    const rowIndex = index + 2;
+
+    worksheet.addRow({
+      fecha: row.fecha,
+      hora: row.hora,
+      operador: row.operador,
+      empresa: row.empresa,
+      placa: row.placa,
+      chofer: row.chofer,
+      medida_lateral: '',
+      medida_central: '',
+      medida_altura: '',
+      observacion: row.observacion,
+    });
+
+    const imageFields = ['medida_lateral', 'medida_central', 'medida_altura'];
+    for (const [imgIndex, field] of imageFields.entries()) {
+      const imageUrl = row[field];
+      if (imageUrl) {
+        const base64Image = await getImageBase64(imageUrl);
+        const imageId = workbook.addImage({
+          base64: base64Image,
+          extension: 'jpeg',
+        });
+        worksheet.addImage(imageId, {
+          tl: { col: 6 + imgIndex, row: rowIndex - 1 },
+          ext: { width: 50, height: 50 },
+        });
+      }
+    }
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'registros_mamparas.xlsx';
+  link.click();
+}
+
+async function getImageBase64(url) {
+  try {
+    // Realizamos la solicitud de la imagen como un blob
+    const response = await fetch(url);
+    
+    // Si la respuesta no es exitosa, lanzamos un error
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${url}`);
+    }
+
+    // Convertimos la respuesta en un array buffer
+    const arrayBuffer = await response.arrayBuffer();
+    
+    // Convertimos el array buffer en una cadena base64
+    const base64 = arrayBufferToBase64(arrayBuffer);
+
+    return base64;
+  } catch (error) {
+    console.error('Error al obtener la imagen en base64:', error);
+    return null;
+  }
+}
+
+// Función auxiliar para convertir el ArrayBuffer en una cadena base64
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return window.btoa(binary);
+}
+

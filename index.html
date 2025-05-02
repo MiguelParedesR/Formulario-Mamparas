@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@1.0.16/dist/browser-image-compression.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.2.1/dist/exceljs.min.js"></script>
   <script defer src="script.js" type="module"></script>
 </head>
 <body>
@@ -55,9 +56,8 @@
         </select>
 
         <button type="submit">Registrar</button>
-        <button id="exportarExcel" style="margin-bottom: 10px;">📥 Exportar a Excel</button>
-
       </form>
+      <button id="exportarExcel" style="margin-bottom: 10px;">📥 Exportar a Excel</button>
     </div>
 
     <!-- BUSCADOR Y TABLA -->
@@ -103,5 +103,6 @@
     <div id="feedbackMessage" class="message" style="display: none;"></div>
   </div>
 </div>
+
 </body>
 </html>
