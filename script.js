@@ -60,18 +60,21 @@ form.addEventListener('submit', async function (e) {
     chofer: document.getElementById('chofer').value.toUpperCase(),
     separacion_lateral: parseFloat(document.getElementById('separacion_lateral').value),
     separacion_central: parseFloat(document.getElementById('separacion_central').value),
+    altura_mampara: parseFloat(document.getElementById('altura_mampara').value),
     observacion: document.getElementById('observacion').value.toUpperCase(),
   };
 
+  const unidad = document.getElementById('foto_unidad').files[0];
   const lateral = document.getElementById('medida_lateral').files[0];
   const altura = document.getElementById('medida_altura').files[0];
   const central = document.getElementById('medida_central').files[0];
 
+  datos.foto_unidad = await subirImagen('foto_unidad', unidad);
   datos.medida_lateral = await subirImagen('lateral', lateral);
   datos.medida_altura = await subirImagen('altura', altura);
   datos.medida_central = await subirImagen('central', central);
 
-  if (!datos.medida_lateral || !datos.medida_altura || !datos.medida_central) return;
+  if (!datos.foto_unidad||!datos.medida_lateral || !datos.medida_altura || !datos.medida_central) return;
 
   const { error } = await supabase.from('registros').insert([datos]);
   if (error) return alert('Error: ' + error.message);
@@ -101,6 +104,8 @@ async function cargarRegistros(filtro = '') {
       <td>${r.chofer}</td>
       <td>${r.separacion_lateral}</td>
       <td>${r.separacion_central}</td>
+      <td>${r.altura_mampara}</td>
+      <td><img src="${r.foto_unidad}" /></td>
       <td><img src="${r.medida_lateral}" /></td>
       <td><img src="${r.medida_altura}" /></td>
       <td><img src="${r.medida_central}" /></td>
@@ -160,6 +165,7 @@ async function exportarExcel() {
     { header: 'Empresa', key: 'empresa', width: 20 },
     { header: 'Placa', key: 'placa', width: 10 },
     { header: 'Chofer', key: 'chofer', width: 20 },
+    { header: 'Foto Unidad ', key: 'foto_unidad', width: 15 },
     { header: 'Medida Lateral', key: 'medida_lateral', width: 15 },
     { header: 'Medida Central', key: 'medida_central', width: 15 },
     { header: 'Medida Altura', key: 'medida_altura', width: 15 },
@@ -176,13 +182,14 @@ async function exportarExcel() {
       empresa: row.empresa,
       placa: row.placa,
       chofer: row.chofer,
+      foto_unidad: '',
       medida_lateral: '',
       medida_central: '',
       medida_altura: '',
       observacion: row.observacion,
     });
 
-    const imageFields = ['medida_lateral', 'medida_central', 'medida_altura'];
+    const imageFields = ['foto_unidad', 'medida_lateral', 'medida_central', 'medida_altura'];
     for (const [imgIndex, field] of imageFields.entries()) {
       const imageUrl = row[field];
       if (imageUrl) {

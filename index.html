@@ -40,6 +40,12 @@
         <label for="separacion_central">Separación Central (cm):</label>
         <input type="number" id="separacion_central" name="separacion_central" required />
 
+        <label for="separacion_central">Separación Altura (cm):</label>
+        <input type="number" id="altura_mampara" name="altura_mampara" required />
+
+        <label for="foto_unidad">Foto Unidad:</label>
+        <input type="file" id="foto_unidad" name="foto_unidad" accept="image/*" required />
+
         <label for="medida_lateral">Foto Lateral:</label>
         <input type="file" id="medida_lateral" name="medida_lateral" accept="image/*" required />
 
@@ -63,7 +69,7 @@
     <!-- BUSCADOR Y TABLA -->
     <div class="records-container">
       <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Buscar por placa..." />
+        <input type="text" id="searchInput" placeholder="BUSCAR POR PLACA (SIN ESPACIOS)" />
         
       </div>
       <div class="table-container">
@@ -73,15 +79,17 @@
               <th>Fecha</th>
               <th>Hora</th>
               <th>Operador</th>
-              <th>Empresa</th>
+              <th>Empresa Transporte</th>
               <th>Placa</th>
               <th>Chofer</th>
-              <th>Lat</th>
-              <th>Cent</th>
               <th>Lateral</th>
-              <th>Altura</th>
               <th>Central</th>
-              <th>Obs.</th>
+              <th>Altura</th>
+              <th>Foto Unidad</th>
+              <th>Foto Lateral</th>
+              <th>Foto Altura</th>
+              <th>Foto Central</th>
+              <th>Operacion</th>
             </tr>
           </thead>
           <tbody></tbody>
