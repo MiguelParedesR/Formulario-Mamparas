@@ -97,12 +97,14 @@ body {
 }
 
 /* TABLA */
+/* TABLA */
 .table-container {
   max-height: 750px;
-  overflow-y: auto;
+  overflow-y: auto; /* habilita el desplazamiento vertical */
   border-radius: 5px;
   background: white;
   box-shadow: 0 1px 8px rgba(255, 152, 0, 0.12);
+  position: relative; /* Necesario para el posicionamiento sticky */
 }
 
 table {
@@ -111,6 +113,22 @@ table {
   margin-top: 6px;
 }
 
+/* Encabezado de la tabla */
+th {
+  background-color: #ffe0b2;
+  color: #e65100;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 0.85rem;
+  
+  /* Fijar el encabezado cuando se desplace */
+  position: sticky;
+  top: 0; /* Se queda en la parte superior */
+  z-index: 10; /* Asegura que se muestre por encima del contenido */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Agrega sombra para mayor visibilidad */
+}
+
+/* Celdas de la tabla */
 th, td {
   padding: 12px 8px;
   border-bottom: 1px solid #f0e0d0;
@@ -118,11 +136,7 @@ th, td {
   font-size: 0.85rem;
 }
 
-th {
-  background-color: #ffe0b2;
-  color: #e65100;
-}
-
+/* Estilo de las filas */
 td img {
   width: 40px;
   transition: transform 0.3s ease;
@@ -134,6 +148,7 @@ td img:hover {
   transform: scale(1.2);
   box-shadow: 0 3px 10px rgba(255, 138, 0, 0.4);
 }
+
 
 /* RESPONSIVE */
 @media screen and (max-width: 1150px) {
