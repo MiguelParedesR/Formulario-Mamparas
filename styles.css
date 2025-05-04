@@ -10,25 +10,25 @@ body {
   font-family: 'Segoe UI', sans-serif;
   background: #fff9f2;
   color: #333;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 /* CONTENEDORES PRINCIPALES */
 .main-container {
   display: flex;
   flex-direction: row;
-  padding: 20px;
-  gap: 30px;
+  padding: 12px;
+  gap: 16px;
   min-height: 100vh;
 }
 
 /* FORMULARIO */
 .form-container {
-  width: 25%;
+  width: 22%;
   background-color: #fff5e6;
-  border-right: 3px solid #ffa726;
-  box-shadow: 0 2px 15px rgba(255, 138, 0, 0.1);
-  padding: 10px;
+  border-right: 2px solid #ffa726;
+  box-shadow: 0 1px 8px rgba(255, 138, 0, 0.1);
+  padding: 8px;
   overflow-y: auto;
   max-height: 93vh;
   animation: fadeSlideIn 0.6s ease forwards;
@@ -36,15 +36,15 @@ body {
 
 .form-container h2 {
   color: #fb8c00;
-  margin-bottom: 20px;
-  font-size: 2rem;
+  margin-bottom: 14px;
+  font-size: 1.6rem;
 }
 
 .form-container label {
   display: block;
-  margin: auto;
-  font-weight: bold;
-  font-size: 0.90rem;
+  margin-bottom: 2px;
+  font-weight: 600;
+  font-size: 0.85rem;
   color: #333;
 }
 
@@ -52,11 +52,11 @@ body {
 .form-container select,
 .form-container button {
   width: 100%;
-  padding: 5px 8px;
-  font-size: 0.9rem;
-  margin-bottom: 6px;
+  padding: 4px 6px;
+  font-size: 0.85rem;
+  margin-bottom: 5px;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 5px;
 }
 
 /* BOTÓN */
@@ -64,16 +64,17 @@ body {
   background-color: #fb8c00;
   color: white;
   border: none;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(255, 138, 0, 0.3);
+  box-shadow: 0 2px 5px rgba(255, 138, 0, 0.2);
   transition: transform 0.2s ease, background-color 0.3s ease;
+  padding: 6px;
+  font-size: 0.9rem;
 }
 
 .form-container button:hover {
   background-color: #ef6c00;
-  transform: scale(1.04);
-  
+  transform: scale(1.03);
 }
 
 /* TABLA Y BUSCADOR */
@@ -83,36 +84,38 @@ body {
 }
 
 .search-container {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 #searchInput {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
+  font-size: 0.85rem;
   border: 1px solid #ffa726;
-  border-radius: 6px;
+  border-radius: 5px;
   outline-color: #fb8c00;
 }
 
 /* TABLA */
 .table-container {
-  max-height: 800px;
+  max-height: 750px;
   overflow-y: auto;
-  border-radius: 6px;
+  border-radius: 5px;
   background: white;
-  box-shadow: 0 2px 10px rgba(255, 152, 0, 0.15);
+  box-shadow: 0 1px 8px rgba(255, 152, 0, 0.12);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
 th, td {
-  padding: 18px;
+  padding: 12px 8px;
   border-bottom: 1px solid #f0e0d0;
   text-align: center;
+  font-size: 0.85rem;
 }
 
 th {
@@ -121,7 +124,7 @@ th {
 }
 
 td img {
-  width: 50px;
+  width: 40px;
   transition: transform 0.3s ease;
   cursor: pointer;
   border-radius: 4px;
@@ -129,8 +132,40 @@ td img {
 
 td img:hover {
   transform: scale(1.2);
-  box-shadow: 0 4px 12px rgba(255, 138, 0, 0.4);
+  box-shadow: 0 3px 10px rgba(255, 138, 0, 0.4);
 }
+
+/* RESPONSIVE */
+@media screen and (max-width: 1150px) {
+  .main-container {
+    flex-direction: column;
+  }
+
+  .form-container {
+    width: 100%;
+    max-height: none;
+    border-right: none;
+    border-bottom: 2px solid #ffa726;
+  }
+
+  .table-container {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  th, td {
+    font-size: 0.8rem;
+    padding: 10px;
+  }
+
+  td img {
+    width: 35px;
+  }
+}
+
+/* ANIMACIONES Y MODAL (sin cambios necesarios) */
+/* Mantén las animaciones y modal como en tu versión original */
+
 
 /* MODAL DE IMAGEN */
 .modal {
