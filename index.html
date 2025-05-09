@@ -34,13 +34,13 @@
         <label for="chofer">Chofer:</label>
         <input type="text" id="chofer" name="chofer" required />
 
-        <label for="separacion_lateral">Separación Lateral (cm):</label>
-        <input type="number" id="separacion_lateral" name="separacion_lateral" required />
+        <!--<label for="separacion_lateral">Separación Central (cm):</label>
+        <input type="number" id="separacion_lateral" name="separacion_lateral" required />-->
 
-        <label for="separacion_central">Separación Central (cm):</label>
+        <label for="separacion_central">Separación Lateral Central (cm):</label>
         <input type="number" id="separacion_central" name="separacion_central" required />
 
-        <label for="altura_mampara">Separación Altura (cm):</label>
+        <label for="altura_mampara">Altura de Mampara(cm):</label>
         <input type="number" id="altura_mampara" name="altura_mampara" required />
 
         <!--ID DE FOTOS -->
@@ -48,15 +48,18 @@
         <label for="foto_unidad">Foto Panoramica de Unidad:</label>
         <input type="file" id="foto_unidad" name="foto_unidad" accept="image/*" required />
 
-        <label for="medida_lateral">Foto Lateral:</label>
-        <input type="file" id="medida_lateral" name="medida_lateral" accept="image/*" required />
-
-        <label for="medida_altura">Foto Altura:</label>
+        <label for="medida_altura">Foto Altura de Mampara:</label>
         <input type="file" id="medida_altura" name="medida_altura" accept="image/*" required />
 
-        <label for="medida_central">Foto Central:</label>
+        <label for="medida_central">Foto Lateral Central:</label>
         <input type="file" id="medida_central" name="medida_central" accept="image/*" required />
 
+        <!--SCRIPTS SIN USO
+        
+        <label for="medida_lateral">Foto Lateral Central:</label>
+        <input type="file" id="medida_lateral" name="medida_lateral" accept="image/*" required />
+
+        -->
         <label for="observacion">Operación:</label>
         <select id="observacion" name="observacion" required>
           <option value="EMBARQUE">Embarque</option>
@@ -84,13 +87,11 @@
               <th>Empresa Transporte</th>
               <th>Placa</th>
               <th>Chofer</th>
-              <th>Lateral</th>
-              <th>Central</th>
+              <th>Lateral Central</th>
               <th>Altura</th>
               <th>Foto Unidad</th>
-              <th>Foto Lateral</th>
               <th>Foto Altura</th>
-              <th>Foto Central</th>
+              <th>Foto Lateral Central</th>
               <th>Operacion</th>
             </tr>
           </thead>
@@ -116,3 +117,4 @@
 
 </body>
 </html>
+  

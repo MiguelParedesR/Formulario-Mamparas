@@ -58,31 +58,36 @@ form.addEventListener('submit', async function (e) {
     empresa: document.getElementById('empresa').value.toUpperCase(),
     placa: document.getElementById('placa').value.toUpperCase(),
     chofer: document.getElementById('chofer').value.toUpperCase(),
-    separacion_lateral: parseFloat(document.getElementById('separacion_lateral').value),
+    /*separacion_lateral: parseFloat(document.getElementById('separacion_lateral').value),*/
     separacion_central: parseFloat(document.getElementById('separacion_central').value),
     altura_mampara: parseFloat(document.getElementById('altura_mampara').value),
     observacion: document.getElementById('observacion').value.toUpperCase(),
   };
+ /*********************************************************/
 
-  const unidad = document.getElementById('foto_unidad').files[0];
-  const lateral = document.getElementById('medida_lateral').files[0];
+  const unidad = document.getElementById('foto_unidad').files[0]; 
   const altura = document.getElementById('medida_altura').files[0];
   const central = document.getElementById('medida_central').files[0];
-
+  
+  /*SCRIPTS SIN USO DE CONST
+  const lateral = document.getElementById('medida_lateral').files[0];
+  */
+ /*********************************************************/
+ 
   datos.foto_unidad = await subirImagen('foto_unidad', unidad);
-  datos.medida_lateral = await subirImagen('lateral', lateral);
+  /*datos.medida_lateral = await subirImagen('lateral', lateral);*/
   datos.medida_altura = await subirImagen('altura', altura);
   datos.medida_central = await subirImagen('central', central);
 
-  if (!datos.foto_unidad||!datos.medida_lateral || !datos.medida_altura || !datos.medida_central) return;
-
+  if (!datos.foto_unidad|| !datos.medida_altura || !datos.medida_central) return;
+      
   const { error } = await supabase.from('registros').insert([datos]);
   if (error) return alert('Error: ' + error.message);
   mostrarModal('success', '✅ Registro guardado con éxito');
   form.reset();
   cargarRegistros();
 });
-
+// Función para cargar los registros en la tabla
 async function cargarRegistros(filtro = '') {
   const { data, error } = await supabase
     .from('registros')
@@ -91,7 +96,7 @@ async function cargarRegistros(filtro = '') {
     .order('created_at', { ascending: false });
 
   if (error) return alert('Error al cargar datos');
-
+  
   tabla.innerHTML = '';
   data.forEach(r => {
     const fila = document.createElement('tr');
@@ -102,11 +107,9 @@ async function cargarRegistros(filtro = '') {
       <td>${r.empresa}</td>
       <td>${r.placa}</td>
       <td>${r.chofer}</td>
-      <td>${r.separacion_lateral}</td>
       <td>${r.separacion_central}</td>
       <td>${r.altura_mampara}</td>
       <td><img src="${r.foto_unidad}" /></td>
-      <td><img src="${r.medida_lateral}" /></td>
       <td><img src="${r.medida_altura}" /></td>
       <td><img src="${r.medida_central}" /></td>
       <td>${r.observacion}</td>
@@ -114,14 +117,15 @@ async function cargarRegistros(filtro = '') {
     tabla.appendChild(fila);
   });
 }
-
+// Cargar registros al cargar la página
+// y agregar evento de búsqueda 
 document.addEventListener('DOMContentLoaded', () => cargarRegistros());
 
 searchInput.addEventListener('input', () => {
   const filtro = searchInput.value.toUpperCase();
   cargarRegistros(filtro);
 });
-
+// Función para mostrar el modal de feedback  
 function mostrarModal(tipo, mensaje) {
   const modal = document.getElementById('feedbackModal');
   const loader = document.getElementById('loadingAnimation');
@@ -142,12 +146,12 @@ function mostrarModal(tipo, mensaje) {
     modal.style.display = 'none';
   }, 5000);
 }
-
 // ✅ FUNCIONES PARA EXPORTACIÓN A EXCEL CON MINIATURAS
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('exportarExcel').addEventListener('click', exportarExcel);
 });
-
+// Función para exportar a Excel
+// y agregar imágenes en miniatura
 async function exportarExcel() {
   const { data, error } = await supabase.from('registros').select('*');
   if (error) {
@@ -166,7 +170,7 @@ async function exportarExcel() {
     { header: 'Placa', key: 'placa', width: 10 },
     { header: 'Chofer', key: 'chofer', width: 20 },
     { header: 'Foto Unidad ', key: 'foto_unidad', width: 15 },
-    { header: 'Medida Lateral', key: 'medida_lateral', width: 15 },
+    /*{ header: 'Medida Lateral', key: 'medida_lateral', width: 15 },*/
     { header: 'Medida Central', key: 'medida_central', width: 15 },
     { header: 'Medida Altura', key: 'medida_altura', width: 15 },
     { header: 'Observación', key: 'observacion', width: 30 },
@@ -183,13 +187,13 @@ async function exportarExcel() {
       placa: row.placa,
       chofer: row.chofer,
       foto_unidad: '',
-      medida_lateral: '',
+      /*medida_lateral: '',*/
       medida_central: '',
       medida_altura: '',
       observacion: row.observacion,
     });
 
-    const imageFields = ['foto_unidad', 'medida_lateral', 'medida_central', 'medida_altura'];
+    const imageFields = ['foto_unidad', 'medida_central', 'medida_altura'];
     for (const [imgIndex, field] of imageFields.entries()) {
       const imageUrl = row[field];
       if (imageUrl) {
@@ -215,7 +219,8 @@ async function exportarExcel() {
   link.download = 'registros_mamparas.xlsx';
   link.click();
 }
-
+// Función para convertir la imagen a base64
+// y agregarla a la hoja de Excel
 async function getImageBase64(url) {
   try {
     // Realizamos la solicitud de la imagen como un blob
@@ -240,6 +245,8 @@ async function getImageBase64(url) {
 }
 
 // Función auxiliar para convertir el ArrayBuffer en una cadena base64
+// Esta función convierte un ArrayBuffer en una cadena base64
+// que puede ser utilizada para incrustar imágenes en Excel
 function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
   let binary = '';

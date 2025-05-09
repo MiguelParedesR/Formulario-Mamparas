@@ -106,7 +106,7 @@ body {
   box-shadow: 0 1px 8px rgba(255, 152, 0, 0.12);
   position: relative; /* Necesario para el posicionamiento sticky */
 }
-
+/* Estilo de la tabla */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -143,13 +143,13 @@ td img {
   cursor: pointer;
   border-radius: 4px;
 }
-
+/* Efecto hover para las imágenes */
 td img:hover {
   transform: scale(1.2);
   box-shadow: 0 3px 10px rgba(255, 138, 0, 0.4);
 }
 
-
+/* Estilo de las filas alternas */
 /* RESPONSIVE */
 @media screen and (max-width: 1150px) {
   .main-container {
@@ -194,6 +194,7 @@ td img:hover {
   background-color: rgba(0, 0, 0, 0.85);
   align-items: center;
   justify-content: center;
+ 
 }
 
 .modal-content {
