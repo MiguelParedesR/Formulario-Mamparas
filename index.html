@@ -2,119 +2,32 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Formulario Mamparas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inicio - Sistema de Inspecciones</title>
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@1.0.16/dist/browser-image-compression.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.2.1/dist/exceljs.min.js"></script>
-  <script defer src="script.js" type="module"></script>
+  
 </head>
 <body>
-  <div class="main-container">
-    <!-- FORMULARIO -->
-    <div class="form-container">
-      <h2>Mamparas - Registro</h2>
-      <form id="formulario">
-        <label for="fecha">Fecha:</label>
-        <input type="date" id="fecha" name="fecha" required />
+  <button class="toggle-btn" id="toggleMenu">&#9776;</button>
 
-        <label for="hora">Hora:</label>
-        <input type="time" id="hora" name="hora" required />
-
-        <label for="operador">Operador de CCTV:</label>
-        <input type="text" id="operador" name="operador" required />
-
-        <label for="empresa">Empresa de Transporte:</label>
-        <input type="text" id="empresa" name="empresa" required />
-
-        <label for="placa">Placa:</label>
-        <input type="text" id="placa" name="placa" required />
-
-        <label for="chofer">Chofer:</label>
-        <input type="text" id="chofer" name="chofer" required />
-
-        <!--<label for="separacion_lateral">Separación Central (cm):</label>
-        <input type="number" id="separacion_lateral" name="separacion_lateral" required />-->
-
-        <label for="separacion_central">Separación Lateral Central (cm):</label>
-        <input type="number" id="separacion_central" name="separacion_central" required />
-
-        <label for="altura_mampara">Altura de Mampara(cm):</label>
-        <input type="number" id="altura_mampara" name="altura_mampara" required />
-
-        <!--ID DE FOTOS -->
-
-        <label for="foto_unidad">Foto Panoramica de Unidad:</label>
-        <input type="file" id="foto_unidad" name="foto_unidad" accept="image/*" required />
-
-        <label for="medida_altura">Foto Altura de Mampara:</label>
-        <input type="file" id="medida_altura" name="medida_altura" accept="image/*" required />
-
-        <label for="medida_central">Foto Lateral Central:</label>
-        <input type="file" id="medida_central" name="medida_central" accept="image/*" required />
-
-        <!--SCRIPTS SIN USO
-        
-        <label for="medida_lateral">Foto Lateral Central:</label>
-        <input type="file" id="medida_lateral" name="medida_lateral" accept="image/*" required />
-
-        -->
-        <label for="observacion">Operación:</label>
-        <select id="observacion" name="observacion" required>
-          <option value="EMBARQUE">Embarque</option>
-          <option value="DESCARGA">Descarga</option>
-        </select>
-
-        <button type="submit">Registrar</button>
-      </form>
-      <button id="exportarExcel" style="margin-bottom: 10px;">📥 Exportar a Excel</button>
-    </div>
-
-    <!-- BUSCADOR Y TABLA -->
-    <div class="records-container">
-      <div class="search-container">
-        <input type="text" id="searchInput" placeholder="BUSCAR POR PLACA (SIN ESPACIOS)" />
-        
-      </div>
-      <div class="table-container">
-        <table id="tabla-registros">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Operador CCTV</th>
-              <th>Empresa Transporte</th>
-              <th>Placa</th>
-              <th>Chofer</th>
-              <th>Lateral Central</th>
-              <th>Altura</th>
-              <th>Foto Unidad</th>
-              <th>Foto Altura</th>
-              <th>Foto Lateral Central</th>
-              <th>Operacion</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>    
+  <div class="sidebar" id="sidebar">
+    <a href="registro.html">📋 Registrar Inspección</a>
+    <a href="reportes.html">📈 Reportes</a>
+    <a href="registros.html">📑 Ver Registros</a>
   </div>
 
-  <!-- Modal -->
-  <div id="modal" class="modal">
-    <span id="closeModal" class="close">&times;</span>
-    <img class="modal-content" id="modalImage" />
+  <div class="main-content">
+    <h1>Bienvenido al Sistema de Inspecciones</h1>
+    <p>Utiliza el menú lateral para acceder a las funcionalidades disponibles.</p>
   </div>
-  
-  <!-- Modal de Proceso -->
-<div id="feedbackModal" class="feedback-modal">
-  <div class="feedback-content">
-    <div id="loadingAnimation" class="loader"></div>
-    <div id="feedbackMessage" class="message" style="display: none;"></div>
-  </div>
-</div>
 
+  <script>
+    const toggleBtn = document.getElementById('toggleMenu');
+    const sidebar = document.getElementById('sidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+    });
+  </script>
 </body>
 </html>
-  

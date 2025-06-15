@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reportes</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Botón de menú -->
+  <button class="toggle-btn" id="toggleMenu">&#9776;</button>
+
+  <!-- Menú lateral -->
+  <div class="sidebar" id="sidebar">
+    <a href="index.html">🏠 Inicio</a>
+    <a href="registro.html">📋 Registrar Inspección</a>
+    <a href="reportes.html" class="active">📈 Reportes</a>
+    <a href="registros.html">📑 Ver Registros</a>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-container">
+    <div class="form-container">
+      <h2>Generar Reportes</h2>
+      <form id="form-reportes">
+        <label for="mes">Seleccionar Mes:</label>
+        <input type="month" id="mes" name="mes" required>
+
+        <label for="operador">Seleccionar Operador:</label>
+        <select id="operador" name="operador" required>
+          <option value="">Todos</option>
+          <option value="Carlos Sanchez">Carlos Sanchez</option>
+          <option value="Francisco Elescano">Francisco Elescano</option>
+          <option value="Hernan Luna">Hernan Luna</option>
+          <option value="Roger Castro">Roger Castro</option>
+          <option value="Oscar Fernandez">Oscar Fernandez</option>
+          <option value="Miguel Paredes">Miguel Paredes</option>
+          <option value="David Echaccaya">David Echaccaya</option>
+          <option value="Juan Quelopana">Juan Quelopana</option>
+          <option value="Grover Munguia">Grover Munguia</option>
+          <option value="Ernesto Alfaro">Ernesto Alfaro</option>
+        </select>
+
+        <br>
+        <button type="submit">Exportar a Excel</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="js/reportes.js" type="module"></script>
+  <script>
+  const toggleBtn = document.getElementById('toggleMenu');
+  const sidebar = document.getElementById('sidebar');
+
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
+</script>
+    
+</body>
+</html>

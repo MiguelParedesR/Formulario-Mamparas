@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registrar Inspección</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<div id="modal" class="modal" style="display: none;">
+  <div class="modal-content" id="modal-content"></div>
+</div>
+
+<body>
+  <!-- Botón para colapsar/expandir menú -->
+  <button class="toggle-btn" id="toggleMenu">&#9776;</button>
+    
+  <!-- Menú lateral -->
+  <div class="sidebar" id="sidebar">
+    <a href="index.html">🏠 Inicio</a>
+    <a href="registro.html" class="active">📋 Registrar Inspección</a>
+    <a href="reportes.html">📈 Reportes</a>
+    <a href="registros.html">📑 Ver Registros</a>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-container">
+    <div class="form-container">
+      <h2>Registro de Inspección</h2>
+      <form id="form-inspeccion">
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" name="fecha" required>
+
+        <label for="hora">Hora:</label>
+        <input type="time" id="hora" name="hora" required>
+
+        <label for="empresa">Empresa:</label>
+        <input type="text" id="empresa" name="empresa" required>
+
+        <label for="placa">Placa:</label>
+        <input type="text" id="placa" name="placa" required>
+
+        <label for="chofer">Chofer:</label>
+        <input type="text" id="chofer" name="chofer" required>
+
+        <label for="lugar">Lugar:</label>
+        <select id="lugar" name="lugar" required>
+          <option value="">Seleccione</option>
+          <option value="Tracciones">Tracciones</option>
+          <option value="Calle">Calle</option>
+        </select>
+
+        <label for="incorreccion">Tipo de incorrección:</label>
+        <select id="incorreccion" name="incorreccion" required>
+          <option value="">Seleccione</option>
+          <option value="Mampara">Mampara</option>
+          <option value="Cola de Pato">Cola de Pato</option>
+          <option value="Pernos">Pernos</option>
+          <option value="Otros">Otros</option>
+        </select>
+
+        <label for="responsable">Responsable:</label>
+        <select id="responsable" name="responsable" required>
+          <option value="">Seleccione</option>
+          <option value="Carlos Sanchez">Carlos Sanchez</option>
+          <option value="Francisco Elescano">Francisco Elescano</option>
+          <option value="Hernan Luna">Hernan Luna</option>
+          <option value="Roger Castro">Roger Castro</option>
+          <option value="Oscar Fernandez">Oscar Fernandez</option>
+          <option value="Miguel Paredes">Miguel Paredes</option>
+          <option value="David Echaccaya">David Echaccaya</option>
+          <option value="Juan Quelopana">Juan Quelopana</option>
+          <option value="Grover Munguia">Grover Munguia</option>
+          <option value="Ernesto Alfaro">Ernesto Alfaro</option>
+        </select>
+
+        <label for="observaciones">Observaciones:</label>
+        <select id="observaciones" name="observaciones" required>
+          <option value="">Seleccione</option>
+          <option value="Descarga">Descarga</option>
+          <option value="Embarque">Embarque</option>
+          <option value="Otros">Otros</option>
+        </select>
+
+        <input type="hidden" id="detalle" name="detalle" />
+        <button type="button" id="btnAgregarDetalle" style="display:none;">Agregar Detalle</button>
+
+
+        <br><br>
+        <button type="submit">Registrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Detalle -->
+  <div class="detalle-modal" id="detalleModal">
+    <div class="detalle-modal-content">
+      <h3>Detalle de la Incorrección</h3>
+<div id="contenidoDetalle" class="detalle-editable"></div>
+      <br>
+      <button id="btnGuardarDetalle">Guardar Detalle</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/registros.js" type="module"></script>
+  <script type="module" src="script.js"></script>
+  <script>
+  const toggleBtn = document.getElementById('toggleMenu');
+  const sidebar = document.getElementById('sidebar');
+
+  toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
+</script>
+    
+</body>
+</html>
