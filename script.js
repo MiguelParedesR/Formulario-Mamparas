@@ -1,4 +1,4 @@
-// script.js actualizado con guardado correcto de campos
+// script.js corregido con guardado adecuado de imágenes
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -96,23 +96,27 @@ export async function guardarInspeccion(datosFormulario, detalleJSON) {
     medida_central: '',
     altura_mampara: '',
     foto_unidad: '',
-    foto_observacion: ''
+    foto_observacion: '',
+    foto_lateral: ''
   };
 
   if (detalleJSON?.tipo === 'Mampara') {
-    registro.separacion_central = detalleJSON.separacion || '';
-    registro.medida_altura = detalleJSON.altura || '';
-    registro.altura_mampara = detalleJSON.altura || '';
-    registro.foto_unidad = detalleJSON.fotoPanoramica || '';
-    registro.medida_central = detalleJSON.separacion || '';
+    registro.separacion_central = detalleJSON.separacion_lateral_central || '';
+    registro.medida_central = detalleJSON.separacion_lateral_central || '';
+    registro.altura_mampara = detalleJSON.altura_mampara || '';
+    registro.medida_altura = detalleJSON.altura_mampara || '';
+
+    registro.foto_unidad = detalleJSON.foto_panoramica_unidad || '';
+    registro.foto_observacion = detalleJSON.foto_altura_mampara || '';
+    registro.foto_lateral = detalleJSON.foto_lateral_central || '';
   }
 
-  if (detalleJSON?.observacion) {
-    registro.observaciones = detalleJSON.observacion;
+  if (detalleJSON?.observacion_texto) {
+    registro.observaciones = detalleJSON.observacion_texto;
   }
 
-  if (detalleJSON?.fotoObservacion) {
-    registro.foto_observacion = detalleJSON.fotoObservacion;
+  if (detalleJSON?.foto_observacion) {
+    registro.foto_observacion = detalleJSON.foto_observacion;
   }
 
   const { error } = await supabase.from('inspecciones').insert([registro]);

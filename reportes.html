@@ -48,8 +48,12 @@
   </div>
 
   <!-- Scripts -->
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="js/reportes.js" type="module"></script>
+   <!-- Primero las bibliotecas externas -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- Luego tu script que las usa -->
+     <script type="module" src="js/reportes.js"></script>
+
   <script>
   const toggleBtn = document.getElementById('toggleMenu');
   const sidebar = document.getElementById('sidebar');
