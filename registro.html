@@ -4,22 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registrar Inspección</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="CSS/styles.css" />
 </head>
-<div id="modal" class="modal" style="display: none;">
-  <div class="modal-content" id="modal-content"></div>
-</div>
+ 
 
 <body>
-  <!-- Botón para colapsar/expandir menú -->
-  <button class="toggle-btn" id="toggleMenu">&#9776;</button>
-    
-  <!-- Menú lateral -->
+<!-- Navbar móvil -->
+  <header class="responsive-header">
+    <button class="toggle-btn" id="toggleMenu">&#9776;</button>
+    <nav class="mobile-nav" id="mobileNav">
+      <a href="index.html">🏠 Inicio</a>
+      <a href="registro.html">📋 Registrar Inspección</a>
+      <a href="reportes.html">📈 Reportes</a>
+      <a href="registros.html" class="active">📑 Ver Registros</a>
+    </nav>
+  </header>
+
+  <!-- Sidebar escritorio -->
   <div class="sidebar" id="sidebar">
     <a href="index.html">🏠 Inicio</a>
-    <a href="registro.html" class="active">📋 Registrar Inspección</a>
+    <a href="registro.html">📋 Registrar Inspección</a>
     <a href="reportes.html">📈 Reportes</a>
-    <a href="registros.html">📑 Ver Registros</a>
+    <a href="registros.html" class="active">📑 Ver Registros</a>
   </div>
 
   <!-- Contenido principal -->

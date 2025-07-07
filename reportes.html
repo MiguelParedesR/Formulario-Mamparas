@@ -4,26 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Reportes</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="CSS/styles.css" />
 </head>
 <body>
-  <!-- Botón de menú -->
-  <button class="toggle-btn" id="toggleMenu">&#9776;</button>
+  <!-- Navbar móvil -->
+  <header class="responsive-header">
+    <button class="toggle-btn" id="toggleMenu">&#9776;</button>
+    <nav class="mobile-nav" id="mobileNav">
+      <a href="index.html">🏠 Inicio</a>
+      <a href="registro.html">📋 Registrar Inspección</a>
+      <a href="reportes.html" class="active">📈 Reportes</a>
+      <a href="registros.html">📑 Ver Registros</a>
+    </nav>
+  </header>
 
-  <!-- Menú lateral -->
+  <!-- Sidebar para escritorio -->
   <div class="sidebar" id="sidebar">
     <a href="index.html">🏠 Inicio</a>
     <a href="registro.html">📋 Registrar Inspección</a>
     <a href="reportes.html" class="active">📈 Reportes</a>
     <a href="registros.html">📑 Ver Registros</a>
   </div>
-<!-- Modal de feedback -->
-<div id="feedbackModal" class="modal">
-  <div class="modal-content">
-    <div id="loadingAnimation" class="loader"></div>
-    <p id="feedbackMessage" class="message"></p>
+
+  <!-- Modal de feedback -->
+  <div id="feedbackModal" class="modal">
+    <div class="modal-content">
+      <div id="loadingAnimation" class="loader"></div>
+      <p id="feedbackMessage" class="message"></p>
+    </div>
   </div>
-</div>
 
   <!-- Contenido principal -->
   <div class="main-container">
@@ -55,20 +64,17 @@
   </div>
 
   <!-- Scripts -->
-   <!-- Primero las bibliotecas externas -->
-    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <!-- Luego tu script que las usa -->
-     <script type="module" src="js/reportes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script type="module" src="js/reportes.js"></script>
 
   <script>
-  const toggleBtn = document.getElementById('toggleMenu');
-  const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleMenu');
+    const mobileNav = document.getElementById('mobileNav');
 
-  toggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-  });
-</script>
-    
+    toggleBtn.addEventListener('click', () => {
+      mobileNav.classList.toggle('show');
+    });
+  </script>
 </body>
 </html>
