@@ -55,25 +55,26 @@ window.mostrarDetalle = function (detalle) {
     contenido.innerHTML = `
       <table class="detalle-tabla">
         <tr><th>Tipo</th><td>${detalle.tipo}</td></tr>
-        <tr><th>Separación Lateral Central</th><td>${detalle.separacion_lateral_central || '—'} cm</td></tr>
-        <tr><th>Altura de Mampara</th><td>${detalle.altura_mampara || '—'} cm</td></tr>
-        <tr><th>Foto Panorámica</th><td>${detalle.foto_panoramica_unidad ? `<img src="${detalle.foto_panoramica_unidad}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_panoramica_unidad}')">` : '—'}</td></tr>
-        <tr><th>Foto Altura</th><td>${detalle.foto_altura_mampara ? `<img src="${detalle.foto_altura_mampara}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_altura_mampara}')">` : '—'}</td></tr>
-        <tr><th>Foto Lateral</th><td>${detalle.foto_lateral_central ? `<img src="${detalle.foto_lateral_central}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_lateral_central}')">` : '—'}</td></tr>
+        <tr><th>Separación Lateral Central</th><td>${detalle.separacion} cm</td></tr>
+        <tr><th>Altura de Mampara</th><td>${detalle.altura} cm</td></tr>
+        <tr><th>Foto Panorámica</th><td><img src="${detalle.fotoPanoramica}" class="miniatura" onclick="verImagenAmpliada('${detalle.fotoPanoramica}')"></td></tr>
+        <tr><th>Foto Altura</th><td><img src="${detalle.fotoAltura}" class="miniatura" onclick="verImagenAmpliada('${detalle.fotoAltura}')"></td></tr>
+        <tr><th>Foto Lateral</th><td><img src="${detalle.fotoLateral}" class="miniatura" onclick="verImagenAmpliada('${detalle.fotoLateral}')"></td></tr>
       </table>
     `;
   }  else {
     contenido.innerHTML = `
       <table class="detalle-tabla">
         <tr><th>Tipo</th><td>${detalle.tipo}</td></tr>
-        <tr><th>Observación</th><td>${detalle.observacion_texto || '—'}</td></tr>
-        <tr><th>Foto</th><td>${detalle.foto_observacion ? `<img src="${detalle.foto_observacion}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_observacion}')">` : '—'}</td></tr>
+        <tr><th>Observación</th><td>${detalle.observacion || '—'}</td></tr>
+        <tr><th>Foto</th><td>${detalle.fotoObservacion ? `<img src="${detalle.fotoObservacion}" class="miniatura" onclick="verImagenAmpliada('${detalle.fotoObservacion}')">` : '—'}</td></tr>
       </table>
     `;
   }
 
   modal.style.display = 'flex';
 };
+
 
 window.verImagenAmpliada = function (url) {
   const ampliado = document.createElement('div');
@@ -100,3 +101,17 @@ window.ampliarImagen = function (url) {
 window.cerrarImagen = function () {
   document.getElementById('imagenAmpliada').style.display = 'none';
 };
+document.getElementById("buscarPlaca").addEventListener("input", function () {
+  const filtro = this.value.toUpperCase();
+  const filas = document.querySelectorAll("#tabla-registros tbody tr");
+
+  filas.forEach(fila => {
+    const celdaPlaca = fila.cells[3]; // 4ta columna = Placa
+    if (celdaPlaca && celdaPlaca.textContent.toUpperCase().includes(filtro)) {
+      fila.style.display = "";
+    } else {
+      fila.style.display = "none";
+    }
+  });
+});
+    

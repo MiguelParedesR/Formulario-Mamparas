@@ -73,16 +73,18 @@ body {
 
 .toggle-btn {
   position: fixed;
-  top: 10px;
-  left: 10px;
-  background-color: #ffa726;
+  top: 20px;
+  left: 20px;
+  background-color: #fb8c00;
   color: white;
   border: none;
-  padding: 8px;
-  border-radius: 5px;
-  z-index: 200;
+  padding: 10px 12px;
+  border-radius: 50%;
+  z-index: 201;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(255, 138, 0, 0.4);
 }
+
 
 /* ===========================
    FORMULARIO
@@ -407,3 +409,178 @@ body {
         margin-left: 20px;
       }
     }
+    /******************/
+/* Estilos para el modal de confirmacion boton Guardar Detalle*/
+.feedback-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-inner {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 250px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+.message.success {
+  color: green;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.message.error {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* NUEVOS ESTILOS PARA LA TABLA Y CUADRO DE BUSQUEDA */ 
+/* Estilo del buscador */
+.search-bar {
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+.search-bar input {
+  padding: 8px 15px;
+  width: 300px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  text-transform: uppercase;
+}
+
+/* Tabla estilizada */
+.table-wrapper {
+  overflow-y: auto;
+  max-height: 500px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.styled-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #ff510c;
+  color: #fff;
+  z-index: 10;
+}
+
+.styled-table th, .styled-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.styled-table tbody tr:hover {
+  background-color: #f2f2f2;
+  transition: background-color 0.3s;
+}
+
+/* Botón cerrar modal */
+.detalle-modal-content button {
+  padding: 10px 20px;
+  background-color: #ff9b05;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.detalle-modal-content button:hover {
+  background-color: #cc4100;
+}
+/*************RESPONSIVE STYLES FOR TABLE AND SEARCH BAR */
+/* Diseño general responsivo */
+ 
+
+/* Main container adaptativo */
+.main-container {
+  padding: 20px;
+  margin-left: 220px;
+  transition: margin-left 0.3s;
+}
+ 
+.styled-table {
+  width: 100%;
+  min-width: 900px; /* Ancho mínimo para scroll en móviles */
+  border-collapse: collapse;
+  font-size: 14px;
+  background-color: white;
+}
+ 
+/* MEDIA QUERIES PARA RESPONSIVIDAD */
+@media screen and (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 220px;
+    height: 100vh;
+    padding-top: 60px;
+    background-color: #fff5e6;
+    border-right: 2px solid #ffa726;
+    box-shadow: 2px 0 6px rgba(255, 138, 0, 0.15);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 200;
+  }
+
+  .sidebar.show {
+    transform: translateX(0);
+  }
+
+  .main-container {
+    margin-left: 0;
+  }
+
+  .toggle-btn {
+    display: block;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 201;
+  }
+
+
+  .styled-table {
+    font-size: 12px;
+    min-width: unset;
+  }
+
+  .table-wrapper {
+    max-height: 400px;
+  }
+}

@@ -27,14 +27,38 @@
     <div class="form-container">
       <h2>Registro de Inspección</h2>
       <form id="form-inspeccion">
-        <label for="fecha">Fecha:</label>
-        <input type="date" id="fecha" name="fecha" required>
+        <input type="date" id="fecha" name="fecha" required readonly>
+<input type="time" id="hora" name="hora" required readonly>
 
-        <label for="hora">Hora:</label>
-        <input type="time" id="hora" name="hora" required>
 
-        <label for="empresa">Empresa:</label>
-        <input type="text" id="empresa" name="empresa" required>
+    <label for="empresa">Empresa:</label>
+<select id="empresa" name="empresa" required>
+  <option value="">Seleccione</option>
+    <option value="otra">AGREGAR OTRA EMPRESA</option>
+  <option value="RYM">RYM</option>
+  <option value="TURICAR">TURICAR</option>
+  <option value="BUEN DIA">BUEN DIA</option>
+  <option value="HUARIJIRCA">HUARIJIRCA</option>
+  <option value="TEAL">TEAL</option>
+  <option value="BRANDOM">BRANDOM</option>
+  <option value="DIOS DA">DIOS DA</option>
+  <option value="KAREL">KAREL</option>
+  <option value="MALEJA">MALEJA</option>
+  <option value="MOTRIL">MOTRIL</option>
+  <option value="JK SALAS">JK SALAS</option>
+  <option value="TATTUS TRUCK">TATTUS TRUCK</option>
+  <option value="PR HERMANOS">PR HERMANOS</option>
+  <option value="SCARAMUTTI">SCARAMUTTI</option>
+  <option value="GM">GM</option>
+  <option value="TILOPSAC">TILOPSAC</option>
+  <option value="CHUCAS CARGO">CHUCAS CARGO</option>
+  <option value="V&B">V&B</option>
+  <option value="GAMARRA BERRENECHEA">GAMARRA BERRENECHEA</option>
+</select>
+
+<!-- Campo de texto que aparecerá si se selecciona "Otra empresa" -->
+<input type="text" id="nueva_empresa" name="nueva_empresa" placeholder="Ingresa el nombre de la empresa" style="display: none;" />
+
 
         <label for="placa">Placa:</label>
         <input type="text" id="placa" name="placa" required>
@@ -100,6 +124,13 @@
       <button id="btnGuardarDetalle">Guardar Detalle</button>
     </div>
   </div>
+<!-- Modal de retroalimentación -->
+<div id="feedbackModal" class="feedback-modal" style="display: none;">
+  <div class="modal-inner">
+    <div id="loadingAnimation" class="loader"></div>
+    <p id="feedbackMessage" class="message"></p>
+  </div>
+</div>
 
   <!-- Scripts -->
   <script src="js/registros.js" type="module"></script>

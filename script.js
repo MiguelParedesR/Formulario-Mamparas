@@ -1,4 +1,4 @@
-// script.js corregido con guardado adecuado de imágenes
+// script.js actualizado con guardado correcto de campos
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -80,6 +80,16 @@ function arrayBufferToBase64(buffer) {
 
 // Función para guardar inspección correctamente
 export async function guardarInspeccion(datosFormulario, detalleJSON) {
+  // Validación y conversión de campos numéricos
+  if (detalleJSON?.tipo === 'Mampara') {
+    detalleJSON.separacion_lateral_central = detalleJSON.separacion_lateral_central
+      ? parseFloat(detalleJSON.separacion_lateral_central)
+      : null;
+    detalleJSON.altura_mampara = detalleJSON.altura_mampara
+      ? parseFloat(detalleJSON.altura_mampara)
+      : null;
+  }
+
   const registro = {
     fecha: datosFormulario.fecha,
     hora: datosFormulario.hora,
@@ -96,27 +106,23 @@ export async function guardarInspeccion(datosFormulario, detalleJSON) {
     medida_central: '',
     altura_mampara: '',
     foto_unidad: '',
-    foto_observacion: '',
-    foto_lateral: ''
+    foto_observacion: ''
   };
 
   if (detalleJSON?.tipo === 'Mampara') {
-    registro.separacion_central = detalleJSON.separacion_lateral_central || '';
-    registro.medida_central = detalleJSON.separacion_lateral_central || '';
-    registro.altura_mampara = detalleJSON.altura_mampara || '';
-    registro.medida_altura = detalleJSON.altura_mampara || '';
-
-    registro.foto_unidad = detalleJSON.foto_panoramica_unidad || '';
-    registro.foto_observacion = detalleJSON.foto_altura_mampara || '';
-    registro.foto_lateral = detalleJSON.foto_lateral_central || '';
+    registro.separacion_central = detalleJSON.separacion || '';
+    registro.medida_altura = detalleJSON.altura || '';
+    registro.altura_mampara = detalleJSON.altura || '';
+    registro.foto_unidad = detalleJSON.fotoPanoramica || '';
+    registro.medida_central = detalleJSON.separacion || '';
   }
 
-  if (detalleJSON?.observacion_texto) {
-    registro.observaciones = detalleJSON.observacion_texto;
+  if (detalleJSON?.observacion) {
+    registro.observaciones = detalleJSON.observacion;
   }
 
-  if (detalleJSON?.foto_observacion) {
-    registro.foto_observacion = detalleJSON.foto_observacion;
+  if (detalleJSON?.fotoObservacion) {
+    registro.foto_observacion = detalleJSON.fotoObservacion;
   }
 
   const { error } = await supabase.from('inspecciones').insert([registro]);
