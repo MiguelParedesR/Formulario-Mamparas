@@ -7,38 +7,36 @@
   <link rel="stylesheet" href="CSS/styles.css" />
 </head>
 <body>
-<!-- Navbar móvil -->
-  <header class="responsive-header">
-    <button class="toggle-btn" id="toggleMenu">&#9776;</button>
-    <nav class="mobile-nav" id="mobileNav">
-      <a href="index.html">🏠 Inicio</a>
-      <a href="registro.html">📋 Registrar Inspección</a>
-      <a href="reportes.html">📈 Reportes</a>
-      <a href="registros.html" class="active">📑 Ver Registros</a>
-    </nav>
-  </header>
+<!-- Botón para colapsar el menú (desktop y responsive) -->
+<button class="toggle-btn">☰</button>
 
-  <!-- Sidebar escritorio -->
-  <div class="sidebar" id="sidebar">
-    <a href="index.html">🏠 Inicio</a>
-    <a href="registro.html">📋 Registrar Inspección</a>
-    <a href="reportes.html">📈 Reportes</a>
-    <a href="registros.html" class="active">📑 Ver Registros</a>
-  </div>
+<!-- Sidebar para escritorio -->
+<div class="sidebar">
+  <a href="index.html">🏠 Inicio</a>
+  <a href="registro.html">📝 Registro</a>
+  <a href="reportes.html">📊 Reportes</a>
+  <a href="registros.html">📋 Registros</a>
+</div>
+
+<!-- Header responsive (solo en móviles) -->
+<div class="responsive-header">
+  <button class="toggle-btn">☰</button>
+</div>
+
+<!-- Menú lateral responsive (se muestra al hacer clic en ☰ en móviles) -->
+<div class="mobile-nav">
+  <a href="index.html">🏠 Inicio</a>
+  <a href="registro.html">📝 Registro</a>
+  <a href="reportes.html">📊 Reportes</a>
+  <a href="registros.html">📋 Registros</a>
+</div>
+
+  <script src="js/sidebar.js"></script>
 
   <!-- Contenido principal -->
   <div class="main-container">
     <h1>Bienvenido al Sistema de Inspecciones</h1>
     <p>Utiliza el menú lateral o superior para acceder a las funcionalidades disponibles.</p>
   </div>
-
-  <!-- Script para alternar menú móvil -->
-  <script>
-    const toggleBtn = document.getElementById('toggleMenu');
-    const mobileNav = document.getElementById('mobileNav');
-    toggleBtn.addEventListener('click', () => {
-      mobileNav.classList.toggle('show');
-    });
-  </script>
 </body>
 </html>
