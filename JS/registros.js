@@ -252,7 +252,7 @@ form.addEventListener('submit', async (e) => {
     form.reset();
     inputDetalle.value = '';
     contenidoDetalle.innerHTML = '';
-    mostrarModal('success', '✅ Registro exitoso');
+    mostrarModal('success', '✅ Registro exitoso, gracias por tu inspeccion!');
   } catch (err) {
     console.error(err);
     mostrarModal('error', '❌ Error inesperado al guardar.');
