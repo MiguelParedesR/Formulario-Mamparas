@@ -91,28 +91,23 @@ export async function guardarInspeccion(datosFormulario, detalleJSON) {
     incorreccion: datosFormulario.incorreccion,
     observaciones: datosFormulario.observaciones,
     detalle: detalleJSON,
-    separacion_central: '',
-    medida_altura: '',
-    medida_central: '',
-    altura_mampara: '',
-    foto_unidad: '',
-    foto_observacion: ''
+    separacion_central: null,
+    medida_altura: null,
+    medida_central: null,
+    altura_mampara: null,
+    foto_unidad: null,
+    foto_observacion: null
   };
 
   if (detalleJSON?.tipo === 'Mampara') {
-    registro.separacion_central = detalleJSON.separacion || '';
-    registro.medida_altura = detalleJSON.altura || '';
-    registro.altura_mampara = detalleJSON.altura || '';
-    registro.foto_unidad = detalleJSON.fotoPanoramica || '';
-    registro.medida_central = detalleJSON.separacion || '';
-  }
-
-  if (detalleJSON?.observacion) {
-    registro.observaciones = detalleJSON.observacion;
-  }
-
-  if (detalleJSON?.fotoObservacion) {
-    registro.foto_observacion = detalleJSON.fotoObservacion;
+    registro.separacion_central = detalleJSON.separacion_lateral_central || null;
+    registro.medida_central = detalleJSON.foto_lateral_central || null;
+    registro.altura_mampara = detalleJSON.altura_mampara || null;
+    registro.medida_altura = detalleJSON.foto_altura_mampara || null;
+    registro.foto_unidad = detalleJSON.foto_panoramica_unidad || null;
+  } else if (detalleJSON?.tipo === 'Otro') {
+    registro.observaciones = detalleJSON.observacion_texto || null;
+    registro.foto_observacion = detalleJSON.foto_observacion || null;
   }
 
   const { error } = await supabase.from('inspecciones').insert([registro]);
