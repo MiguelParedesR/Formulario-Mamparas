@@ -80,16 +80,6 @@ function arrayBufferToBase64(buffer) {
 
 // Función para guardar inspección correctamente
 export async function guardarInspeccion(datosFormulario, detalleJSON) {
-  // Validación y conversión de campos numéricos
-  if (detalleJSON?.tipo === 'Mampara') {
-    detalleJSON.separacion_lateral_central = detalleJSON.separacion_lateral_central
-      ? parseFloat(detalleJSON.separacion_lateral_central)
-      : null;
-    detalleJSON.altura_mampara = detalleJSON.altura_mampara
-      ? parseFloat(detalleJSON.altura_mampara)
-      : null;
-  }
-
   const registro = {
     fecha: datosFormulario.fecha,
     hora: datosFormulario.hora,

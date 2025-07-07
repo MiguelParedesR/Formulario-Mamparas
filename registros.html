@@ -72,12 +72,12 @@
 
   <!-- SCRIPTS -->
   <script src="js/verRegistros.js" type="module"></script>
-   <script>
+  <script>
     const toggleBtn = document.getElementById('toggleMenu');
     const sidebar = document.getElementById('sidebar');
 
     toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('show');
+      sidebar.classList.toggle('collapsed');
     });
 
     function cerrarDetalle() {
