@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="CSS/styles.css" />
 </head>
 <body>
-
 <!-- Navbar móvil -->
   <header class="responsive-header">
     <button class="toggle-btn" id="toggleMenu">&#9776;</button>
@@ -86,6 +85,8 @@
 
     toggleBtn.addEventListener('click', () => {
       sidebar.classList.toggle('collapsed');
+            mobileNav.classList.toggle('show');
+
     });
 
     function cerrarDetalle() {
@@ -101,6 +102,6 @@
       document.getElementById('imagenAmpliada').style.display = 'none';
     }
   </script>
-
+  
 </body>
 </html>
