@@ -47,7 +47,7 @@ body {
   height: 100%;
   z-index: 100;
   overflow-x: hidden;
-  transition: width 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
 }
 
 .sidebar.collapsed {
@@ -84,7 +84,6 @@ body {
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(255, 138, 0, 0.4);
 }
-
 
 /* ===========================
    FORMULARIO
@@ -126,7 +125,6 @@ body {
   border-radius: 5px;
 }
 
-/* Botón de formulario */
 .form-container button {
   background-color: #fb8c00;
   color: white;
@@ -161,7 +159,6 @@ body {
   align-items: center;
 }
 
-
 .detalle-modal-content {
   background-color: #fff;
   padding: 30px 25px;
@@ -190,6 +187,7 @@ body {
   text-align: left;
   border-bottom: 1px solid #ccc;
 }
+
 .detalle-modal-content button {
   display: block;
   width: 100%;
@@ -205,10 +203,12 @@ body {
 .detalle-modal-content button:hover {
   background-color: #e65c00;
 }
+
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
 }
+
 /* ===========================
    ESTILO CAMPOS DETALLE MODAL
 =========================== */
@@ -323,24 +323,37 @@ body {
 }
 
 /* ===========================
-   RESPONSIVE
+   RESPONSIVE: SIDEBAR y MOBILE
 =========================== */
-@media screen and (max-width: 1150px) {
-  .main-container {
-    margin-left: 0;
-    flex-direction: column;
+@media screen and (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    position: fixed;
+    width: 220px;
+    height: 100vh;
+    background-color: #fff5e6;
+    padding-top: 60px;
+    z-index: 200;
+    transition: transform 0.3s ease-in-out;
+    border-right: 2px solid #ffa726;
+    box-shadow: 2px 0 6px rgba(255, 138, 0, 0.15);
   }
 
-  .sidebar {
-    position: relative;
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    justify-content: space-around;
+  .sidebar.show {
+    transform: translateX(0);
   }
 
   .toggle-btn {
-    display: none;
+    display: block;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 201;
+  }
+
+  .main-container {
+    margin-left: 0;
+    flex-direction: column;
   }
 
   .form-container {
@@ -348,69 +361,10 @@ body {
     border-top: 2px solid #ffa726;
   }
 }
-/* Estilos adicionales para el menú lateral */
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      height: 100vh;
-      width: 220px;
-      background-color: #fff5e6;
-      border-right: 2px solid #ffa726;
-      box-shadow: 2px 0 6px rgba(255, 138, 0, 0.15);
-      padding-top: 60px;
-      transition: transform 0.3s ease-in-out;
-      z-index: 100;
-    }
 
-    .sidebar.collapsed {
-      transform: translateX(-100%);
-    }
-
-    .sidebar a {
-      display: block;
-      padding: 14px 20px;
-      color: #333;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
-
-    .sidebar a:hover {
-      background-color: #ffe0b2;
-    }
-
-    .toggle-btn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 101;
-      background-color: #fb8c00;
-      color: white;
-      border: none;
-      padding: 10px 12px;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(255, 138, 0, 0.4);
-    }
-
-    .main-content {
-      margin-left: 240px;
-      padding: 40px 20px;
-      transition: margin-left 0.3s ease-in-out;
-    }
-
-    .sidebar.collapsed ~ .main-content {
-      margin-left: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .main-content {
-        margin-left: 20px;
-      }
-    }
-    /******************/
-/* Estilos para el modal de confirmacion boton Guardar Detalle*/
+/* ===========================
+   FEEDBACK MODAL
+=========================== */
 .feedback-modal {
   position: fixed;
   top: 0; left: 0;
@@ -458,8 +412,9 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* NUEVOS ESTILOS PARA LA TABLA Y CUADRO DE BUSQUEDA */ 
-/* Estilo del buscador */
+/* ===========================
+   TABLAS Y BÚSQUEDA
+=========================== */
 .search-bar {
   margin-bottom: 10px;
   text-align: right;
@@ -474,7 +429,6 @@ body {
   text-transform: uppercase;
 }
 
-/* Tabla estilizada */
 .table-wrapper {
   overflow-y: auto;
   max-height: 500px;
@@ -485,6 +439,7 @@ body {
 
 .styled-table {
   width: 100%;
+  min-width: 900px;
   border-collapse: collapse;
   font-size: 13px;
   text-transform: uppercase;
@@ -509,7 +464,6 @@ body {
   transition: background-color 0.3s;
 }
 
-/* Botón cerrar modal */
 .detalle-modal-content button {
   padding: 10px 20px;
   background-color: #ff9b05;
@@ -521,66 +475,4 @@ body {
 
 .detalle-modal-content button:hover {
   background-color: #cc4100;
-}
-/*************RESPONSIVE STYLES FOR TABLE AND SEARCH BAR */
-/* Diseño general responsivo */
- 
-
-/* Main container adaptativo */
-.main-container {
-  padding: 20px;
-  margin-left: 220px;
-  transition: margin-left 0.3s;
-}
- 
-.styled-table {
-  width: 100%;
-  min-width: 900px; /* Ancho mínimo para scroll en móviles */
-  border-collapse: collapse;
-  font-size: 14px;
-  background-color: white;
-}
- 
-/* MEDIA QUERIES PARA RESPONSIVIDAD */
-@media screen and (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 220px;
-    height: 100vh;
-    padding-top: 60px;
-    background-color: #fff5e6;
-    border-right: 2px solid #ffa726;
-    box-shadow: 2px 0 6px rgba(255, 138, 0, 0.15);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-    z-index: 200;
-  }
-
-  .sidebar.show {
-    transform: translateX(0);
-  }
-
-  .main-container {
-    margin-left: 0;
-  }
-
-  .toggle-btn {
-    display: block;
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 201;
-  }
-
-
-  .styled-table {
-    font-size: 12px;
-    min-width: unset;
-  }
-
-  .table-wrapper {
-    max-height: 400px;
-  }
 }
