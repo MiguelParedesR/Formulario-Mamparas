@@ -5,7 +5,7 @@
 
 // 🔥 RUTAS DEFINITIVAS (basadas en tu estructura real)
 const SIDEBAR_HTML = "./html/base/sidebar.html"; // ahora desde el index sí funciona
-const SIDEBAR_JS = "./js/sidebar/sidebar.js";
+const SIDEBAR_JS = "/js/sidebar/sidebar.js";
 const SIDEBAR_CSS = "./css/estilos-sidebar/sidebar.css";
 
 const FONT_AWESOME =

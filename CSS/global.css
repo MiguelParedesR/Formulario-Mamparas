@@ -1,0 +1,70 @@
+/* ============================================================================
+   GLOBAL.CSS — FIXES CRÍTICOS PARA EL SPA + SIDEBAR TPP
+   ========================================================================= */
+
+/* Layout base */
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+/* Para que el SPA siempre pueda actualizar el DOM */
+#dashboardContent {
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+/* Estado cuando el sidebar está oculto en mobile */
+.sidebar-hidden #sidebar {
+    transform: translateX(-260px);
+}
+
+.sidebar-hidden #dashboardContent {
+    margin-left: 0 !important;
+}
+
+/* Botones */
+button {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Fix para enlaces del menú */
+.menu-link, .submenu-link {
+    cursor: pointer;
+}
+
+/* Evitar selección accidental al tocar */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Fix general de z-index */
+#sidebar {
+    z-index: 2000;
+}
+
+.sidebar-toggle-floating {
+    z-index: 3500 !important;
+}
+
+.sidebar-flyout {
+    z-index: 5000 !important;
+}
+
+/* Animaciones ligeras */
+.fade {
+    transition: opacity .2s ease;
+}
+
+/* Para prevenir que Tailwind arrastre estilos previos del navegador */
+img, svg {
+    display: block;
+    max-width: 100%;
+}
+
+/* Scroll suave para toda la app */
+html {
+    scroll-behavior: smooth;
+}
