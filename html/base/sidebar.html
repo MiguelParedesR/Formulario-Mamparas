@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title>Sidebar TPP</title>
 
-    <!-- CSS del Sidebar -->
+    <!-- CSS (lo inyecta el loader, pero no afecta tenerlo aquí también) -->
     <link rel="stylesheet" href="../../css/estilos-sidebar/sidebar.css">
 
     <!-- Iconos -->
@@ -16,7 +16,7 @@
 <body>
 
     <!-- ====================================================
-          TOGGLE UNIVERSAL FLOTANTE (solo cuando sidebar está oculto)
+          TOGGLE UNIVERSAL FLOTANTE (solo visible en móvil)
           ==================================================== -->
     <button id="sidebarUniversalToggle" class="sidebar-toggle-floating">
         <i class="fas fa-bars"></i>
@@ -27,31 +27,34 @@
           ==================================================== -->
     <nav id="sidebar" class="sidebar" aria-label="Sidebar principal">
 
-        <!-- LOGO + TOGGLE INTERNO -->
+        <!-- LOGO + TOGGLES -->
         <div class="logo">
             <span class="logo-text">TPP DASHBOARD</span>
 
-            <!-- Botón collapse desktop -->
-            <button id="collapseBtn" class="collapse-btn" aria-label="Colapsar menú">
+            <!-- Collapse desktop -->
+            <button id="collapseBtn" class="collapse-btn" aria-label="Colapsar">
                 <i class="fas fa-angle-left"></i>
             </button>
 
-            <!-- Toggle interno (visible SOLO cuando sidebar está abierto) -->
-            <button id="sidebarInternalToggle" class="sidebar-toggle-internal" aria-label="Cerrar sidebar">
+            <!-- Toggle interno móvil -->
+            <button id="sidebarInternalToggle" class="sidebar-toggle-internal" aria-label="Cerrar">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
 
+        <!-- ====================================================
+              MENÚ PRINCIPAL
+              ==================================================== -->
         <ul class="menu" role="menu">
 
             <!-- DASHBOARD -->
             <li>
-                <a class="menu-link" href="../../html/dashboard.html">
+                <a class="menu-link" href="./index.html">
                     <i class="fas fa-home"></i><span>Dashboard</span>
                 </a>
             </li>
 
-            <!-- INCIDENCIAS -->
+            <!-- ========================== INCIDENCIAS ========================== -->
             <li class="has-submenu">
                 <a class="menu-link" href="#">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -69,10 +72,9 @@
                         </a>
 
                         <ul class="submenu">
-                            <li><a class="submenu-link" href="../../html/formulario.html?tipo=CABLE">Nuevo informe</a>
-                            </li>
-                            <li><a class="submenu-link" href="../../html/registros.html?tipo=CABLE">Registros</a></li>
-                            <li><a class="submenu-link" href="../../html/ver-incidencia.html">Ver / Editar</a></li>
+                            <li><a class="submenu-link" href="./html/formulario.html?tipo=CABLE">Nuevo informe</a></li>
+                            <li><a class="submenu-link" href="./html/registros.html?tipo=CABLE">Registros</a></li>
+                            <li><a class="submenu-link" href="./html/ver-incidencia.html">Ver / Editar</a></li>
                         </ul>
                     </li>
 
@@ -84,11 +86,10 @@
                         </a>
 
                         <ul class="submenu">
-                            <li><a class="submenu-link" href="../../html/formulario.html?tipo=MERCADERIA">Nuevo
-                                    informe</a></li>
-                            <li><a class="submenu-link" href="../../html/registros.html?tipo=MERCADERIA">Registros</a>
+                            <li><a class="submenu-link" href="./html/formulario.html?tipo=MERCADERIA">Nuevo informe</a>
                             </li>
-                            <li><a class="submenu-link" href="../../html/ver-incidencia.html">Ver / Editar</a></li>
+                            <li><a class="submenu-link" href="./html/registros.html?tipo=MERCADERIA">Registros</a></li>
+                            <li><a class="submenu-link" href="./html/ver-incidencia.html">Ver / Editar</a></li>
                         </ul>
                     </li>
 
@@ -100,10 +101,9 @@
                         </a>
 
                         <ul class="submenu">
-                            <li><a class="submenu-link" href="../../html/formulario.html?tipo=CHOQUE">Nuevo informe</a>
-                            </li>
-                            <li><a class="submenu-link" href="../../html/registros.html?tipo=CHOQUE">Registros</a></li>
-                            <li><a class="submenu-link" href="../../html/ver-incidencia.html">Ver / Editar</a></li>
+                            <li><a class="submenu-link" href="./html/formulario.html?tipo=CHOQUE">Nuevo informe</a></li>
+                            <li><a class="submenu-link" href="./html/registros.html?tipo=CHOQUE">Registros</a></li>
+                            <li><a class="submenu-link" href="./html/ver-incidencia.html">Ver / Editar</a></li>
                         </ul>
                     </li>
 
@@ -115,33 +115,34 @@
                         </a>
 
                         <ul class="submenu">
-                            <li><a class="submenu-link" href="../../html/formulario.html?tipo=SINIESTRO">Nuevo
-                                    informe</a></li>
-                            <li><a class="submenu-link" href="../../html/registros.html?tipo=SINIESTRO">Registros</a>
+                            <li><a class="submenu-link" href="./html/formulario.html?tipo=SINIESTRO">Nuevo informe</a>
                             </li>
-                            <li><a class="submenu-link" href="../../html/ver-incidencia.html">Ver / Editar</a></li>
+                            <li><a class="submenu-link" href="./html/registros.html?tipo=SINIESTRO">Registros</a></li>
+                            <li><a class="submenu-link" href="./html/ver-incidencia.html">Ver / Editar</a></li>
                         </ul>
                     </li>
 
                 </ul>
             </li>
 
-            <!-- MAMPARAS -->
+            <!-- ========================== MAMPARAS ========================== -->
             <li class="has-submenu">
                 <a class="menu-link" href="#">
-                    <i class="fas fa-warehouse"></i><span>Mamparas</span><i class="fas arrow"></i>
+                    <i class="fas fa-warehouse"></i>
+                    <span>Mamparas</span>
+                    <i class="fas arrow"></i>
                 </a>
 
                 <ul class="submenu">
-                    <li><a class="submenu-link" href="../../html/mamparas.html">Registro</a></li>
-                    <li><a class="submenu-link" href="../../html/mamparas/reportes.html">Reportes</a></li>
-                    <li><a class="submenu-link" href="../../html/mamparas/registros.html">Registros</a></li>
+                    <li><a class="submenu-link" href="./html/mamparas.html">Registro</a></li>
+                    <li><a class="submenu-link" href="./html/mamparas/reportes.html">Reportes</a></li>
+                    <li><a class="submenu-link" href="./html/mamparas/registros.html">Registros</a></li>
                 </ul>
             </li>
 
             <!-- LOGIN -->
             <li>
-                <a class="menu-link" href="../../html/login-general/login.html">
+                <a class="menu-link" href="./html/login-general/login.html">
                     <i class="fas fa-sign-in-alt"></i><span>Login</span>
                 </a>
             </li>

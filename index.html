@@ -4,18 +4,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CCTV – Incidencias</title>
+  <title>TPP — Dashboard</title>
 
-  <!-- Tailwind CDN -->
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#2f3b52" />
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-  <!-- Sidebar CSS -->
+  <!-- Sidebar + Global -->
   <link rel="stylesheet" href="./css/estilos-sidebar/sidebar.css" />
   <link rel="stylesheet" href="./css/global.css" />
+
+  <!-- Dashboard CSS -->
+  <link rel="stylesheet" href="./css/dashboard/dashboard.css" />
 
   <style>
     body {
@@ -29,23 +36,132 @@
   <!-- SIDEBAR -->
   <div id="sidebar-container"></div>
 
-  <!-- CONTENIDO PRINCIPAL SPA -->
-  <main id="dashboardContent" class="pt-6 p-6 transition-all duration-300">
-    <p class="text-sm text-gray-600">Cargando…</p>
+  <!-- CONTENIDO PRINCIPAL -->
+  <main id="dashboardContent" class="max-w-7xl mx-auto p-6 space-y-10">
+
+    <!-- =======================
+             DASHBOARD INTEGRADO
+        ======================= -->
+    <section id="dashboardView">
+
+      <!-- TÍTULO -->
+      <div class="fade-up">
+        <h1 class="text-3xl font-bold text-tpp-dark flex items-center gap-3">
+          <i class="fas fa-layer-group text-indigo-600"></i>
+          Dashboard de Incidencias
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">
+          Seleccione el tipo de informe que desea generar o gestionar.
+        </p>
+      </div>
+
+      <!-- GRID -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 fade-up-delayed">
+
+        <!-- CABLE -->
+        <div onclick="navigateToFormulario('CABLE')"
+          class="dashboard-card bg-white border border-gray-200 shadow-md p-7 rounded-2xl relative cursor-pointer">
+          <div class="dashboard-icon-bg"><i class="fas fa-bolt"></i></div>
+
+          <div>
+            <div
+              class="w-12 h-12 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 text-2xl mb-4">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800">Sustracción de Cable RH</h2>
+            <p class="text-sm text-gray-500 mt-1">Informe oficial para incidentes en Reefers.</p>
+          </div>
+        </div>
+
+        <!-- MERCADERÍA -->
+        <div onclick="navigateToFormulario('MERCADERIA')"
+          class="dashboard-card bg-white border border-gray-200 shadow-md p-7 rounded-2xl relative cursor-pointer">
+          <div class="dashboard-icon-bg"><i class="fas fa-box-open"></i></div>
+
+          <div>
+            <div
+              class="w-12 h-12 flex items-center justify-center rounded-full bg-yellow-50 text-yellow-600 text-2xl mb-4">
+              <i class="fas fa-box-open"></i>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800">Sustracción de Mercadería</h2>
+            <p class="text-sm text-gray-500 mt-1">Informe detallado de pérdida de carga.</p>
+          </div>
+        </div>
+
+        <!-- CHOQUE -->
+        <div onclick="navigateToFormulario('CHOQUE')"
+          class="dashboard-card bg-white border border-gray-200 shadow-md p-7 rounded-2xl relative cursor-pointer">
+          <div class="dashboard-icon-bg"><i class="fas fa-car-crash"></i></div>
+
+          <div>
+            <div class="w-12 h-12 flex items-center justify-center rounded-full bg-red-50 text-red-600 text-2xl mb-4">
+              <i class="fas fa-car-crash"></i>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800">Choque de Unidad</h2>
+            <p class="text-sm text-gray-500 mt-1">Registro de incidentes vehiculares.</p>
+          </div>
+        </div>
+
+        <!-- SINIESTRO -->
+        <div onclick="navigateToFormulario('SINIESTRO')"
+          class="dashboard-card bg-white border border-gray-200 shadow-md p-7 rounded-2xl relative cursor-pointer">
+          <div class="dashboard-icon-bg"><i class="fas fa-fire"></i></div>
+
+          <div>
+            <div
+              class="w-12 h-12 flex items-center justify-center rounded-full bg-orange-50 text-orange-600 text-2xl mb-4">
+              <i class="fas fa-fire"></i>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800">Siniestro</h2>
+            <p class="text-sm text-gray-500 mt-1">Incidentes inesperados o de causa no determinada.</p>
+          </div>
+        </div>
+
+        <!-- MAMPARAS -->
+        <div onclick="navigateToMamparas()"
+          class="dashboard-card bg-white border border-gray-200 shadow-md p-7 rounded-2xl relative cursor-pointer">
+          <div class="dashboard-icon-bg"><i class="fas fa-warehouse"></i></div>
+
+          <div>
+            <div
+              class="w-12 h-12 flex items-center justify-center rounded-full bg-green-50 text-green-600 text-2xl mb-4">
+              <i class="fas fa-warehouse"></i>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-800">Formulario Mamparas</h2>
+            <p class="text-sm text-gray-500 mt-1">Registro y reportes del módulo existente.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
   </main>
 
-  <!-- SIDEBAR LOADER (inyecta el sidebar y llama initSidebar) -->
-  <script type="module" src="./js/sidebar/sidebar-loader.js"></script>
-
-  <!-- Navegación inicial del SPA -->
+  <!-- Navegación SPA -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Enviar evento para cargar dashboard.html apenas cargue la página
+    function navigateToFormulario(tipo) {
       window.dispatchEvent(
-        new CustomEvent("sidebar:navigate", { detail: "./html/dashboard.html" })
+        new CustomEvent("sidebar:navigate", {
+          detail: `./html/formulario.html?tipo=${tipo}`
+        })
       );
-    });
+    }
+
+    function navigateToMamparas() {
+      window.dispatchEvent(
+        new CustomEvent("sidebar:navigate", {
+          detail: "./html/mamparas.html"
+        })
+      );
+    }
+
+    // Registrar SW
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js');
+    }
   </script>
+
+  <!-- Loader del Sidebar -->
+  <script type="module" src="./js/sidebar/sidebar-loader.js"></script>
 
 </body>
 
