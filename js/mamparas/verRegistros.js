@@ -1,4 +1,4 @@
-import { supabase } from '../script.js';
+import { supabase } from '/script.js';
 
 window.addEventListener('DOMContentLoaded', async () => {
   await cargarRegistros();

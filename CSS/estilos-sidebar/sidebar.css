@@ -1,0 +1,264 @@
+/* ==========================================================================
+   SIDEBAR TPP – ESTILOS OFICIALES
+   Versión migrada y optimizada para SPA + Sidebar.js moderno
+   ========================================================================== */
+
+/* ============ RESET GENERAL ============ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #f4f6f8;
+    transition: background 0.25s ease;
+}
+
+/* ==========================================================================
+   SIDEBAR
+   ========================================================================== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    background: #2f3b52;
+    color: #fff;
+    overflow-y: auto;
+    z-index: 1000;
+    transform: translateX(0);
+    transition: transform 0.32s ease, width 0.25s ease;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 165, 0, 0.45);
+    border-radius: 3px;
+}
+
+/* ==========================================================================
+   LOGO
+   ========================================================================== */
+.logo {
+    position: relative;
+    padding: 18px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.logo .logo-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+/* Collapse button */
+.collapse-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    padding: 6px;
+    cursor: pointer;
+}
+
+
+/* ==========================================================================
+   MENU PRINCIPAL
+   ========================================================================== */
+.menu {
+    list-style: none;
+    padding: 8px 0;
+}
+
+.menu li {
+    position: relative;
+}
+
+.menu-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #e1e1e1;
+    text-decoration: none;
+    padding: 12px 14px;
+    font-size: 0.98rem;
+    border-left: 4px solid transparent;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.menu-link i {
+    width: 22px;
+    min-width: 22px;
+    text-align: center;
+    color: #f1f3f6;
+}
+
+/* Hover / Active */
+.menu-link:hover {
+    background: #3e4b67;
+    color: #fff;
+    border-left-color: #ffa500;
+}
+
+.menu>li.active-link>.menu-link {
+    background: #3e4b67;
+    border-left-color: #ffa500;
+}
+
+/* Arrow for submenus */
+.menu-link .arrow {
+    margin-left: auto;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.85rem;
+}
+
+.menu-link .arrow::after {
+    content: "▶";
+    display: inline-block;
+    transition: transform 0.25s ease;
+}
+
+.menu li.active>.menu-link .arrow::after {
+    transform: rotate(90deg);
+}
+
+/* ==========================================================================
+   SUBMENUS
+   ========================================================================== */
+.submenu {
+    list-style: none;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    background: #394862;
+    transition: max-height 0.36s ease, opacity 0.25s ease;
+}
+
+.menu li.active>.submenu {
+    opacity: 1;
+    max-height: 400px;
+}
+
+.submenu li a {
+    display: block;
+    padding: 10px 18px 10px 48px;
+    color: #cfd3da;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.submenu li a:hover {
+    background: rgba(255, 165, 0, 0.18);
+    color: #fff;
+}
+
+
+/* ==========================================================================
+   SIDEBAR COLLAPSED (ICON ONLY)
+   ========================================================================== */
+.sidebar.collapsed {
+    width: 70px;
+}
+
+.sidebar.collapsed .logo .logo-text {
+    display: none;
+}
+
+.sidebar.collapsed .collapse-btn i {
+    transform: rotate(180deg);
+}
+
+.sidebar.collapsed .menu-link {
+    justify-content: center;
+}
+
+.sidebar.collapsed .menu-link span {
+    display: none;
+}
+
+.sidebar.collapsed .menu-link .arrow {
+    display: none;
+}
+
+.sidebar.collapsed .submenu {
+    display: none !important;
+}
+
+
+/* ==========================================================================
+   MOBILE MODE
+   ========================================================================== */
+.sidebar-toggle {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    background: #2f3b52;
+    color: #fff;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 6px;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    z-index: 1100;
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .sidebar-toggle {
+        display: inline-flex;
+    }
+
+    .sidebar {
+        transform: translateX(-260px);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .collapse-btn {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   BODY OVERLAY (MOBILE)
+   ========================================================================== */
+body.sidebar-open {
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   CONTENT SHIFT
+   ========================================================================== */
+body.sidebar-collapsed main,
+body.sidebar-collapsed #dashboardContent,
+body.sidebar-collapsed .wrap {
+    margin-left: 70px;
+    transition: margin-left 0.25s ease;
+}
+
+@media (max-width: 1024px) {
+
+    body.sidebar-collapsed main,
+    body.sidebar-collapsed #dashboardContent,
+    body.sidebar-collapsed .wrap {
+        margin-left: 0 !important;
+    }
+}

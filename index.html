@@ -1,43 +1,66 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Inicio - Sistema de Inspecciones</title>
-  <link rel="stylesheet" href="CSS/styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TPP – Incidencias</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Sidebar CSS -->
+  <link rel="stylesheet" href="./css/estilos-sidebar/sidebar.css" />
+  <link rel="stylesheet" href="./css/global.css" />
+
+  <style>
+    body {
+      background-color: #f4f6f8;
+    }
+  </style>
 </head>
+
 <body>
-<!-- Botón para colapsar el menú (desktop y responsive) 
 
-  <button class="toggle-btn">☰</button>-->
+  <!-- ======================================================
+         SIDEBAR (insertado dinámicamente por sidebar-loader)
+         ====================================================== -->
+  <div id="sidebar-container"></div>
 
-<!-- Header con botón ☰ (funciona tanto en móvil como en desktop) -->
-<div class="responsive-header">
-  <button class="toggle-btn">☰</button>
-</div>
+  <!-- ======================================================
+         CONTENIDO PRINCIPAL SPA
+         ====================================================== -->
 
-<!-- Sidebar escritorio -->
-<div class="sidebar">
-  <a href="index.html">🏠 Inicio</a>
-  <a href="registro.html">📝 Registro</a>
-  <a href="reportes.html">📊 Reportes</a>
-  <a href="registros.html">📋 Registros</a>
-</div>
+  <main id="dashboardContent" class="pt-6 p-6 transition-all duration-300">
+    <!-- El contenido inicial se carga dinámicamente -->
+    <p class="text-sm text-gray-600">Cargando…</p>
+  </main>
 
-<!-- Sidebar móvil -->
-<div class="mobile-nav">
-  <a href="index.html">🏠 Inicio</a>
-  <a href="registro.html">📝 Registro</a>
-  <a href="reportes.html">📊 Reportes</a>
-  <a href="registros.html">📋 Registros</a>
-</div>
+  <!-- ======================================================
+         SCRIPTS CENTRALES
+         ====================================================== -->
 
-  <script src="js/sidebar.js"></script>
+  <!-- Loader que inyecta sidebar + inicializa SPA -->
+  <script type="module" src="./js/sidebar/sidebar-loader.js"></script>
 
-  <!-- Contenido principal -->
-  <div class="main-container">
-    <h1>Bienvenido al Sistema de Inspecciones</h1>
-    <p>Utiliza el menú lateral o superior para acceder a las funcionalidades disponibles.</p>
-  </div>
+  <!-- Listener global para navegación desde los módulos -->
+  <script type="module">
+    document.addEventListener("DOMContentLoaded", () => {
+      // Delega la navegación a sidebar.js
+      import("./js/sidebar/sidebar.js").then(mod => {
+        const navigate = new CustomEvent("sidebar:navigate", {
+          detail: "./html/dashboard.html"
+        });
+        window.dispatchEvent(navigate);
+      });
+    });
+  </script>
+
+
 </body>
+
 </html>

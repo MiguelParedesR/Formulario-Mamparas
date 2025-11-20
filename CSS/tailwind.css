@@ -1,0 +1,207 @@
+/*
+===========================================================
+  FORMULARIOS TPP – ESTILOS PERSONALIZADOS PARA TAILWIND
+===========================================================
+*/
+
+/* -------------------------
+   CONFIGURACIÓN GENERAL
+--------------------------*/
+
+body {
+  background-color: #f4f6f8;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Contenedor principal */
+.tpp-container {
+  @apply max-w-5xl mx-auto px-6 py-8;
+}
+
+/* Card general */
+.tpp-card {
+  @apply bg-white rounded-xl shadow-md p-6 border border-gray-200;
+}
+
+/* Card título */
+.tpp-title {
+  @apply text-xl font-bold text-gray-800 mb-6;
+}
+
+/* Subtítulo */
+.tpp-subtitle {
+  @apply text-sm text-gray-500 mb-4;
+}
+
+/* Inputs */
+.tpp-input {
+  @apply w-full rounded-lg border border-gray-300 px-4 py-2
+         text-sm focus:ring-2 focus:ring-blue-500
+         focus:border-blue-500 transition-all duration-200;
+}
+
+/* Inputs grandes */
+.tpp-input-lg {
+  @apply tpp-input h-12;
+}
+
+/* Textareas */
+.tpp-textarea {
+  @apply w-full rounded-lg border border-gray-300 px-4 py-3
+         text-sm leading-relaxed min-h-[120px]
+         focus:ring-2 focus:ring-blue-500
+         focus:border-blue-500 transition-all duration-200;
+}
+
+/* Labels */
+.tpp-label {
+  @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+/* Select */
+.tpp-select {
+  @apply w-full rounded-lg border border-gray-300 px-4 py-2
+         bg-white text-sm focus:ring-2 focus:ring-blue-500
+         focus:border-blue-500 cursor-pointer;
+}
+
+/* Separación entre grupos */
+.tpp-group {
+  @apply mb-6;
+}
+
+
+/* -------------------------
+   BOTONES SISTEMA TPP
+--------------------------*/
+
+.tpp-btn {
+  @apply inline-flex items-center justify-center px-5 py-2.5
+         font-medium rounded-lg text-white transition-all duration-200;
+}
+
+.tpp-btn-primary {
+  @apply tpp-btn bg-blue-600 hover:bg-blue-700 shadow;
+}
+
+.tpp-btn-secondary {
+  @apply tpp-btn bg-gray-700 hover:bg-gray-800;
+}
+
+.tpp-btn-success {
+  @apply tpp-btn bg-green-600 hover:bg-green-700;
+}
+
+.tpp-btn-warning {
+  @apply tpp-btn bg-yellow-500 hover:bg-yellow-600;
+}
+
+.tpp-btn-danger {
+  @apply tpp-btn bg-red-600 hover:bg-red-700;
+}
+
+/* Buttons outline */
+.tpp-btn-outline {
+  @apply border border-gray-400 text-gray-700 bg-transparent
+         hover:bg-gray-100;
+}
+
+
+/* -------------------------
+   PROGRESS BAR
+--------------------------*/
+
+.progress-container {
+  @apply w-full bg-gray-200 rounded-lg h-3 mb-2 overflow-hidden;
+}
+
+.progress-bar {
+  @apply h-full rounded-lg transition-all duration-300;
+}
+
+/* Colors según porcentaje (clases dinámicas en JS) */
+
+
+/* -------------------------
+   TABLE (REGISTROS)
+--------------------------*/
+
+.tpp-table {
+  @apply w-full border-collapse shadow rounded-lg overflow-hidden;
+}
+
+.tpp-table th {
+  @apply bg-tpp-dark text-white px-4 py-3 text-left text-sm font-semibold;
+}
+
+.tpp-table td {
+  @apply bg-white border-b px-4 py-3 text-sm text-gray-800;
+}
+
+.tpp-table tr:hover td {
+  @apply bg-gray-50;
+}
+
+
+/* -------------------------
+   CARDS DEL DASHBOARD
+--------------------------*/
+
+.dashboard-card {
+  @apply bg-white shadow-md border border-gray-200 rounded-xl
+         p-6 flex flex-col items-start gap-2 transition;
+}
+
+.dashboard-card:hover {
+  @apply shadow-lg scale-[1.01];
+}
+
+.dashboard-card h3 {
+  @apply text-lg font-semibold text-gray-700;
+}
+
+
+/* -------------------------
+   MODALES
+--------------------------*/
+
+.tpp-modal {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-[2000];
+}
+
+.tpp-modal-box {
+  @apply bg-white p-8 rounded-xl shadow-lg max-w-2xl w-full;
+}
+
+.tpp-modal-header {
+  @apply text-lg font-semibold text-gray-800 mb-4;
+}
+
+.tpp-modal-footer {
+  @apply flex justify-end gap-3 mt-4;
+}
+
+
+/* -------------------------
+   UPLOAD ZONE
+--------------------------*/
+
+.tpp-upload {
+  @apply border border-dashed border-gray-400 rounded-lg
+         p-5 flex justify-center items-center text-gray-600
+         cursor-pointer hover:bg-gray-50 transition;
+}
+
+
+/* -------------------------
+   ALERTAS / TAGS / ESTADOS
+--------------------------*/
+
+.tag {
+  @apply px-2.5 py-1 text-xs font-semibold rounded-md;
+}
+
+.tag-green { @apply bg-green-100 text-green-700; }
+.tag-yellow { @apply bg-yellow-100 text-yellow-700; }
+.tag-red { @apply bg-red-100 text-red-700; }
+
