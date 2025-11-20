@@ -1,0 +1,50 @@
+/* ============================================================
+   DASHBOARD CSS — ANIMACIONES + ESTILOS DE CARDS
+   ============================================================ */
+
+.fade-up {
+    opacity: 0;
+    animation: fadeUp 0.5s ease-out forwards;
+}
+
+.fade-up-delayed {
+    opacity: 0;
+    animation: fadeUp 0.9s ease-out forwards;
+}
+
+@keyframes fadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Cards hover */
+.dashboard-card {
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    cursor: pointer;
+}
+
+.dashboard-card:hover {
+    box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    transform: scale(1.02);
+}
+
+/* Icon background */
+.dashboard-icon-bg {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 80px;
+    color: rgba(0,0,0,0.06);
+    pointer-events: none;
+}
+
+.dashboard-icon-bg i {
+    opacity: 0.10 !important;
+}
+

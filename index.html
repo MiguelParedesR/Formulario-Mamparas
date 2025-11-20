@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TPP – Incidencias</title>
+  <title>CCTV – Incidencias</title>
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -26,40 +26,26 @@
 
 <body>
 
-  <!-- ======================================================
-         SIDEBAR (insertado dinámicamente por sidebar-loader)
-         ====================================================== -->
+  <!-- SIDEBAR -->
   <div id="sidebar-container"></div>
 
-  <!-- ======================================================
-         CONTENIDO PRINCIPAL SPA
-         ====================================================== -->
-
+  <!-- CONTENIDO PRINCIPAL SPA -->
   <main id="dashboardContent" class="pt-6 p-6 transition-all duration-300">
-    <!-- El contenido inicial se carga dinámicamente -->
     <p class="text-sm text-gray-600">Cargando…</p>
   </main>
 
-  <!-- ======================================================
-         SCRIPTS CENTRALES
-         ====================================================== -->
-
-  <!-- Loader que inyecta sidebar + inicializa SPA -->
+  <!-- SIDEBAR LOADER (inyecta el sidebar y llama initSidebar) -->
   <script type="module" src="./js/sidebar/sidebar-loader.js"></script>
 
-  <!-- Listener global para navegación desde los módulos -->
-  <script type="module">
+  <!-- Navegación inicial del SPA -->
+  <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Delega la navegación a sidebar.js
-      import("./js/sidebar/sidebar.js").then(mod => {
-        const navigate = new CustomEvent("sidebar:navigate", {
-          detail: "./html/dashboard.html"
-        });
-        window.dispatchEvent(navigate);
-      });
+      // Enviar evento para cargar dashboard.html apenas cargue la página
+      window.dispatchEvent(
+        new CustomEvent("sidebar:navigate", { detail: "./html/dashboard.html" })
+      );
     });
   </script>
-
 
 </body>
 

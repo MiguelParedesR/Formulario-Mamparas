@@ -15,100 +15,111 @@
 
 <body>
 
+    <!-- ====================================================
+          TOGGLE UNIVERSAL FLOTANTE (solo cuando sidebar está oculto)
+          ==================================================== -->
+    <button id="sidebarUniversalToggle" class="sidebar-toggle-floating">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- ====================================================
+          SIDEBAR PRINCIPAL
+          ==================================================== -->
     <nav id="sidebar" class="sidebar" aria-label="Sidebar principal">
 
-        <!-- LOGO -->
+        <!-- LOGO + TOGGLE INTERNO -->
         <div class="logo">
             <span class="logo-text">TPP DASHBOARD</span>
+
+            <!-- Botón collapse desktop -->
             <button id="collapseBtn" class="collapse-btn" aria-label="Colapsar menú">
                 <i class="fas fa-angle-left"></i>
+            </button>
+
+            <!-- Toggle interno (visible SOLO cuando sidebar está abierto) -->
+            <button id="sidebarInternalToggle" class="sidebar-toggle-internal" aria-label="Cerrar sidebar">
+                <i class="fas fa-bars"></i>
             </button>
         </div>
 
         <ul class="menu" role="menu">
 
             <!-- DASHBOARD -->
-            <li role="none">
-                <a role="menuitem" class="menu-link" href="../../html/dashboard.html">
+            <li>
+                <a class="menu-link" href="../../html/dashboard.html">
                     <i class="fas fa-home"></i><span>Dashboard</span>
                 </a>
             </li>
 
             <!-- INCIDENCIAS -->
-            <li role="none" class="has-submenu">
-                <a role="button" class="menu-link" href="#" aria-expanded="false">
+            <li class="has-submenu">
+                <a class="menu-link" href="#">
                     <i class="fas fa-exclamation-triangle"></i>
                     <span>Incidencias</span>
                     <i class="fas arrow"></i>
                 </a>
 
-                <ul class="submenu" role="menu">
+                <ul class="submenu">
 
                     <!-- Cable RH -->
-                    <li role="none" class="has-submenu">
-                        <a role="button" class="menu-link" href="#" aria-expanded="false">
+                    <li class="has-submenu">
+                        <a class="menu-link" href="#">
                             <i class="fas fa-bolt"></i><span>Cable RH</span>
                             <i class="fas arrow"></i>
                         </a>
 
-                        <ul class="submenu" role="menu">
-                            <li><a role="menuitem" class="menu-link" href="../../html/formulario.html?tipo=CABLE">Nuevo
-                                    informe</a></li>
-                            <li><a role="menuitem" class="menu-link"
-                                    href="../../html/registros.html?tipo=CABLE">Registros</a></li>
-                            <li><a role="menuitem" class="menu-link" href="../../html/ver-incidencia.html">Ver /
-                                    Editar</a></li>
+                        <ul class="submenu">
+                            <li><a class="submenu-link" href="../../html/formulario.html?tipo=CABLE">Nuevo informe</a>
+                            </li>
+                            <li><a class="submenu-link" href="../../html/registros.html?tipo=CABLE">Registros</a></li>
+                            <li><a class="submenu-link" href="../../html/ver-incidencia.html">Ver / Editar</a></li>
                         </ul>
                     </li>
 
                     <!-- Mercadería -->
-                    <li role="none" class="has-submenu">
-                        <a role="button" class="menu-link" href="#" aria-expanded="false">
+                    <li class="has-submenu">
+                        <a class="menu-link" href="#">
                             <i class="fas fa-box-open"></i><span>Mercadería</span>
                             <i class="fas arrow"></i>
                         </a>
 
-                        <ul class="submenu" role="menu">
-                            <li><a role="menuitem" class="menu-link"
-                                    href="../../html/formulario.html?tipo=MERCADERIA">Nuevo informe</a></li>
-                            <li><a role="menuitem" class="menu-link"
-                                    href="../../html/registros.html?tipo=MERCADERIA">Registros</a></li>
-                            <li><a role="menuitem" class="menu-link" href="../../html/ver-incidencia.html">Ver /
-                                    Editar</a></li>
+                        <ul class="submenu">
+                            <li><a class="submenu-link" href="../../html/formulario.html?tipo=MERCADERIA">Nuevo
+                                    informe</a></li>
+                            <li><a class="submenu-link" href="../../html/registros.html?tipo=MERCADERIA">Registros</a>
+                            </li>
+                            <li><a class="submenu-link" href="../../html/ver-incidencia.html">Ver / Editar</a></li>
                         </ul>
                     </li>
 
                     <!-- Choque -->
-                    <li role="none" class="has-submenu">
-                        <a role="button" class="menu-link" href="#" aria-expanded="false">
+                    <li class="has-submenu">
+                        <a class="menu-link" href="#">
                             <i class="fas fa-car-crash"></i><span>Choque</span>
                             <i class="fas arrow"></i>
                         </a>
 
-                        <ul class="submenu" role="menu">
-                            <li><a role="menuitem" class="menu-link" href="../../html/formulario.html?tipo=CHOQUE">Nuevo
-                                    informe</a></li>
-                            <li><a role="menuitem" class="menu-link"
-                                    href="../../html/registros.html?tipo=CHOQUE">Registros</a></li>
-                            <li><a role="menuitem" class="menu-link" href="../../html/ver-incidencia.html">Ver /
-                                    Editar</a></li>
+                        <ul class="submenu">
+                            <li><a class="submenu-link" href="../../html/formulario.html?tipo=CHOQUE">Nuevo informe</a>
+                            </li>
+                            <li><a class="submenu-link" href="../../html/registros.html?tipo=CHOQUE">Registros</a></li>
+                            <li><a class="submenu-link" href="../../html/ver-incidencia.html">Ver / Editar</a></li>
                         </ul>
                     </li>
 
                     <!-- Siniestro -->
-                    <li role="none" class="has-submenu">
-                        <a role="button" class="menu-link" href="#" aria-expanded="false">
+                    <li class="has-submenu">
+                        <a class="menu-link" href="#">
                             <i class="fas fa-fire"></i><span>Siniestro</span>
                             <i class="fas arrow"></i>
                         </a>
 
-                        <ul class="submenu" role="menu">
-                            <li><a role="menuitem" class="menu-link"
-                                    href="../../html/formulario.html?tipo=SINIESTRO">Nuevo informe</a></li>
-                            <li><a role="menuitem" class="menu-link"
-                                    href="../../html/registros.html?tipo=SINIESTRO">Registros</a></li>
-                            <li><a role="menuitem" class="menu-link" href="../../html/ver-incidencia.html">Ver /
-                                    Editar</a></li>
+                        <ul class="submenu">
+                            <li><a class="submenu-link" href="../../html/formulario.html?tipo=SINIESTRO">Nuevo
+                                    informe</a></li>
+                            <li><a class="submenu-link" href="../../html/registros.html?tipo=SINIESTRO">Registros</a>
+                            </li>
+                            <li><a class="submenu-link" href="../../html/ver-incidencia.html">Ver / Editar</a></li>
                         </ul>
                     </li>
 
@@ -116,32 +127,27 @@
             </li>
 
             <!-- MAMPARAS -->
-            <li role="none" class="has-submenu">
-                <a role="button" class="menu-link" href="#" aria-expanded="false">
+            <li class="has-submenu">
+                <a class="menu-link" href="#">
                     <i class="fas fa-warehouse"></i><span>Mamparas</span><i class="fas arrow"></i>
                 </a>
 
-                <ul class="submenu" role="menu">
-                    <li><a role="menuitem" class="menu-link" href="../../html/mamparas.html">Registro</a></li>
-                    <li><a role="menuitem" class="menu-link" href="../../html/mamparas/reportes.html">Reportes</a></li>
-                    <li><a role="menuitem" class="menu-link" href="../../html/mamparas/registros.html">Registros</a>
-                    </li>
+                <ul class="submenu">
+                    <li><a class="submenu-link" href="../../html/mamparas.html">Registro</a></li>
+                    <li><a class="submenu-link" href="../../html/mamparas/reportes.html">Reportes</a></li>
+                    <li><a class="submenu-link" href="../../html/mamparas/registros.html">Registros</a></li>
                 </ul>
             </li>
 
             <!-- LOGIN -->
-            <li role="none">
-                <a role="menuitem" class="menu-link" href="../../html/login-general/login.html">
+            <li>
+                <a class="menu-link" href="../../html/login-general/login.html">
                     <i class="fas fa-sign-in-alt"></i><span>Login</span>
                 </a>
             </li>
 
         </ul>
     </nav>
-
-    <button id="sidebarToggle" class="sidebar-toggle">
-        <i class="fas fa-bars"></i>
-    </button>
 
 </body>
 
