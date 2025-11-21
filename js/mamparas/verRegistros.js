@@ -1,11 +1,9 @@
-import { supabase } from '/script.js';
-
-window.addEventListener('DOMContentLoaded', async () => {
-  await cargarRegistros();
-});
+import { supabase } from './script.js';
 
 async function cargarRegistros() {
   const tabla = document.querySelector('#tabla-registros tbody');
+  if (!tabla) return;
+
   tabla.innerHTML = '';
 
   const { data, error } = await supabase
@@ -36,15 +34,44 @@ async function cargarRegistros() {
       <td>${registro.incorreccion || ''}</td>
       <td>${registro.responsable || ''}</td>
       <td>${registro.observaciones || ''}</td>
-      <td><button onclick='mostrarDetalle(${JSON.stringify(typeof registro.detalle === "string" ? JSON.parse(registro.detalle) : registro.detalle)})'>👁️</button></td>
+      <td><button onclick='mostrarDetalle(${JSON.stringify(typeof registro.detalle === "string" ? JSON.parse(registro.detalle) : registro.detalle)})'>🔍</button></td>
     `;
     tabla.appendChild(fila);
   });
 }
 
+async function initVerRegistros() {
+  await cargarRegistros();
+
+  const buscarPlacaInput = document.getElementById("buscarPlaca");
+  if (buscarPlacaInput) {
+    buscarPlacaInput.addEventListener("input", function () {
+      const filtro = this.value.toUpperCase();
+      const filas = document.querySelectorAll("#tabla-registros tbody tr");
+
+      filas.forEach(fila => {
+        const celdaPlaca = fila.cells[3];
+        if (celdaPlaca && celdaPlaca.textContent.toUpperCase().includes(filtro)) {
+          fila.style.display = "";
+        } else {
+          fila.style.display = "none";
+        }
+      });
+    });
+  }
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener('DOMContentLoaded', initVerRegistros);
+} else {
+  initVerRegistros();
+}
+
 window.mostrarDetalle = function (detalle) {
   const modal = document.getElementById('detalleModal');
   const contenido = document.getElementById('detalleCompleto');
+
+  if (!modal || !contenido) return;
 
   if (!detalle || typeof detalle !== 'object') {
     contenido.innerHTML = '<p>Sin detalle disponible.</p>';
@@ -55,28 +82,26 @@ window.mostrarDetalle = function (detalle) {
   if (detalle.tipo === 'Mampara') {
     contenido.innerHTML = `
       <table class="detalle-tabla">
-        <tr><th>Tipo</th><td>${detalle.tipo || '—'}</td></tr>
-        <tr><th>Separación Lateral Central</th><td>${detalle.separacion_lateral_central || '—'} cm</td></tr>
-        <tr><th>Altura de Mampara</th><td>${detalle.altura_mampara || '—'} cm</td></tr>
-        <tr><th>Foto Panorámica</th><td>${detalle.foto_panoramica_unidad ? `<img src="${detalle.foto_panoramica_unidad}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_panoramica_unidad}')">` : '—'}</td></tr>
-        <tr><th>Foto Altura</th><td>${detalle.foto_altura_mampara ? `<img src="${detalle.foto_altura_mampara}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_altura_mampara}')">` : '—'}</td></tr>
-        <tr><th>Foto Lateral</th><td>${detalle.foto_lateral_central ? `<img src="${detalle.foto_lateral_central}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_lateral_central}')">` : '—'}</td></tr>
+        <tr><th>Tipo</th><td>${detalle.tipo || '-'}</td></tr>
+        <tr><th>Separación Lateral Central</th><td>${detalle.separacion_lateral_central || '-' } cm</td></tr>
+        <tr><th>Altura de Mampara</th><td>${detalle.altura_mampara || '-' } cm</td></tr>
+        <tr><th>Foto Panorámica</th><td>${detalle.foto_panoramica_unidad ? `<img src="${detalle.foto_panoramica_unidad}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_panoramica_unidad}')">` : '-'}</td></tr>
+        <tr><th>Foto Altura</th><td>${detalle.foto_altura_mampara ? `<img src="${detalle.foto_altura_mampara}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_altura_mampara}')">` : '-'}</td></tr>
+        <tr><th>Foto Lateral</th><td>${detalle.foto_lateral_central ? `<img src="${detalle.foto_lateral_central}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_lateral_central}')">` : '-'}</td></tr>
       </table>
     `;
   } else {
     contenido.innerHTML = `
       <table class="detalle-tabla">
-        <tr><th>Tipo</th><td>${detalle.tipo || '—'}</td></tr>
-        <tr><th>Observación</th><td>${detalle.observacion_texto || '—'}</td></tr>
-        <tr><th>Foto</th><td>${detalle.foto_observacion ? `<img src="${detalle.foto_observacion}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_observacion}')">` : '—'}</td></tr>
+        <tr><th>Tipo</th><td>${detalle.tipo || '-'}</td></tr>
+        <tr><th>Observación</th><td>${detalle.observacion_texto || '-'}</td></tr>
+        <tr><th>Foto</th><td>${detalle.foto_observacion ? `<img src="${detalle.foto_observacion}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_observacion}')">` : '-'}</td></tr>
       </table>
     `;
   }
 
   modal.style.display = 'flex';
 };
-
-
 
 window.verImagenAmpliada = function (url) {
   const ampliado = document.createElement('div');
@@ -90,30 +115,19 @@ window.verImagenAmpliada = function (url) {
   document.body.appendChild(ampliado);
 };
 
-
 window.cerrarDetalle = function () {
-  document.getElementById('detalleModal').style.display = 'none';
+  const modal = document.getElementById('detalleModal');
+  if (modal) modal.style.display = 'none';
 };
 
 window.ampliarImagen = function (url) {
-  document.getElementById('imagenGrande').src = url;
-  document.getElementById('imagenAmpliada').style.display = 'block';
+  const img = document.getElementById('imagenGrande');
+  const cont = document.getElementById('imagenAmpliada');
+  if (img) img.src = url;
+  if (cont) cont.style.display = 'block';
 };
 
 window.cerrarImagen = function () {
-  document.getElementById('imagenAmpliada').style.display = 'none';
+  const cont = document.getElementById('imagenAmpliada');
+  if (cont) cont.style.display = 'none';
 };
-document.getElementById("buscarPlaca").addEventListener("input", function () {
-  const filtro = this.value.toUpperCase();
-  const filas = document.querySelectorAll("#tabla-registros tbody tr");
-
-  filas.forEach(fila => {
-    const celdaPlaca = fila.cells[3]; // 4ta columna = Placa
-    if (celdaPlaca && celdaPlaca.textContent.toUpperCase().includes(filtro)) {
-      fila.style.display = "";
-    } else {
-      fila.style.display = "none";
-    }
-  });
-});
-    

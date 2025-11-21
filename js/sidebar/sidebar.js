@@ -1,255 +1,364 @@
 // ============================================================================
-// SIDEBAR.JS – VERSION FINAL PRODUCCIÓN TPP
-// Integrado con:
-// - sidebar.html (toggle universal + interno + collapse)
-// - sidebar.css (floating, collapsed, mobile, flyout)
-// - sidebar-loader.js
-// - SPA (loadPartial)
+// SIDEBAR.JS — SPA + Sidebar persistente
+//  - Mobile slide + toggles
+//  - Collapse desktop + flyout
+//  - Submenús independientes
+//  - Navegación SPA con loadPartial()
+//  - Resaltado de enlace activo
+//  - Cierre al hacer click fuera y resize seguro
 // ============================================================================
 
+const MAIN_SELECTOR = "#dashboardContent";
+const DESKTOP_BREAK = 1024;
+
 export async function initSidebar(
-    containerSelector = "#sidebar-container",
-    options = {}
+  containerSelector = "#sidebar-container",
+  options = {}
 ) {
+  const htmlPath = options.htmlPath ?? "/html/base/sidebar.html";
+  const enableRouting = options.enableRouting !== false;
 
-    const htmlPath = options.htmlPath ?? "../../html/base/sidebar.html";
-    const mainSelector = "#dashboardContent";
-    const DESKTOP_BREAK = 1024;
+  const container = document.querySelector(containerSelector);
+  const mainContainer = document.querySelector(MAIN_SELECTOR);
 
-    // --------------------------------------------------------------------------------
-    // Localizar contenedor
-    // --------------------------------------------------------------------------------
-    const container = document.querySelector(containerSelector);
-    if (!container) {
-        console.error("❌ initSidebar: No existe #sidebar-container.");
-        return;
+  if (!container) {
+    console.error("❌ initSidebar: No existe #sidebar-container.");
+    return;
+  }
+
+  if (!mainContainer) {
+    console.error("❌ initSidebar: No existe #dashboardContent.");
+    return;
+  }
+
+  if (!container.querySelector("#sidebar")) {
+    try {
+      const resp = await fetch(htmlPath, { cache: "no-cache" });
+      container.insertAdjacentHTML("afterbegin", await resp.text());
+    } catch (e) {
+      console.error("❌ Error cargando sidebar.html:", e);
+      return;
     }
+  }
 
-    // Si no existe sidebar → lo carga (normalmente sidebar-loader lo hace)
-    if (!container.querySelector("#sidebar")) {
-        try {
-            const resp = await fetch(htmlPath);
-            container.insertAdjacentHTML("afterbegin", await resp.text());
-        } catch (e) {
-            console.error("❌ Error cargando sidebar.html:", e);
-            return;
-        }
+  const sidebar = container.querySelector("#sidebar");
+  const toggleFloating = container.querySelector("#sidebarUniversalToggle");
+  const toggleInternal = container.querySelector("#sidebarInternalToggle");
+  const collapseBtn = container.querySelector("#collapseBtn");
+  const menuRoot = sidebar?.querySelector(".menu");
+
+  if (!sidebar || !toggleFloating || !toggleInternal || !collapseBtn) {
+    console.error("❌ initSidebar: No se encontraron los toggles requeridos.");
+    return;
+  }
+
+  let isNavigating = false;
+
+  const isDesktop = () => window.innerWidth >= DESKTOP_BREAK;
+
+  function adjustContentMargin() {
+    if (!mainContainer) return;
+
+    if (isDesktop()) {
+      mainContainer.style.marginLeft = sidebar.classList.contains("collapsed")
+        ? "70px"
+        : "250px";
+    } else {
+      mainContainer.style.marginLeft = "0px";
     }
+  }
 
-    // --------------------------------------------------------------------------------
-    // Referencias reales (100% matching con tu sidebar.html)
-    // --------------------------------------------------------------------------------
-    const sidebar = container.querySelector("#sidebar");
-    const toggleFloating = container.querySelector("#sidebarUniversalToggle");
-    const toggleInternal = container.querySelector("#sidebarInternalToggle");
-    const collapseBtn = container.querySelector("#collapseBtn");
-    const mainContainer = document.querySelector(mainSelector);
-
-    if (!sidebar || !toggleFloating || !toggleInternal || !collapseBtn) {
-        console.error("❌ initSidebar: No se encontraron todos los toggles.");
-        return;
-    }
-
-    // ------------------------------------------------------------
-    // UTILIDADES
-    // ------------------------------------------------------------
-    const isDesktop = () => window.innerWidth >= DESKTOP_BREAK;
-
-    function adjustContentMargin() {
-        if (isDesktop()) {
-            mainContainer.style.marginLeft =
-                sidebar.classList.contains("collapsed") ? "70px" : "250px";
-        } else {
-            mainContainer.style.marginLeft = "0px";
-        }
-    }
-
-    // ------------------------------------------------------------
-    // BEHAVIOR: MOBILE SLIDE
-    // ------------------------------------------------------------
-    function openMobile() {
-        sidebar.classList.add("show");
-        document.body.classList.remove("sidebar-hidden");
-    }
-
-    function closeMobile() {
-        sidebar.classList.remove("show");
-        document.body.classList.add("sidebar-hidden");
-    }
-
-    // Floating toggle siempre abre el sidebar
-    toggleFloating.addEventListener("click", openMobile);
-
-    // Internal toggle (cuando sidebar está visible)
-    toggleInternal.addEventListener("click", closeMobile);
-
-    // ------------------------------------------------------------
-    // BEHAVIOR: DESKTOP COLLAPSE
-    // ------------------------------------------------------------
-    collapseBtn.addEventListener("click", () => {
-        const collapsed = sidebar.classList.toggle("collapsed");
-        if (collapsed) document.body.classList.add("sidebar-collapsed");
-        else document.body.classList.remove("sidebar-collapsed");
-        adjustContentMargin();
-    });
-
-    // ------------------------------------------------------------
-    // SUBMENÚS – Modo B (independientes)
-    // ------------------------------------------------------------
-    const menuRoot = sidebar.querySelector(".menu");
-
-    function toggleSubmenu(node) {
-        node.classList.toggle("active");
-        const submenu = node.querySelector(".submenu");
-
-        if (!submenu) return;
-
-        if (node.classList.contains("active")) {
-            submenu.style.display = "block";
-            submenu.style.maxHeight = submenu.scrollHeight + "px";
-            submenu.style.opacity = "1";
-        } else {
-            submenu.style.maxHeight = "0px";
-            submenu.style.opacity = "0";
-            setTimeout(() => {
-                if (!node.classList.contains("active")) {
-                    submenu.style.display = "none";
-                }
-            }, 300);
-        }
-    }
-
-    // Flyout for collapsed desktop
-    function openFlyout(li) {
-        if (!isDesktop() || !sidebar.classList.contains("collapsed")) return;
-
-        const old = document.querySelector(".sidebar-flyout");
-        if (old) old.remove();
-
-        const submenu = li.querySelector(".submenu");
-        if (!submenu) return;
-
-        const rect = li.getBoundingClientRect();
-        const sideRect = sidebar.getBoundingClientRect();
-
-        const fly = document.createElement("div");
-        fly.className = "sidebar-flyout";
-        fly.style.position = "fixed";
-        fly.style.top = `${rect.top}px`;
-        fly.style.left = `${sideRect.right}px`;
-
-        const clone = submenu.cloneNode(true);
-        clone.style.display = "block";
-        clone.style.maxHeight = "none";
-
-        fly.appendChild(clone);
-        document.body.appendChild(fly);
-
-        setTimeout(() => {
-            document.addEventListener("click", function close(ev) {
-                if (!fly.contains(ev.target) && !li.contains(ev.target)) {
-                    fly.remove();
-                    document.removeEventListener("click", close);
-                }
-            });
-        }, 30);
-    }
-
-    // Attach listeners
-    menuRoot.querySelectorAll(":scope > li").forEach(li => {
-        const link = li.querySelector(".menu-link");
-        const submenu = li.querySelector(".submenu");
-
-        if (!link) return;
-
-        // Enlace directo con navegación SPA
-        if (!submenu) {
-            link.addEventListener("click", e => {
-                const href = link.getAttribute("href");
-                if (href && href.endsWith(".html")) {
-                    e.preventDefault();
-                    loadPartial(href);
-                }
-            });
-            return;
-        }
-
-        // Enlace con submenú
-        link.addEventListener("click", e => {
-            e.preventDefault();
-
-            if (isDesktop() && sidebar.classList.contains("collapsed")) {
-                openFlyout(li);
-            } else {
-                toggleSubmenu(li);
-            }
-        });
-    });
-
-    // ------------------------------------------------------------
-    // SPA — loadPartial
-    // ------------------------------------------------------------
-    async function loadPartial(href) {
-        try {
-            const req = await fetch(href, { cache: "no-cache" });
-            const html = await req.text();
-            const dom = new DOMParser().parseFromString(html, "text/html");
-
-            const main = dom.querySelector("main");
-            if (main) mainContainer.innerHTML = main.innerHTML;
-
-            document.title = dom.querySelector("title")?.textContent || "TPP";
-
-            highlightActive(href);
-            adjustContentMargin();
-
-            history.pushState({ href }, "", href);
-        } catch (err) {
-            console.error("❌ loadPartial error:", err);
-        }
-    }
-
-    // ------------------------------------------------------------
-    // ACTIVE LINK
-    // ------------------------------------------------------------
-    function highlightActive(href) {
-        sidebar.querySelectorAll(".menu-link").forEach(a =>
-            a.classList.remove("active-link")
-        );
-
-        const item = sidebar.querySelector(`a[href="${href}"]`);
-        if (item) item.classList.add("active-link");
-    }
-
-    // ------------------------------------------------------------
-    // CLICK FUERA PARA CERRAR EN MÓVIL
-    // ------------------------------------------------------------
-    document.addEventListener("click", ev => {
-        if (isDesktop()) return;
-
-        if (!sidebar.contains(ev.target) && !toggleFloating.contains(ev.target)) {
-            closeMobile();
-        }
-    });
-
-    // ------------------------------------------------------------
-    // RESIZE
-    // ------------------------------------------------------------
-    window.addEventListener("resize", () => {
-        if (isDesktop()) {
-            sidebar.classList.add("show");
-            document.body.classList.remove("sidebar-hidden");
-        } else {
-            sidebar.classList.remove("collapsed");
-            document.body.classList.remove("sidebar-collapsed");
-        }
-        adjustContentMargin();
-    });
-
-    // ------------------------------------------------------------
-    // INIT FINAL
-    // ------------------------------------------------------------
+  function openMobile() {
     sidebar.classList.add("show");
     document.body.classList.remove("sidebar-hidden");
+  }
+
+  function closeMobile() {
+    sidebar.classList.remove("show");
+    document.body.classList.add("sidebar-hidden");
+  }
+
+  toggleFloating.addEventListener("click", openMobile);
+  toggleInternal.addEventListener("click", closeMobile);
+
+  collapseBtn.addEventListener("click", () => {
+    const collapsed = sidebar.classList.toggle("collapsed");
+    if (collapsed) document.body.classList.add("sidebar-collapsed");
+    else document.body.classList.remove("sidebar-collapsed");
     adjustContentMargin();
+  });
+
+  function setSubmenuState(li, open) {
+    li.classList.toggle("active", open);
+    const submenu = li.querySelector(":scope > .submenu");
+    if (!submenu) return;
+
+    submenu.style.display = open ? "block" : "none";
+    submenu.style.maxHeight = open ? submenu.scrollHeight + "px" : "0px";
+    submenu.style.opacity = open ? "1" : "0";
+  }
+
+  function toggleSubmenu(li) {
+    setSubmenuState(li, !li.classList.contains("active"));
+  }
+
+  function openFlyout(li) {
+    if (!isDesktop() || !sidebar.classList.contains("collapsed")) return;
+
+    const old = document.querySelector(".sidebar-flyout");
+    if (old) old.remove();
+
+    const submenu = li.querySelector(":scope > .submenu");
+    if (!submenu) return;
+
+    const rect = li.getBoundingClientRect();
+    const sideRect = sidebar.getBoundingClientRect();
+
+    const fly = document.createElement("div");
+    fly.className = "sidebar-flyout";
+    fly.style.position = "fixed";
+    fly.style.top = `${rect.top}px`;
+    fly.style.left = `${sideRect.right}px`;
+
+    const clone = submenu.cloneNode(true);
+    clone.style.display = "block";
+    clone.style.maxHeight = "none";
+
+    fly.appendChild(clone);
+    document.body.appendChild(fly);
+
+    setTimeout(() => {
+      document.addEventListener("click", function close(ev) {
+        if (!fly.contains(ev.target) && !li.contains(ev.target)) {
+          fly.remove();
+          document.removeEventListener("click", close);
+        }
+      });
+    }, 30);
+  }
+
+  function highlightActive(href) {
+    sidebar
+      .querySelectorAll(".menu-link, .submenu-link")
+      .forEach((a) => a.classList.remove("active-link"));
+
+    if (!href) return;
+
+    let target = sidebar.querySelector(`a[href="${href}"]`);
+    if (!target) {
+      const pathOnly = href.split("?")[0];
+      target = sidebar.querySelector(`a[href="${pathOnly}"]`);
+    }
+    if (!target) return;
+
+    target.classList.add("active-link");
+
+    let node = target.parentElement;
+    while (node) {
+      if (node.classList?.contains?.("has-submenu")) {
+        setSubmenuState(node, true);
+      }
+      node = node.parentElement;
+    }
+  }
+
+  function expandSubmenuByHref(href) {
+    if (!href) return;
+    const url = new URL(href, window.location.origin);
+    const params = url.searchParams;
+    const tipo = params.get("tipo");
+
+    const mapTipo = {
+      CABLE: "cable",
+      MERCADERIA: "mercaderia",
+      CHOQUE: "choque",
+      SINIESTRO: "siniestro",
+    };
+
+    let targetLi = null;
+
+    if (tipo && mapTipo[tipo]) {
+      targetLi = sidebar.querySelector(`li[data-submenu="${mapTipo[tipo]}"]`);
+    } else if (url.pathname.includes("/mamparas")) {
+      targetLi = sidebar.querySelector(`li[data-submenu="mamparas"]`);
+    }
+
+    if (targetLi) {
+      setSubmenuState(targetLi, true);
+      const parent = targetLi.closest('li[data-submenu="incidencias"]');
+      if (parent) setSubmenuState(parent, true);
+    }
+  }
+
+  async function executeScripts(scripts) {
+    for (const script of scripts) {
+      const srcAttr = script.getAttribute("src");
+      const typeAttr = script.getAttribute("type");
+      const newScript = document.createElement("script");
+
+      if (typeAttr) newScript.type = typeAttr;
+
+      if (srcAttr) {
+        const cacheBust = srcAttr.includes("?") ? "&" : "?";
+        newScript.src = `${srcAttr}${cacheBust}_=${Date.now()}`;
+
+        await new Promise((resolve, reject) => {
+          newScript.onload = resolve;
+          newScript.onerror = reject;
+          document.body.appendChild(newScript);
+        });
+        newScript.remove();
+      } else {
+        newScript.textContent = script.textContent;
+        document.body.appendChild(newScript);
+        newScript.remove();
+      }
+    }
+  }
+
+  function buildStateUrl(targetUrl) {
+    const navUrl = new URL(window.location.origin + window.location.pathname);
+    navUrl.searchParams.set("view", targetUrl.pathname);
+    targetUrl.searchParams.forEach((value, key) =>
+      navUrl.searchParams.set(key, value)
+    );
+    return navUrl;
+  }
+
+  function normalizeHref(href) {
+    const targetUrl = new URL(href, window.location.origin + window.location.pathname);
+    const fetchUrl = `${targetUrl.pathname}${targetUrl.search}`;
+    const stateUrl = buildStateUrl(targetUrl);
+    const menuHref = `${targetUrl.pathname}${targetUrl.search}`;
+
+    return { fetchUrl, stateUrl, menuHref };
+  }
+
+  async function loadPartial(href, { push = true } = {}) {
+    if (!enableRouting || !href || isNavigating) return;
+
+    const target = normalizeHref(href);
+
+    try {
+      isNavigating = true;
+      const req = await fetch(target.fetchUrl, { cache: "no-cache" });
+      if (!req.ok) throw new Error(`HTTP ${req.status}`);
+
+      const html = await req.text();
+      const dom = new DOMParser().parseFromString(html, "text/html");
+      const main = dom.querySelector("main");
+
+      if (!main) throw new Error("No se encontró <main> en la vista cargada.");
+
+      const scripts = Array.from(main.querySelectorAll("script"));
+      scripts.forEach((s) => s.remove());
+
+      mainContainer.innerHTML = main.innerHTML;
+      mainContainer.scrollTo(0, 0);
+
+      await executeScripts(scripts);
+      const pageTitle = dom.querySelector("title")?.textContent;
+      if (pageTitle) document.title = pageTitle;
+
+      highlightActive(target.menuHref);
+      expandSubmenuByHref(target.menuHref);
+      adjustContentMargin();
+
+      if (push) {
+        history.pushState(
+          { href: target.fetchUrl },
+          "",
+          target.stateUrl.toString()
+        );
+      }
+    } catch (err) {
+      console.error("❌ loadPartial error:", err);
+    } finally {
+      isNavigating = false;
+    }
+  }
+
+  function hrefFromLocation() {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get("view");
+    if (!view) return null;
+    params.delete("view");
+    const search = params.toString();
+    return search ? `${view}?${search}` : view;
+  }
+
+  if (menuRoot) {
+    menuRoot.querySelectorAll(":scope > li.has-submenu > .menu-link").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const li = link.parentElement;
+        if (isDesktop() && sidebar.classList.contains("collapsed")) {
+          openFlyout(li);
+        } else {
+          toggleSubmenu(li);
+        }
+      });
+    });
+
+    menuRoot
+      .querySelectorAll(".submenu-link, :scope > li:not(.has-submenu) > .menu-link")
+      .forEach((link) => {
+        link.addEventListener("click", (e) => {
+          const href = link.getAttribute("href");
+          if (!href || !href.includes(".html")) return;
+
+          e.preventDefault();
+          loadPartial(href);
+        });
+      });
+  }
+
+  window.addEventListener("sidebar:navigate", (ev) => {
+    const href = ev.detail;
+    if (href) loadPartial(href);
+  });
+
+  window.addEventListener("popstate", (ev) => {
+    const href = ev.state?.href || hrefFromLocation();
+    if (href) {
+      loadPartial(href, { push: false });
+    } else {
+      highlightActive("/index.html");
+    }
+  });
+
+  document.addEventListener("click", (ev) => {
+    if (isDesktop()) return;
+    if (!sidebar.contains(ev.target) && !toggleFloating.contains(ev.target)) {
+      closeMobile();
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (isDesktop()) {
+      sidebar.classList.add("show");
+      document.body.classList.remove("sidebar-hidden");
+    } else {
+      sidebar.classList.remove("collapsed");
+      document.body.classList.remove("sidebar-collapsed");
+    }
+    adjustContentMargin();
+  });
+
+  const initialHref = hrefFromLocation();
+  if (initialHref) {
+    loadPartial(initialHref, { push: false });
+  } else {
+    highlightActive("/index.html");
+    expandSubmenuByHref("/index.html");
+  }
+
+  if (isDesktop()) {
+    sidebar.classList.add("show");
+    document.body.classList.remove("sidebar-hidden");
+  } else {
+    closeMobile();
+  }
+
+  adjustContentMargin();
 }

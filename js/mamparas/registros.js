@@ -1,4 +1,4 @@
-import { supabase, mostrarModal, subirImagen, guardarInspeccion } from '../script.js';
+import { supabase, mostrarModal, subirImagen, guardarInspeccion } from './script.js';
 
 // Elementos del DOM
 const form = document.getElementById('form-inspeccion');
@@ -211,13 +211,20 @@ document.getElementById('empresa').addEventListener('change', function () {
 });
 
 // Autocompletar fecha y hora
-window.addEventListener('DOMContentLoaded', () => {
+function autocompletarFechaHora() {
   const fechaInput = document.getElementById('fecha');
   const horaInput = document.getElementById('hora');
+  if (!fechaInput || !horaInput) return;
   const ahora = new Date();
   fechaInput.value = ahora.toISOString().split('T')[0];
   horaInput.value = ahora.toTimeString().slice(0, 5);
-});
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener('DOMContentLoaded', autocompletarFechaHora);
+} else {
+  autocompletarFechaHora();
+}
 
 // Enviar a Supabase
 form.addEventListener('submit', async (e) => {

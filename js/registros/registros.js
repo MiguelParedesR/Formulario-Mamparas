@@ -20,21 +20,6 @@ const tablaBody = document.querySelector("#tabla-registros tbody");
 const inputBuscar = document.getElementById("buscarPlaca");
 
 /* ===============================
-   INICIO
-   =============================== */
-document.addEventListener("DOMContentLoaded", async () => {
-  await cargarIncidencias();
-  renderTabla(incidencias);
-
-  // Búsqueda en vivo
-  if (inputBuscar) {
-    inputBuscar.addEventListener("input", () => {
-      aplicarFiltro(inputBuscar.value.trim());
-    });
-  }
-});
-
-/* ===============================
    CARGAR DATOS DESDE SUPABASE
    =============================== */
 async function cargarIncidencias() {
@@ -142,9 +127,8 @@ function activarBotones() {
    NAVEGACIÓN A ver-incidencia.html
    =============================== */
 function abrirIncidencia(id) {
-  const url = `ver-incidencia.html?id=${encodeURIComponent(id)}`;
+  const url = `./html/ver-incidencia.html?id=${encodeURIComponent(id)}`;
 
-  // SPA con sidebar-loader
   window.dispatchEvent(new CustomEvent("sidebar:navigate", { detail: url }));
 }
 
@@ -164,4 +148,24 @@ export function obtenerDatosTabla() {
       estado: prog.estado,
     };
   });
+}
+
+/* ===============================
+   INICIO
+   =============================== */
+async function initRegistros() {
+  await cargarIncidencias();
+  renderTabla(incidencias);
+
+  if (inputBuscar) {
+    inputBuscar.addEventListener("input", () => {
+      aplicarFiltro(inputBuscar.value.trim());
+    });
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initRegistros);
+} else {
+  initRegistros();
 }

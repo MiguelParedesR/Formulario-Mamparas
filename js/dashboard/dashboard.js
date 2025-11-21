@@ -19,7 +19,7 @@
 export function navigateToFormulario(tipo) {
     if (!tipo) return;
 
-    const url = `formulario.html?tipo=${encodeURIComponent(tipo)}`;
+    const url = `./html/formulario.html?tipo=${encodeURIComponent(tipo)}`;
 
     console.log(`➡️ Navegando a: ${url}`);
 
@@ -33,7 +33,7 @@ export function navigateToFormulario(tipo) {
  * Navega al módulo de mamparas
  */
 export function navigateToMamparas() {
-    const url = "mamparas.html";
+    const url = "./html/mamparas.html";
 
     console.log(`➡️ Navegando a: ${url}`);
 

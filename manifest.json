@@ -1,0 +1,10 @@
+{
+  "name": "TPP – Incidencias",
+  "short_name": "TPP",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "theme_color": "#2f3b52",
+  "background_color": "#f4f6f8",
+  "icons": [],
+  "orientation": "portrait-primary"
+}

@@ -1,228 +1,162 @@
-<!DOCTYPE html>
-<html lang="es">
+<main class="p-6 space-y-6">
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.4/dist/pizzip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.4/dist/pizzip-utils.min.js"></script>
+    <!-- Encabezado -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 animate-slide select-none">
 
-    <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.38.0/build/docxtemplater.js"></script>
-    <script
-        src="https://cdn.jsdelivr.net/npm/docxtemplater-image-module-free@1.0.2/build/browser-image-module.min.js"></script>
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                <i class="fas fa-file-signature text-indigo-600"></i>
+                Nuevo Informe de Incidencia
+            </h1>
 
-
-    <title>Nuevo Informe de Incidencia</title>
-
-    <!-- Tailwind CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Animaciones Tailwind personalizadas -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        tpp: {
-                            dark: "#2f3b52",
-                            mid: "#3e4b67",
-                            light: "#f4f6f8",
-                            orange: "#ffa500",
-                        }
-                    },
-                    animation: {
-                        fade: "fadeIn 0.4s ease-out",
-                        slide: "slideUp 0.5s ease-out",
-                        grow: "growIn 0.35s ease-out",
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            "0%": { opacity: 0 },
-                            "100%": { opacity: 1 }
-                        },
-                        slideUp: {
-                            "0%": { opacity: 0, transform: "translateY(10px)" },
-                            "100%": { opacity: 1, transform: "translateY(0)" }
-                        },
-                        growIn: {
-                            "0%": { transform: "scale(0.96)", opacity: 0 },
-                            "100%": { transform: "scale(1)", opacity: 1 }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-</head>
-
-<body class="bg-gray-100 animate-fade">
-
-    <main class="p-6 space-y-6">
-
-        <!-- Encabezado -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 animate-slide select-none">
-
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                    <i class="fas fa-file-signature text-indigo-600"></i>
-                    Nuevo Informe de Incidencia
-                </h1>
-
-                <p class="text-sm text-gray-500 italic" id="tipoDescripcion">
-                    Selecciona el tipo de incidencia para cargar la plantilla correspondiente.
-                </p>
-            </div>
-
-            <!-- Barra de progreso -->
-            <div class="w-full md:w-72 animate-grow">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="text-xs font-semibold text-gray-600">Avance del informe</span>
-                    <span id="progressLabel" class="text-xs font-semibold text-gray-600">0%</span>
-                </div>
-
-                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden shadow-inner">
-                    <div id="progressBar" class="h-2 w-0 bg-red-500 rounded-full transition-all duration-500 ease-out">
-                    </div>
-                </div>
-
-                <p id="progressStatus" class="mt-1 text-[11px] text-gray-500">
-                    Puedes guardar borradores incompletos y continuar más tarde.
-                </p>
-            </div>
+            <p class="text-sm text-gray-500 italic" id="tipoDescripcion">
+                Selecciona el tipo de incidencia para cargar la plantilla correspondiente.
+            </p>
         </div>
 
-        <!-- FORMULARIO PRINCIPAL -->
-        <section class="bg-white rounded-2xl shadow-lg p-6 space-y-8 animate-slide">
+        <!-- Barra de progreso -->
+        <div class="w-full md:w-72 animate-grow">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-semibold text-gray-600">Avance del informe</span>
+                <span id="progressLabel" class="text-xs font-semibold text-gray-600">0%</span>
+            </div>
 
-            <form id="form-incidencia" class="space-y-10">
+            <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden shadow-inner">
+                <div id="progressBar" class="h-2 w-0 bg-red-500 rounded-full transition-all duration-500 ease-out">
+                </div>
+            </div>
 
-                <!-- Tipo de incidencia -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4 border-b border-gray-200">
+            <p id="progressStatus" class="mt-1 text-[11px] text-gray-500">
+                Puedes guardar borradores incompletos y continuar más tarde.
+            </p>
+        </div>
+    </div>
 
-                    <!-- Tipo -->
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-gray-700">Tipo de incidencia</label>
-                        <select id="tipoIncidencia" class="w-full rounded-xl border-gray-300 text-sm shadow-sm
-                                   focus:ring-indigo-500 focus:border-indigo-500 transition">
-                            <option value="">Seleccione...</option>
-                            <option value="CABLE">Sustracción de Cable RH</option>
-                            <option value="MERCADERIA">Sustracción de Mercadería</option>
-                            <option value="CHOQUE">Choque de Unidad</option>
-                            <option value="SINIESTRO">Siniestro</option>
-                        </select>
-                        <p class="text-xs text-gray-500">Puede venir preseleccionado desde la URL.</p>
-                    </div>
+    <!-- FORMULARIO PRINCIPAL -->
+    <section class="bg-white rounded-2xl shadow-lg p-6 space-y-8 animate-slide">
 
-                    <!-- Asunto -->
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-gray-700">Asunto (automático)</label>
-                        <input id="asunto" readonly class="w-full bg-gray-50 rounded-xl border-gray-200 text-sm shadow-sm px-3 py-2
-                                   text-gray-700 select-none" />
-                    </div>
+        <form id="form-incidencia" class="space-y-10">
+
+            <!-- Tipo de incidencia -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4 border-b border-gray-200">
+
+                <!-- Tipo -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700">Tipo de incidencia</label>
+                    <select id="tipoIncidencia" class="w-full rounded-xl border-gray-300 text-sm shadow-sm
+                               focus:ring-indigo-500 focus:border-indigo-500 transition">
+                        <option value="">Seleccione...</option>
+                        <option value="CABLE">Sustracción de Cable RH</option>
+                        <option value="MERCADERIA">Sustracción de Mercadería</option>
+                        <option value="CHOQUE">Choque de Unidad</option>
+                        <option value="SINIESTRO">Siniestro</option>
+                    </select>
+                    <p class="text-xs text-gray-500">Puede venir preseleccionado desde la URL.</p>
                 </div>
 
-                <!-- Cabecera -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-4 border-b border-gray-200">
+                <!-- Asunto -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700">Asunto (automático)</label>
+                    <input id="asunto" readonly class="w-full bg-gray-50 rounded-xl border-gray-200 text-sm shadow-sm px-3 py-2
+                               text-gray-700 select-none" />
+                </div>
+            </div>
 
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-gray-700">A:</label>
-                        <input id="dirigidoA" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
-                                   focus:ring-indigo-500 focus:border-indigo-500 transition" />
-                    </div>
+            <!-- Cabecera -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-4 border-b border-gray-200">
 
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-gray-700">De:</label>
-                        <input id="remitente" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
-                                   focus:ring-indigo-500 focus:border-indigo-500 transition" />
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-gray-700">Fecha del informe</label>
-                        <input id="fechaInforme" type="date" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
-                                   focus:ring-indigo-500 focus:border-indigo-500 transition" />
-                    </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700">A:</label>
+                    <input id="dirigidoA" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
+                               focus:ring-indigo-500 focus:border-indigo-500 transition" />
                 </div>
 
-                <!-- HECHOS -->
-                <section class="space-y-4 pb-4 border-b border-gray-200">
-                    <div class="flex items-center gap-2">
-                        <h2 class="text-sm font-bold text-gray-800 tracking-wide uppercase">II. Hechos</h2>
-                        <span class="text-[11px] text-gray-500">Los campos cambian según el tipo.</span>
-                    </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700">De:</label>
+                    <input id="remitente" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
+                               focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                </div>
 
-                    <div id="hechosDinamicos" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade">
-                        <!-- Campos dinámicos aquí -->
-                    </div>
-                </section>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700">Fecha del informe</label>
+                    <input id="fechaInforme" type="date" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
+                               focus:ring-indigo-500 focus:border-indigo-500 transition" />
+                </div>
+            </div>
 
-                <!-- ANÁLISIS / CONCLUSIONES / RECOMENDACIONES -->
-                <section class="space-y-6 pb-4 border-b border-gray-200">
-                    <div class="space-y-2">
-                        <h2 class="text-sm font-bold text-gray-800 uppercase">III. Análisis</h2>
-                        <textarea id="analisis" rows="4" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
-                                   focus:ring-indigo-500 focus:border-indigo-500 transition"
-                            placeholder="Analiza los hechos del incidente..."></textarea>
-                    </div>
+            <!-- HECHOS -->
+            <section class="space-y-4 pb-4 border-b border-gray-200">
+                <div class="flex items-center gap-2">
+                    <h2 class="text-sm font-bold text-gray-800 tracking-wide uppercase">II. Hechos</h2>
+                    <span class="text-[11px] text-gray-500">Los campos cambian según el tipo.</span>
+                </div>
 
-                    <div class="space-y-2">
-                        <h2 class="text-sm font-bold text-gray-800 uppercase">IV. Conclusiones</h2>
-                        <textarea id="conclusiones" rows="3" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
-                                   focus:ring-indigo-500 focus:border-indigo-500 transition"
-                            placeholder="Conclusiones claras..."></textarea>
-                    </div>
+                <div id="hechosDinamicos" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade">
+                    <!-- Campos dinámicos aquí -->
+                </div>
+            </section>
 
-                    <div class="space-y-2">
-                        <h2 class="text-sm font-bold text-gray-800 uppercase">V. Recomendaciones</h2>
-                        <textarea id="recomendaciones" rows="3" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
-                                   focus:ring-indigo-500 focus:border-indigo-500 transition"
-                            placeholder="Acciones correctivas..."></textarea>
-                    </div>
-                </section>
+            <!-- ANÁLISIS / CONCLUSIONES / RECOMENDACIONES -->
+            <section class="space-y-6 pb-4 border-b border-gray-200">
+                <div class="space-y-2">
+                    <h2 class="text-sm font-bold text-gray-800 uppercase">III. Análisis</h2>
+                    <textarea id="analisis" rows="4" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
+                               focus:ring-indigo-500 focus:border-indigo-500 transition"
+                        placeholder="Analiza los hechos del incidente..."></textarea>
+                </div>
 
-                <!-- ANEXOS -->
-                <section class="space-y-4">
-                    <h2 class="text-sm font-bold text-gray-800 uppercase">VI. Anexos – Evidencias</h2>
-                    <input id="anexos" type="file" multiple class="w-full file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700
-                               file:font-semibold file:px-4 file:py-2 text-sm
-                               hover:file:bg-indigo-100 transition" />
-                </section>
+                <div class="space-y-2">
+                    <h2 class="text-sm font-bold text-gray-800 uppercase">IV. Conclusiones</h2>
+                    <textarea id="conclusiones" rows="3" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
+                               focus:ring-indigo-500 focus:border-indigo-500 transition"
+                        placeholder="Conclusiones claras..."></textarea>
+                </div>
 
-                <!-- ACCIONES -->
-                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
-                    <button id="btnVolverDashboard" class="px-4 py-2 bg-white border border-gray-300 rounded-xl shadow-sm
-                               text-gray-700 text-sm hover:bg-gray-50 transition">
-                        Volver al Dashboard
+                <div class="space-y-2">
+                    <h2 class="text-sm font-bold text-gray-800 uppercase">V. Recomendaciones</h2>
+                    <textarea id="recomendaciones" rows="3" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
+                               focus:ring-indigo-500 focus:border-indigo-500 transition"
+                        placeholder="Acciones correctivas..."></textarea>
+                </div>
+            </section>
+
+            <!-- ANEXOS -->
+            <section class="space-y-4">
+                <h2 class="text-sm font-bold text-gray-800 uppercase">VI. Anexos – Evidencias</h2>
+                <input id="anexos" type="file" multiple class="w-full file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700
+                           file:font-semibold file:px-4 file:py-2 text-sm
+                           hover:file:bg-indigo-100 transition" />
+            </section>
+
+            <!-- ACCIONES -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
+                <button id="btnVolverDashboard" class="px-4 py-2 bg-white border border-gray-300 rounded-xl shadow-sm
+                           text-gray-700 text-sm hover:bg-gray-50 transition">
+                    Volver al Dashboard
+                </button>
+
+                <div class="flex gap-3 flex-wrap">
+                    <button id="btnGuardarBorrador" type="button" class="px-4 py-2 bg-amber-50 border border-amber-400 rounded-xl text-amber-700
+                               text-sm font-semibold shadow-sm hover:bg-amber-100 transition">
+                        Guardar Borrador
                     </button>
 
-                    <div class="flex gap-3 flex-wrap">
-                        <button id="btnGuardarBorrador" type="button" class="px-4 py-2 bg-amber-50 border border-amber-400 rounded-xl text-amber-700
-                                   text-sm font-semibold shadow-sm hover:bg-amber-100 transition">
-                            Guardar Borrador
-                        </button>
+                    <button id="btnGuardarCompleto" type="submit" class="px-4 py-2 bg-indigo-600 rounded-xl text-white shadow-md text-sm
+                               font-semibold hover:bg-indigo-700 transition">
+                        Guardar Informe
+                    </button>
 
-                        <button id="btnGuardarCompleto" type="submit" class="px-4 py-2 bg-indigo-600 rounded-xl text-white shadow-md text-sm
-                                   font-semibold hover:bg-indigo-700 transition">
-                            Guardar Informe
-                        </button>
-
-                        <button id="btnExportarWord" type="button" class="px-4 py-2 bg-emerald-50 border-emerald-600 border rounded-xl text-emerald-700
-                                   text-sm font-semibold hover:bg-emerald-100 transition">
-                            Exportar Word
-                        </button>
-                    </div>
+                    <button id="btnExportarWord" type="button" class="px-4 py-2 bg-emerald-50 border-emerald-600 border rounded-xl text-emerald-700
+                               text-sm font-semibold hover:bg-emerald-100 transition">
+                        Exportar Word
+                    </button>
                 </div>
+            </div>
 
-            </form>
-        </section>
+        </form>
+    </section>
 
-    </main>
+</main>
 
-    <!-- Lógica modular -->
-    <script type="module" src="../js/formularios/formulario.js"></script>
-
-    <!-- FontAwesome -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
-</body>
-
-</html>
+<!-- Lógica modular -->
+<script type="module" src="/js/formularios/formulario.js"></script>

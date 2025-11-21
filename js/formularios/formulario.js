@@ -340,7 +340,7 @@ document
 document.getElementById("btnVolverDashboard").addEventListener("click", () => {
   window.dispatchEvent(
     new CustomEvent("sidebar:navigate", {
-      detail: "dashboard.html",
+      detail: "./index.html",
     })
   );
 });

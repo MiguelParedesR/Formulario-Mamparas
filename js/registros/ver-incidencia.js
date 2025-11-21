@@ -1,13 +1,10 @@
 /* ============================================================================
    ver-incidencia.js — Vista Individual de Incidencia TPP
-   ------------------------------------------------------
-   ✔ Carga desde Supabase
-   ✔ Actualiza campos en vivo
-   ✔ Guarda cambios (UPDATE)
-   ✔ Maneja anexos (Supabase Storage)
-   ✔ Actualiza barra de progreso
-   ✔ Exporta a Word (DOCX)
-   ✔ SPA con sidebar-loader
+   - Carga y guarda en Supabase
+   - Actualiza progreso
+   - Maneja anexos (Supabase Storage)
+   - Exporta a Word (DOCX)
+   - Compatible con SPA (sidebar-loader)
 ============================================================================ */
 
 import { supabase } from "../utils/supabase.js";
@@ -23,29 +20,6 @@ import { generarDocxIncidencia } from "../formularios/generador-docx.js";
    =============================== */
 let incidenciaActual = null;
 let incidenciaId = null;
-
-/* ===============================
-   INICIO
-   =============================== */
-document.addEventListener("DOMContentLoaded", async () => {
-  incidenciaId = obtenerIdDesdeURL();
-
-  if (!incidenciaId) {
-    mostrarMensaje("ID inválido", "error");
-    return;
-  }
-
-  await cargarIncidencia();
-
-  if (!incidenciaActual) {
-    mostrarMensaje("No se encontró la incidencia", "error");
-    return;
-  }
-
-  pintarDatosEnFormulario();
-  actualizarBarraConIncidencia();
-  activarEventos();
-});
 
 /* ===============================
    OBTENER ID DESDE URL
@@ -78,7 +52,6 @@ async function cargarIncidencia() {
    PINTAR DATOS EN EL FORMULARIO
    =============================== */
 function pintarDatosEnFormulario() {
-  // Campos directos
   asignar("tipoIncidencia", incidenciaActual.tipo_incidencia);
   asignar("asunto", incidenciaActual.asunto);
   asignar("dirigidoA", incidenciaActual.dirigido_a);
@@ -88,14 +61,12 @@ function pintarDatosEnFormulario() {
   asignar("conclusiones", incidenciaActual.conclusiones);
   asignar("recomendaciones", incidenciaActual.recomendaciones);
 
-  // Campos dinámicos ("campos" JSONB)
   if (incidenciaActual.campos) {
     for (const key in incidenciaActual.campos) {
       asignar(key, incidenciaActual.campos[key]);
     }
   }
 
-  // Anexos
   const contenedor = document.getElementById("listaAnexos");
 
   if (contenedor && incidenciaActual.anexos?.length > 0) {
@@ -113,8 +84,7 @@ function pintarDatosEnFormulario() {
 
 function asignar(id, valor) {
   const input = document.getElementById(id);
-  if (!input) return;
-  if (input.type === "file") return;
+  if (!input || input.type === "file") return;
   input.value = valor || "";
 }
 
@@ -245,4 +215,33 @@ function mostrarMensaje(texto, tipo) {
 
   modal.style.display = "flex";
   setTimeout(() => (modal.style.display = "none"), 2000);
+}
+
+/* ===============================
+   INICIO
+   =============================== */
+async function initVerIncidencia() {
+  incidenciaId = obtenerIdDesdeURL();
+
+  if (!incidenciaId) {
+    mostrarMensaje("ID inválido", "error");
+    return;
+  }
+
+  await cargarIncidencia();
+
+  if (!incidenciaActual) {
+    mostrarMensaje("No se encontró la incidencia", "error");
+    return;
+  }
+
+  pintarDatosEnFormulario();
+  actualizarBarraConIncidencia();
+  activarEventos();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initVerIncidencia);
+} else {
+  initVerIncidencia();
 }
