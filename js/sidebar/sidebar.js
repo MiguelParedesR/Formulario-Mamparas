@@ -226,7 +226,10 @@ export async function initSidebar(
   }
 
   function normalizeHref(href) {
-    const targetUrl = new URL(href, window.location.origin + window.location.pathname);
+    const targetUrl = new URL(
+      href,
+      window.location.origin + window.location.pathname
+    );
     const fetchUrl = `${targetUrl.pathname}${targetUrl.search}`;
     const stateUrl = buildStateUrl(targetUrl);
     const menuHref = `${targetUrl.pathname}${targetUrl.search}`;
@@ -246,12 +249,12 @@ export async function initSidebar(
 
       const html = await req.text();
       const dom = new DOMParser().parseFromString(html, "text/html");
+      const scripts = Array.from(dom.querySelectorAll("script"));
+      scripts.forEach((s) => s.remove());
+
       const main = dom.querySelector("main");
 
       if (!main) throw new Error("No se encontró <main> en la vista cargada.");
-
-      const scripts = Array.from(main.querySelectorAll("script"));
-      scripts.forEach((s) => s.remove());
 
       mainContainer.innerHTML = main.innerHTML;
       mainContainer.scrollTo(0, 0);
@@ -288,20 +291,24 @@ export async function initSidebar(
   }
 
   if (menuRoot) {
-    menuRoot.querySelectorAll(":scope > li.has-submenu > .menu-link").forEach((link) => {
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-        const li = link.parentElement;
-        if (isDesktop() && sidebar.classList.contains("collapsed")) {
-          openFlyout(li);
-        } else {
-          toggleSubmenu(li);
-        }
+    menuRoot
+      .querySelectorAll(":scope > li.has-submenu > .menu-link")
+      .forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const li = link.parentElement;
+          if (isDesktop() && sidebar.classList.contains("collapsed")) {
+            openFlyout(li);
+          } else {
+            toggleSubmenu(li);
+          }
+        });
       });
-    });
 
     menuRoot
-      .querySelectorAll(".submenu-link, :scope > li:not(.has-submenu) > .menu-link")
+      .querySelectorAll(
+        ".submenu-link, :scope > li:not(.has-submenu) > .menu-link"
+      )
       .forEach((link) => {
         link.addEventListener("click", (e) => {
           const href = link.getAttribute("href");
