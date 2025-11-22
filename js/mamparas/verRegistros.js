@@ -1,108 +1,114 @@
-﻿import { supabase } from './script.js';
+﻿// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
 
-async function cargarRegistros() {
-  const cuerpo = document.getElementById('tabla-registros');
-  if (!cuerpo) return;
-
-  cuerpo.innerHTML = '';
-
-  const { data, error } = await supabase
-    .from('inspecciones')
-    .select('*')
-    .order('fecha', { ascending: false });
-
-  if (error) {
-    console.error('Error al cargar registros:', error.message);
-    cuerpo.innerHTML = '<tr><td colspan="10">Error al cargar datos</td></tr>';
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    cuerpo.innerHTML = '<tr><td colspan="10">No hay registros disponibles</td></tr>';
-    return;
-  }
-
-  data.forEach((registro) => {
-    const fila = document.createElement('tr');
-    const detalleObj = typeof registro.detalle === 'string' ? JSON.parse(registro.detalle || '{}') : (registro.detalle || {});
-    fila.innerHTML = `
-      <td>${registro.fecha || ''}</td>
-      <td>${registro.hora || ''}</td>
-      <td>${registro.empresa || ''}</td>
-      <td>${registro.placa || ''}</td>
-      <td>${registro.chofer || ''}</td>
-      <td>${registro.lugar || ''}</td>
-      <td>${registro.incorreccion || ''}</td>
-      <td>${registro.responsable || ''}</td>
-      <td>${registro.observaciones || ''}</td>
-      <td><button class="px-2 py-1 text-indigo-600 underline text-xs flex items-center gap-1" onclick='mostrarDetalle(${JSON.stringify(detalleObj)})'><i class="fas fa-eye"></i> Ver</button></td>
-    `;
-    cuerpo.appendChild(fila);
-  });
-}
-
-async function initVerRegistros() {
-  await cargarRegistros();
-
-  const buscarPlacaInput = document.getElementById('buscarPlaca');
-  if (buscarPlacaInput) {
-    buscarPlacaInput.addEventListener('input', function () {
-      const filtro = this.value.toUpperCase();
-      const filas = document.querySelectorAll('#tabla-registros tr');
-
-      filas.forEach((fila) => {
-        const celdaPlaca = fila.cells[3];
-        if (celdaPlaca && celdaPlaca.textContent.toUpperCase().includes(filtro)) {
-          fila.style.display = '';
-        } else {
-          fila.style.display = 'none';
-        }
-      });
-    });
-  }
-}
-
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', initVerRegistros);
-} else {
-  initVerRegistros();
-}
-
+/* ======================================================
+   🔵 MOSTRAR DETALLE EN EL MODAL
+   ====================================================== */
 window.mostrarDetalle = function (detalle) {
-  const modal = document.getElementById('detalleModal');
-  const contenido = document.getElementById('detalleContenido');
+  const modal = document.getElementById("detalleModal");
+  const contenido = document.getElementById("detalleContenido");
 
   if (!modal || !contenido) return;
 
-  if (!detalle || typeof detalle !== 'object') {
-    contenido.innerHTML = '<tr><td>Sin detalle disponible.</td></tr>';
-    modal.style.display = 'flex';
+  if (!detalle || typeof detalle !== "object") {
+    contenido.innerHTML = `
+      <tr><td class="py-2 text-gray-600">Sin detalle disponible.</td></tr>
+    `;
+    modal.classList.remove("hidden");
+    modal.style.display = "flex";
     return;
   }
 
-  const rows = Object.entries(detalle).map(
-    ([key, value]) => `<tr><th style="text-transform:capitalize">${key}</th><td>${value || ''}</td></tr>`
-  );
+  /* ======================================================
+     🔵 DETALLE TIPO MAMPARA
+     ====================================================== */
+  if (detalle.tipo === "Mampara") {
+    contenido.innerHTML = `
+      <tr>
+        <th class="text-left py-1 pr-2 text-gray-700">Separación central</th>
+        <td class="py-1">${detalle.separacion_lateral_central || "-"} cm</td>
+      </tr>
 
-  contenido.innerHTML = rows.join('');
-  modal.style.display = 'flex';
+      <tr>
+        <th class="text-left py-1 pr-2 text-gray-700">Altura mampara</th>
+        <td class="py-1">${detalle.altura_mampara || "-"} cm</td>
+      </tr>
+
+      <tr>
+        <th class="text-left py-1 pr-2 text-gray-700">Fotos</th>
+        <td class="py-2 flex gap-3">
+          ${renderFoto(detalle.foto_panoramica_unidad)}
+          ${renderFoto(detalle.foto_altura_mampara)}
+          ${renderFoto(detalle.foto_lateral_central)}
+        </td>
+      </tr>
+    `;
+  }
+
+  /* ======================================================
+     🔵 DETALLE TIPO OTROS / PERNOS / COLA DE PATO
+     ====================================================== */
+  else {
+    contenido.innerHTML = `
+      <tr>
+        <th class="text-left py-1 pr-2 text-gray-700">Descripción</th>
+        <td class="py-1">${detalle.observacion_texto || "-"}</td>
+      </tr>
+
+      <tr>
+        <th class="text-left py-1 pr-2 text-gray-700">Foto</th>
+        <td class="py-2">
+          ${renderFoto(detalle.foto_observacion)}
+        </td>
+      </tr>
+    `;
+  }
+
+  modal.style.display = "flex";
+  modal.classList.remove("hidden");
 };
 
-window.cerrarDetalle = function () {
-  const modal = document.getElementById('detalleModal');
-  if (modal) modal.style.display = 'none';
+/* ======================================================
+   🔵 RENDERIZAR MINIATURA DE FOTO
+   ====================================================== */
+window.renderFoto = function (url) {
+  if (!url) return "";
+  return `
+    <img 
+      src="${url}" 
+      class="w-20 h-20 rounded-lg border shadow cursor-pointer object-cover"
+      onclick="verImagenAmpliada('${url}')"
+    />
+  `;
 };
 
+/* ======================================================
+   🔵 ABRIR IMAGEN EN GRANDE
+   ====================================================== */
 window.verImagenAmpliada = function (url) {
-  const img = document.getElementById('imagenAmpliadaSrc');
-  const modal = document.getElementById('imagenAmpliada');
+  const img = document.getElementById("imagenAmpliadaSrc");
+  const modal = document.getElementById("imagenAmpliada");
+
   if (img && modal) {
     img.src = url;
-    modal.style.display = 'flex';
+    modal.style.display = "flex";
+    modal.classList.remove("hidden");
   }
 };
 
-window.cerrarImagenAmpliada = function () {
-  const modal = document.getElementById('imagenAmpliada');
-  if (modal) modal.style.display = 'none';
+/* ======================================================
+   🔵 CERRAR MODAL DETALLE
+   ====================================================== */
+window.cerrarDetalle = function () {
+  const modal = document.getElementById("detalleModal");
+  if (modal) modal.style.display = "none";
 };
+
+/* ======================================================
+   🔵 CERRAR IMAGEN AMPLIADA
+   ====================================================== */
+window.cerrarImagenAmpliada = function () {
+  const modal = document.getElementById("imagenAmpliada");
+  if (modal) modal.style.display = "none";
+};
+
+console.log("QA Mamparas: archivo corregido");

@@ -1,25 +1,29 @@
 /* ============================================================================
-   storage.js — Manejo de archivos en Supabase Storage
+   storage.js - Manejo de archivos en Supabase Storage
    ---------------------------------------------------
-   ✔ uploadFiles(idIncidencia, files)
-   ✔ sanitizeFileName(name)
-   ✔ getBase64(file)
-   ✔ getRemoteBase64(url)
+   - uploadFiles(idIncidencia, files)
+   - sanitizeFileName(name)
+   - getBase64(file)
+   - getRemoteBase64(url)
 ============================================================================ */
 
 import { supabase } from "./supabase.js";
+
+const INCIDENCIAS_BUCKET =
+  (typeof window !== "undefined" && window.INCIDENCIAS_BUCKET) ||
+  (typeof window !== "undefined" &&
+    window.APP_CONFIG &&
+    window.APP_CONFIG.incidenciasBucket) ||
+  "incidencias";
 
 /* --------------------------------------------
    Normaliza nombres
 -------------------------------------------- */
 function sanitizeFileName(name) {
   return name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/[áàäâ]/g, "a")
-    .replace(/[éèëê]/g, "e")
-    .replace(/[íìïî]/g, "i")
-    .replace(/[óòöô]/g, "o")
-    .replace(/[úùüû]/g, "u")
     .replace(/[^a-z0-9.\-_]/g, "_");
 }
 
@@ -54,12 +58,38 @@ export async function getFileBase64(url) {
 }
 
 /* --------------------------------------------
+   Validar acceso al bucket
+-------------------------------------------- */
+async function ensureBucketAvailable(bucket) {
+  const { error } = await supabase.storage.from(bucket).list("", { limit: 1 });
+
+  if (!error) return;
+
+  const message = error.message || "No se pudo acceder al bucket.";
+  const lower = message.toLowerCase();
+
+  if (lower.includes("not found")) {
+    throw new Error(
+      `El bucket "${bucket}" no existe o no es accesible con la anon key. ` +
+        `Verifica el nombre exacto en Storage o define window.INCIDENCIAS_BUCKET antes de cargar los scripts.`
+    );
+  }
+
+  throw new Error(
+    `No se pudo acceder al bucket "${bucket}". Revisa las politicas de Storage. Detalle: ${message}`
+  );
+}
+
+/* --------------------------------------------
    Subida de archivos
 -------------------------------------------- */
 export async function uploadFiles(idIncidencia, files) {
-  const bucket = "incidencias";
-  const carpeta = `${idIncidencia}`;
+  if (!files || !files.length) return [];
 
+  const bucket = INCIDENCIAS_BUCKET;
+  await ensureBucketAvailable(bucket);
+
+  const carpeta = `${idIncidencia}`;
   const resultados = [];
 
   for (const file of files) {
@@ -71,11 +101,18 @@ export async function uploadFiles(idIncidencia, files) {
       .upload(ruta, file);
 
     if (uploadError) {
-      console.error("❌ Error subiendo archivo:", uploadError);
-      continue;
+      throw new Error(
+        `No se pudo subir ${file.name}: ${uploadError.message || "error desconocido"}`
+      );
     }
 
-    const { data } = supabase.storage.from(bucket).getPublicUrl(ruta);
+    const { data, error: urlError } = supabase.storage.from(bucket).getPublicUrl(ruta);
+
+    if (urlError) {
+      throw new Error(
+        `Archivo subido pero sin URL publica (${file.name}): ${urlError.message || "sin detalle"}`
+      );
+    }
 
     resultados.push({
       name: cleanName,

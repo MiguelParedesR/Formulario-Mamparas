@@ -10,7 +10,7 @@
             </h1>
 
             <p class="text-sm text-gray-500 italic" id="tipoDescripcion">
-                Selecciona el tipo de incidencia para cargar la plantilla correspondiente.
+                El tipo se define desde el dashboard o el sidebar; el asunto se carga de forma automatica.
             </p>
         </div>
 
@@ -27,7 +27,7 @@
             </div>
 
             <p id="progressStatus" class="mt-1 text-[11px] text-gray-500">
-                Puedes guardar borradores incompletos y continuar más tarde.
+                Puedes guardar borradores incompletos y continuar mas tarde.
             </p>
         </div>
     </div>
@@ -37,28 +37,16 @@
 
         <form id="form-incidencia" class="space-y-10">
 
-            <!-- Tipo de incidencia -->
+            <!-- Asunto + campo extra -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-4 border-b border-gray-200">
-
-                <!-- Tipo -->
                 <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">Tipo de incidencia</label>
-                    <select id="tipoIncidencia" class="w-full rounded-xl border-gray-300 text-sm shadow-sm
-                               focus:ring-indigo-500 focus:border-indigo-500 transition">
-                        <option value="">Seleccione...</option>
-                        <option value="CABLE">Sustracción de Cable RH</option>
-                        <option value="MERCADERIA">Sustracción de Mercadería</option>
-                        <option value="CHOQUE">Choque de Unidad</option>
-                        <option value="SINIESTRO">Siniestro</option>
-                    </select>
-                    <p class="text-xs text-gray-500">Puede venir preseleccionado desde la URL.</p>
-                </div>
-
-                <!-- Asunto -->
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">Asunto (automático)</label>
+                    <label class="text-sm font-semibold text-gray-700">Asunto (automatico)</label>
                     <input id="asunto" readonly class="w-full bg-gray-50 rounded-xl border-gray-200 text-sm shadow-sm px-3 py-2
                                text-gray-700 select-none" />
+                </div>
+
+                <div id="campoExtraContainer" class="space-y-2">
+                    <!-- Campo extra dinamico segun tipo -->
                 </div>
             </div>
 
@@ -88,18 +76,18 @@
             <section class="space-y-4 pb-4 border-b border-gray-200">
                 <div class="flex items-center gap-2">
                     <h2 class="text-sm font-bold text-gray-800 tracking-wide uppercase">II. Hechos</h2>
-                    <span class="text-[11px] text-gray-500">Los campos cambian según el tipo.</span>
+                    <span class="text-[11px] text-gray-500">Redacta los hechos en lista numerada.</span>
                 </div>
-
-                <div id="hechosDinamicos" class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade">
-                    <!-- Campos dinámicos aquí -->
-                </div>
+                <textarea id="hechos" rows="4" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
+                           focus:ring-indigo-500 focus:border-indigo-500 transition"
+                    placeholder="1. Describa el primer hecho..."></textarea>
+                <p class="text-[11px] text-gray-500">Al presionar Enter se insertará el siguiente numero automaticamente.</p>
             </section>
 
-            <!-- ANÁLISIS / CONCLUSIONES / RECOMENDACIONES -->
+            <!-- ANALISIS / CONCLUSIONES / RECOMENDACIONES -->
             <section class="space-y-6 pb-4 border-b border-gray-200">
                 <div class="space-y-2">
-                    <h2 class="text-sm font-bold text-gray-800 uppercase">III. Análisis</h2>
+                    <h2 class="text-sm font-bold text-gray-800 uppercase">III. Analisis</h2>
                     <textarea id="analisis" rows="4" class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2
                                focus:ring-indigo-500 focus:border-indigo-500 transition"
                         placeholder="Analiza los hechos del incidente..."></textarea>
@@ -122,7 +110,7 @@
 
             <!-- ANEXOS -->
             <section class="space-y-4">
-                <h2 class="text-sm font-bold text-gray-800 uppercase">VI. Anexos – Evidencias</h2>
+                <h2 class="text-sm font-bold text-gray-800 uppercase">VI. Anexos / Evidencias</h2>
                 <input id="anexos" type="file" multiple class="w-full file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700
                            file:font-semibold file:px-4 file:py-2 text-sm
                            hover:file:bg-indigo-100 transition" />
@@ -131,7 +119,7 @@
             <!-- ACCIONES -->
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
                 <button id="btnVolverDashboard" class="px-4 py-2 bg-white border border-gray-300 rounded-xl shadow-sm
-                           text-gray-700 text-sm hover:bg-gray-50 transition">
+                           text-gray-700 text-sm hover:bg-gray-50 transition" type="button">
                     Volver al Dashboard
                 </button>
 
@@ -158,5 +146,5 @@
 
 </main>
 
-<!-- Lógica modular -->
+<!-- Logica modular -->
 <script type="module" src="/js/formularios/formulario.js"></script>

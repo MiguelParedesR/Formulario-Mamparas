@@ -1,6 +1,7 @@
+﻿<!-- 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas -->
 <main class="p-6 space-y-6 max-w-4xl mx-auto">
+
   <div class="space-y-1">
-    <p class="text-sm text-gray-500">Mamparas</p>
     <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
       <i class="fas fa-file-export text-indigo-600"></i>
       Reportes
@@ -8,24 +9,44 @@
     <p class="text-sm text-gray-600">Exporta los registros filtrando por mes y operador.</p>
   </div>
 
+  <!-- CONTENEDOR PRINCIPAL -->
   <section class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-4">
+
+    <!-- SELECCIÓN DE MES / OPERADOR -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
       <div>
-        <label class="block text-sm font-semibold text-gray-700" for="mesSelect">Seleccionar Mes</label>
-        <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="month" id="mesSelect" />
+        <label class="block text-sm font-semibold text-gray-700" for="mes">
+          Seleccionar Mes
+        </label>
+        <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="month" id="mes" />
       </div>
+
       <div>
-        <label class="block text-sm font-semibold text-gray-700" for="operadorSelect">Seleccionar Operador</label>
-        <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="operadorSelect">
+        <label class="block text-sm font-semibold text-gray-700" for="operador">
+          Seleccionar Operador
+        </label>
+        <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="operador">
           <option value="Todos">Todos</option>
         </select>
       </div>
+
     </div>
 
-    <button id="btnExportar" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold">Exportar a Excel</button>
+    <!-- BOTÓN EXPORTAR -->
+    <button id="btnExportarExcel"
+      class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">
+      Exportar a Excel
+    </button>
+
   </section>
 </main>
 
+<!-- LIBRERÍAS NECESARIAS -->
 <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+<!-- SCRIPT PRINCIPAL DEL MÓDULO -->
 <script type="module" src="/js/mamparas/reportes.js"></script>
+
+<!-- 🚫 NO BORRAR — Fin archivo restaurado/corregido módulo Mamparas -->

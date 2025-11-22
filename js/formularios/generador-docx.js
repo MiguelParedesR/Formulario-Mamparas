@@ -1,5 +1,5 @@
 /* ============================================================
-   generador-docx.js — Exportación DOCX
+   generador-docx.js - Exportacion DOCX
    - Convierte la incidencia a un documento .docx usando docxtemplater
    - Descarga en el cliente (PWA)
    ============================================================ */
@@ -12,9 +12,21 @@ export async function generarDocxIncidencia(incidencia) {
 
     const templateURL = "/assets/templates/informe-base.docx";
     const templateBinary = await cargarDocx(templateURL);
+    if (!templateBinary || templateBinary.byteLength === 0) {
+      throw new Error(
+        "La plantilla Word esta vacia o no se pudo cargar (/assets/templates/informe-base.docx)."
+      );
+    }
+
+    const Docxtemplater = window.docxtemplater || window.Docxtemplater;
+    if (!window.PizZip || !Docxtemplater) {
+      throw new Error("Faltan dependencias de docxtemplater/pizzip en la pagina.");
+    }
 
     const zip = new window.PizZip(templateBinary);
-    const doc = new window.docxtemplater().loadZip(zip);
+    const doc = Docxtemplater.prototype?.loadZip
+      ? new Docxtemplater().loadZip(zip)
+      : new Docxtemplater(zip);
 
     const datos = {
       asunto: incidencia.asunto,
@@ -43,13 +55,11 @@ export async function generarDocxIncidencia(incidencia) {
     doc.setData(datos);
     doc.render();
 
-    const output = doc
-      .getZip()
-      .generate({
-        type: "blob",
-        mimeType:
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      });
+    const output = doc.getZip().generate({
+      type: "blob",
+      mimeType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    });
 
     descargarDOCX(output, `informe-${incidencia.id}.docx`);
     ocultarModalCarga();
@@ -68,9 +78,17 @@ async function cargarDocx(url) {
 
 function expandirCamposJSON(json) {
   const plano = {};
+
   for (const key in json) {
-    plano[key] = json[key] || "";
+    if (key === "valorExtra" && typeof json[key] === "object" && json[key] !== null) {
+      const extra = json[key];
+      plano.contenedor = extra.contenedor || "";
+      plano.placa = extra.placa || "";
+    } else {
+      plano[key] = json[key] || "";
+    }
   }
+
   return plano;
 }
 

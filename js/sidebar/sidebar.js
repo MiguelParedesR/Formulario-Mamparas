@@ -1,9 +1,9 @@
 // ============================================================================
-// SIDEBAR.JS — SPA + Sidebar persistente
+// SIDEBAR.JS - SPA + Sidebar persistente
 //  - Mobile slide + toggles
 //  - Collapse desktop + flyout
-//  - Submenús independientes
-//  - Navegación SPA con loadPartial()
+//  - Submenus independientes
+//  - Navegacion SPA con loadPartial()
 //  - Resaltado de enlace activo
 //  - Cierre al hacer click fuera y resize seguro
 // ============================================================================
@@ -22,12 +22,12 @@ export async function initSidebar(
   const mainContainer = document.querySelector(MAIN_SELECTOR);
 
   if (!container) {
-    console.error("❌ initSidebar: No existe #sidebar-container.");
+    console.error("⚠️ initSidebar: No existe #sidebar-container.");
     return;
   }
 
   if (!mainContainer) {
-    console.error("❌ initSidebar: No existe #dashboardContent.");
+    console.error("⚠️ initSidebar: No existe #dashboardContent.");
     return;
   }
 
@@ -36,7 +36,7 @@ export async function initSidebar(
       const resp = await fetch(htmlPath, { cache: "no-cache" });
       container.insertAdjacentHTML("afterbegin", await resp.text());
     } catch (e) {
-      console.error("❌ Error cargando sidebar.html:", e);
+      console.error("⚠️ Error cargando sidebar.html:", e);
       return;
     }
   }
@@ -48,7 +48,7 @@ export async function initSidebar(
   const menuRoot = sidebar?.querySelector(".menu");
 
   if (!sidebar || !toggleFloating || !toggleInternal || !collapseBtn) {
-    console.error("❌ initSidebar: No se encontraron los toggles requeridos.");
+    console.error("⚠️ initSidebar: No se encontraron los toggles requeridos.");
     return;
   }
 
@@ -296,14 +296,6 @@ export async function initSidebar(
       mainContainer.innerHTML = main.innerHTML;
       mainContainer.scrollTo(0, 0);
 
-      await executeScripts(scripts);
-      const pageTitle = dom.querySelector("title")?.textContent;
-      if (pageTitle) document.title = pageTitle;
-
-      highlightActive(target.menuHref);
-      expandSubmenuByHref(target.menuHref);
-      adjustContentMargin();
-
       if (push) {
         history.pushState(
           { href: target.fetchUrl },
@@ -311,8 +303,16 @@ export async function initSidebar(
           target.stateUrl.toString()
         );
       }
+
+      await executeScripts(scripts);
+      const pageTitle = dom.querySelector("title")?.textContent;
+      if (pageTitle) document.title = pageTitle;
+
+      highlightActive(target.menuHref);
+      expandSubmenuByHref(target.menuHref);
+      adjustContentMargin();
     } catch (err) {
-      console.error("❌ loadPartial error:", err);
+      console.error("⚠️ loadPartial error:", err);
     } finally {
       isNavigating = false;
     }
