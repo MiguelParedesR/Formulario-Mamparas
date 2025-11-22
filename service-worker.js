@@ -1,4 +1,4 @@
-const CACHE_NAME = "tpp-pwa-v11";
+const CACHE_NAME = "tpp-pwa-v14";
 const CORE_ASSETS = [
   "/",
   "/index.html",

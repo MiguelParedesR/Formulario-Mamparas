@@ -35,7 +35,7 @@ async function cargarRegistros() {
       <td>${registro.incorreccion || ''}</td>
       <td>${registro.responsable || ''}</td>
       <td>${registro.observaciones || ''}</td>
-      <td><button class="px-2 py-1 text-indigo-600 underline text-xs" onclick='mostrarDetalle(${JSON.stringify(detalleObj)})'>Ver</button></td>
+      <td><button class="px-2 py-1 text-indigo-600 underline text-xs flex items-center gap-1" onclick='mostrarDetalle(${JSON.stringify(detalleObj)})'><i class="fas fa-eye"></i> Ver</button></td>
     `;
     cuerpo.appendChild(fila);
   });

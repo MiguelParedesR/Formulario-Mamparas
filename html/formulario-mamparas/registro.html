@@ -1,12 +1,15 @@
-﻿<main class="p-6 space-y-6 max-w-5xl mx-auto">
+<main class="p-6 space-y-6 max-w-5xl mx-auto">
   <div class="space-y-1">
     <p class="text-sm text-gray-500">Mamparas</p>
-    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3"><i class="fas fa-clipboard-list text-indigo-600"></i> Registro de Inspeccion</h1>
+    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+      <i class="fas fa-clipboard-list text-indigo-600"></i>
+      Registro de Inspeccion
+    </h1>
     <p class="text-sm text-gray-600">Completa los datos y adjunta el detalle obligatorio.</p>
   </div>
 
-  <section class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-4">
-    <form id="form-inspeccion" class="space-y-4">
+  <section class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-5">
+    <form id="form-inspeccion" class="space-y-5">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-semibold text-gray-700" for="fecha">Fecha</label>
@@ -19,7 +22,7 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
+        <div class="space-y-2">
           <label class="block text-sm font-semibold text-gray-700" for="empresa">Empresa</label>
           <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="empresa" name="empresa" required>
             <option value="">Seleccione</option>
@@ -46,18 +49,18 @@
           </select>
           <input class="w-full rounded-lg border-gray-300 px-3 py-2 mt-2" type="text" id="nueva_empresa" name="nueva_empresa" placeholder="Ingresa el nombre de la empresa" style="display: none;" />
         </div>
-        <div>
+        <div class="space-y-2">
           <label class="block text-sm font-semibold text-gray-700" for="placa">Placa</label>
           <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="text" id="placa" name="placa" required />
         </div>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
+        <div class="space-y-2">
           <label class="block text-sm font-semibold text-gray-700" for="chofer">Chofer</label>
           <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="text" id="chofer" name="chofer" required />
         </div>
-        <div>
+        <div class="space-y-2">
           <label class="block text-sm font-semibold text-gray-700" for="lugar">Lugar</label>
           <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="lugar" name="lugar" required>
             <option value="">Seleccione</option>
@@ -68,7 +71,7 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
+        <div class="space-y-2">
           <label class="block text-sm font-semibold text-gray-700" for="incorreccion">Tipo de incorreccion</label>
           <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="incorreccion" name="incorreccion" required>
             <option value="">Seleccione</option>
@@ -78,7 +81,7 @@
             <option value="Otros">Otros</option>
           </select>
         </div>
-        <div>
+        <div class="space-y-2">
           <label class="block text-sm font-semibold text-gray-700" for="responsable">Responsable</label>
           <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="responsable" name="responsable" required>
             <option value="">Seleccione</option>
@@ -96,7 +99,7 @@
         </div>
       </div>
 
-      <div>
+      <div class="space-y-2">
         <label class="block text-sm font-semibold text-gray-700" for="observaciones">Observaciones</label>
         <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="observaciones" name="observaciones" required>
           <option value="">Seleccione</option>
@@ -115,7 +118,6 @@
   </section>
 </main>
 
-<!-- Modal de Detalle -->
 <div class="detalle-modal" id="detalleModal">
   <div class="detalle-modal-content">
     <h3>Detalle de la Incorreccion</h3>
@@ -124,7 +126,6 @@
   </div>
 </div>
 
-<!-- Modal de retroalimentacion -->
 <div id="feedbackModal" class="feedback-modal" style="display: none;">
   <div class="modal-inner">
     <div id="loadingAnimation" class="loader"></div>
