@@ -1,10 +1,10 @@
-import { supabase } from './script.js';
+﻿import { supabase } from './script.js';
 
 async function cargarRegistros() {
-  const tabla = document.querySelector('#tabla-registros tbody');
-  if (!tabla) return;
+  const cuerpo = document.getElementById('tabla-registros');
+  if (!cuerpo) return;
 
-  tabla.innerHTML = '';
+  cuerpo.innerHTML = '';
 
   const { data, error } = await supabase
     .from('inspecciones')
@@ -13,17 +13,18 @@ async function cargarRegistros() {
 
   if (error) {
     console.error('Error al cargar registros:', error.message);
-    tabla.innerHTML = '<tr><td colspan="10">Error al cargar datos</td></tr>';
+    cuerpo.innerHTML = '<tr><td colspan="10">Error al cargar datos</td></tr>';
     return;
   }
 
-  if (data.length === 0) {
-    tabla.innerHTML = '<tr><td colspan="10">No hay registros disponibles</td></tr>';
+  if (!data || data.length === 0) {
+    cuerpo.innerHTML = '<tr><td colspan="10">No hay registros disponibles</td></tr>';
     return;
   }
 
   data.forEach((registro) => {
     const fila = document.createElement('tr');
+    const detalleObj = typeof registro.detalle === 'string' ? JSON.parse(registro.detalle || '{}') : (registro.detalle || {});
     fila.innerHTML = `
       <td>${registro.fecha || ''}</td>
       <td>${registro.hora || ''}</td>
@@ -34,34 +35,34 @@ async function cargarRegistros() {
       <td>${registro.incorreccion || ''}</td>
       <td>${registro.responsable || ''}</td>
       <td>${registro.observaciones || ''}</td>
-      <td><button onclick='mostrarDetalle(${JSON.stringify(typeof registro.detalle === "string" ? JSON.parse(registro.detalle) : registro.detalle)})'>🔍</button></td>
+      <td><button class="px-2 py-1 text-indigo-600 underline text-xs" onclick='mostrarDetalle(${JSON.stringify(detalleObj)})'>Ver</button></td>
     `;
-    tabla.appendChild(fila);
+    cuerpo.appendChild(fila);
   });
 }
 
 async function initVerRegistros() {
   await cargarRegistros();
 
-  const buscarPlacaInput = document.getElementById("buscarPlaca");
+  const buscarPlacaInput = document.getElementById('buscarPlaca');
   if (buscarPlacaInput) {
-    buscarPlacaInput.addEventListener("input", function () {
+    buscarPlacaInput.addEventListener('input', function () {
       const filtro = this.value.toUpperCase();
-      const filas = document.querySelectorAll("#tabla-registros tbody tr");
+      const filas = document.querySelectorAll('#tabla-registros tr');
 
-      filas.forEach(fila => {
+      filas.forEach((fila) => {
         const celdaPlaca = fila.cells[3];
         if (celdaPlaca && celdaPlaca.textContent.toUpperCase().includes(filtro)) {
-          fila.style.display = "";
+          fila.style.display = '';
         } else {
-          fila.style.display = "none";
+          fila.style.display = 'none';
         }
       });
     });
   }
 }
 
-if (document.readyState === "loading") {
+if (document.readyState === 'loading') {
   window.addEventListener('DOMContentLoaded', initVerRegistros);
 } else {
   initVerRegistros();
@@ -69,50 +70,22 @@ if (document.readyState === "loading") {
 
 window.mostrarDetalle = function (detalle) {
   const modal = document.getElementById('detalleModal');
-  const contenido = document.getElementById('detalleCompleto');
+  const contenido = document.getElementById('detalleContenido');
 
   if (!modal || !contenido) return;
 
   if (!detalle || typeof detalle !== 'object') {
-    contenido.innerHTML = '<p>Sin detalle disponible.</p>';
+    contenido.innerHTML = '<tr><td>Sin detalle disponible.</td></tr>';
     modal.style.display = 'flex';
     return;
   }
 
-  if (detalle.tipo === 'Mampara') {
-    contenido.innerHTML = `
-      <table class="detalle-tabla">
-        <tr><th>Tipo</th><td>${detalle.tipo || '-'}</td></tr>
-        <tr><th>Separación Lateral Central</th><td>${detalle.separacion_lateral_central || '-' } cm</td></tr>
-        <tr><th>Altura de Mampara</th><td>${detalle.altura_mampara || '-' } cm</td></tr>
-        <tr><th>Foto Panorámica</th><td>${detalle.foto_panoramica_unidad ? `<img src="${detalle.foto_panoramica_unidad}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_panoramica_unidad}')">` : '-'}</td></tr>
-        <tr><th>Foto Altura</th><td>${detalle.foto_altura_mampara ? `<img src="${detalle.foto_altura_mampara}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_altura_mampara}')">` : '-'}</td></tr>
-        <tr><th>Foto Lateral</th><td>${detalle.foto_lateral_central ? `<img src="${detalle.foto_lateral_central}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_lateral_central}')">` : '-'}</td></tr>
-      </table>
-    `;
-  } else {
-    contenido.innerHTML = `
-      <table class="detalle-tabla">
-        <tr><th>Tipo</th><td>${detalle.tipo || '-'}</td></tr>
-        <tr><th>Observación</th><td>${detalle.observacion_texto || '-'}</td></tr>
-        <tr><th>Foto</th><td>${detalle.foto_observacion ? `<img src="${detalle.foto_observacion}" class="miniatura" onclick="verImagenAmpliada('${detalle.foto_observacion}')">` : '-'}</td></tr>
-      </table>
-    `;
-  }
+  const rows = Object.entries(detalle).map(
+    ([key, value]) => `<tr><th style="text-transform:capitalize">${key}</th><td>${value || ''}</td></tr>`
+  );
 
+  contenido.innerHTML = rows.join('');
   modal.style.display = 'flex';
-};
-
-window.verImagenAmpliada = function (url) {
-  const ampliado = document.createElement('div');
-  ampliado.className = 'imagen-ampliada';
-  ampliado.innerHTML = `
-    <div class="imagen-wrapper">
-      <img src="${url}" />
-      <span class="cerrar-img" onclick="this.parentElement.parentElement.remove()">✖</span>
-    </div>
-  `;
-  document.body.appendChild(ampliado);
 };
 
 window.cerrarDetalle = function () {
@@ -120,14 +93,16 @@ window.cerrarDetalle = function () {
   if (modal) modal.style.display = 'none';
 };
 
-window.ampliarImagen = function (url) {
-  const img = document.getElementById('imagenGrande');
-  const cont = document.getElementById('imagenAmpliada');
-  if (img) img.src = url;
-  if (cont) cont.style.display = 'block';
+window.verImagenAmpliada = function (url) {
+  const img = document.getElementById('imagenAmpliadaSrc');
+  const modal = document.getElementById('imagenAmpliada');
+  if (img && modal) {
+    img.src = url;
+    modal.style.display = 'flex';
+  }
 };
 
-window.cerrarImagen = function () {
-  const cont = document.getElementById('imagenAmpliada');
-  if (cont) cont.style.display = 'none';
+window.cerrarImagenAmpliada = function () {
+  const modal = document.getElementById('imagenAmpliada');
+  if (modal) modal.style.display = 'none';
 };

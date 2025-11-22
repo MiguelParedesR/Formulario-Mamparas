@@ -1,96 +1,118 @@
-﻿<main class="main-container">
-  <div class="form-container">
-    <h2>Registro de Inspeccion</h2>
+﻿<main class="p-6 space-y-6 max-w-5xl mx-auto">
+  <div class="space-y-1">
+    <p class="text-sm text-gray-500">Mamparas</p>
+    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3"><i class="fas fa-clipboard-list text-indigo-600"></i> Registro de Inspeccion</h1>
+    <p class="text-sm text-gray-600">Completa los datos y adjunta el detalle obligatorio.</p>
+  </div>
 
-    <form id="form-inspeccion">
-      <div class="grid-fecha-hora">
+  <section class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-4">
+    <form id="form-inspeccion" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label for="fecha">Fecha:</label>
-          <input type="date" id="fecha" name="fecha" required readonly />
+          <label class="block text-sm font-semibold text-gray-700" for="fecha">Fecha</label>
+          <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="date" id="fecha" name="fecha" required readonly />
         </div>
         <div>
-          <label for="hora">Hora:</label>
-          <input type="time" id="hora" name="hora" required readonly />
+          <label class="block text-sm font-semibold text-gray-700" for="hora">Hora</label>
+          <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="time" id="hora" name="hora" required readonly />
         </div>
       </div>
 
-      <label for="empresa">Empresa:</label>
-      <select id="empresa" name="empresa" required>
-        <option value="">Seleccione</option>
-        <option value="otra">AGREGAR OTRA EMPRESA</option>
-        <option value="RYM">RYM</option>
-        <option value="TURICAR">TURICAR</option>
-        <option value="BUEN DIA">BUEN DIA</option>
-        <option value="HUARIJIRCA">HUARIJIRCA</option>
-        <option value="TEAL">TEAL</option>
-        <option value="BRANDOM">BRANDOM</option>
-        <option value="DIOS DA">DIOS DA</option>
-        <option value="KAREL">KAREL</option>
-        <option value="MALEJA">MALEJA</option>
-        <option value="MOTRIL">MOTRIL</option>
-        <option value="JK SALAS">JK SALAS</option>
-        <option value="TATTUS TRUCK">TATTUS TRUCK</option>
-        <option value="PR HERMANOS">PR HERMANOS</option>
-        <option value="SCARAMUTTI">SCARAMUTTI</option>
-        <option value="GM">GM</option>
-        <option value="TILOPSAC">TILOPSAC</option>
-        <option value="CHUCAS CARGO">CHUCAS CARGO</option>
-        <option value="V&B">V&B</option>
-        <option value="GAMARRA BERRENECHEA">GAMARRA BERRENECHEA</option>
-      </select>
-      <input type="text" id="nueva_empresa" name="nueva_empresa" placeholder="Ingresa el nombre de la empresa" style="display: none;" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700" for="empresa">Empresa</label>
+          <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="empresa" name="empresa" required>
+            <option value="">Seleccione</option>
+            <option value="otra">AGREGAR OTRA EMPRESA</option>
+            <option value="RYM">RYM</option>
+            <option value="TURICAR">TURICAR</option>
+            <option value="BUEN DIA">BUEN DIA</option>
+            <option value="HUARIJIRCA">HUARIJIRCA</option>
+            <option value="TEAL">TEAL</option>
+            <option value="BRANDOM">BRANDOM</option>
+            <option value="DIOS DA">DIOS DA</option>
+            <option value="KAREL">KAREL</option>
+            <option value="MALEJA">MALEJA</option>
+            <option value="MOTRIL">MOTRIL</option>
+            <option value="JK SALAS">JK SALAS</option>
+            <option value="TATTUS TRUCK">TATTUS TRUCK</option>
+            <option value="PR HERMANOS">PR HERMANOS</option>
+            <option value="SCARAMUTTI">SCARAMUTTI</option>
+            <option value="GM">GM</option>
+            <option value="TILOPSAC">TILOPSAC</option>
+            <option value="CHUCAS CARGO">CHUCAS CARGO</option>
+            <option value="V&B">V&B</option>
+            <option value="GAMARRA BERRENECHEA">GAMARRA BERRENECHEA</option>
+          </select>
+          <input class="w-full rounded-lg border-gray-300 px-3 py-2 mt-2" type="text" id="nueva_empresa" name="nueva_empresa" placeholder="Ingresa el nombre de la empresa" style="display: none;" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700" for="placa">Placa</label>
+          <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="text" id="placa" name="placa" required />
+        </div>
+      </div>
 
-      <label for="placa">Placa:</label>
-      <input type="text" id="placa" name="placa" required />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700" for="chofer">Chofer</label>
+          <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="text" id="chofer" name="chofer" required />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700" for="lugar">Lugar</label>
+          <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="lugar" name="lugar" required>
+            <option value="">Seleccione</option>
+            <option value="Tracciones">Tracciones</option>
+            <option value="Calle">Calle</option>
+          </select>
+        </div>
+      </div>
 
-      <label for="chofer">Chofer:</label>
-      <input type="text" id="chofer" name="chofer" required />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700" for="incorreccion">Tipo de incorreccion</label>
+          <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="incorreccion" name="incorreccion" required>
+            <option value="">Seleccione</option>
+            <option value="Mampara">Mampara</option>
+            <option value="Cola de Pato">Cola de Pato</option>
+            <option value="Pernos">Pernos</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700" for="responsable">Responsable</label>
+          <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="responsable" name="responsable" required>
+            <option value="">Seleccione</option>
+            <option value="Carlos Sanchez">Carlos Sanchez</option>
+            <option value="Francisco Elescano">Francisco Elescano</option>
+            <option value="Hernan Luna">Hernan Luna</option>
+            <option value="Roger Castro">Roger Castro</option>
+            <option value="Oscar Fernandez">Oscar Fernandez</option>
+            <option value="Miguel Paredes">Miguel Paredes</option>
+            <option value="David Echaccaya">David Echaccaya</option>
+            <option value="Juan Quelopana">Juan Quelopana</option>
+            <option value="Grover Munguia">Grover Munguia</option>
+            <option value="Ernesto Alfaro">Ernesto Alfaro</option>
+          </select>
+        </div>
+      </div>
 
-      <label for="lugar">Lugar:</label>
-      <select id="lugar" name="lugar" required>
-        <option value="">Seleccione</option>
-        <option value="Tracciones">Tracciones</option>
-        <option value="Calle">Calle</option>
-      </select>
-
-      <label for="incorreccion">Tipo de incorreccion:</label>
-      <select id="incorreccion" name="incorreccion" required>
-        <option value="">Seleccione</option>
-        <option value="Mampara">Mampara</option>
-        <option value="Cola de Pato">Cola de Pato</option>
-        <option value="Pernos">Pernos</option>
-        <option value="Otros">Otros</option>
-      </select>
-
-      <label for="responsable">Responsable:</label>
-      <select id="responsable" name="responsable" required>
-        <option value="">Seleccione</option>
-        <option value="Carlos Sanchez">Carlos Sanchez</option>
-        <option value="Francisco Elescano">Francisco Elescano</option>
-        <option value="Hernan Luna">Hernan Luna</option>
-        <option value="Roger Castro">Roger Castro</option>
-        <option value="Oscar Fernandez">Oscar Fernandez</option>
-        <option value="Miguel Paredes">Miguel Paredes</option>
-        <option value="David Echaccaya">David Echaccaya</option>
-        <option value="Juan Quelopana">Juan Quelopana</option>
-        <option value="Grover Munguia">Grover Munguia</option>
-        <option value="Ernesto Alfaro">Ernesto Alfaro</option>
-      </select>
-
-      <label for="observaciones">Observaciones:</label>
-      <select id="observaciones" name="observaciones" required>
-        <option value="">Seleccione</option>
-        <option value="Descarga">Descarga</option>
-        <option value="Embarque">Embarque</option>
-        <option value="Otros">Otros</option>
-      </select>
+      <div>
+        <label class="block text-sm font-semibold text-gray-700" for="observaciones">Observaciones</label>
+        <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="observaciones" name="observaciones" required>
+          <option value="">Seleccione</option>
+          <option value="Descarga">Descarga</option>
+          <option value="Embarque">Embarque</option>
+          <option value="Otros">Otros</option>
+        </select>
+      </div>
 
       <input type="hidden" id="detalle" name="detalle" />
-      <button type="button" id="btnAgregarDetalle" style="display:none;">Agregar Detalle</button>
-
-      <button type="submit">Registrar</button>
+      <div class="flex flex-wrap gap-3 items-center">
+        <button type="button" id="btnAgregarDetalle" class="px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg text-sm font-semibold" style="display:none;">Agregar Detalle</button>
+        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold">Registrar</button>
+      </div>
     </form>
-  </div>
+  </section>
 </main>
 
 <!-- Modal de Detalle -->

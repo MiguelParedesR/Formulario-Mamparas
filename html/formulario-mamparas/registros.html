@@ -1,9 +1,14 @@
-﻿<main class="main-container">
-  <div class="form-container">
-    <h2>Registros de Inspeccion</h2>
+﻿<main class="p-6 space-y-6 max-w-6xl mx-auto">
+  <div class="space-y-1">
+    <p class="text-sm text-gray-500">Mamparas</p>
+    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3"><i class="fas fa-database text-indigo-600"></i> Registros de Inspeccion</h1>
+    <p class="text-sm text-gray-600">Consulta y revisa los registros almacenados.</p>
+  </div>
 
-    <div class="search-bar">
-      <input type="text" id="buscarPlaca" placeholder="Buscar por placa..." />
+  <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 space-y-4">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+      <label class="text-sm font-semibold text-gray-700" for="buscarPlaca">Buscar por placa</label>
+      <input class="w-full sm:w-64 rounded-lg border-gray-300 px-3 py-2 text-sm" type="text" id="buscarPlaca" placeholder="Ej: ABC123" />
     </div>
 
     <div class="table-wrapper">
@@ -22,8 +27,7 @@
             <th>Detalle</th>
           </tr>
         </thead>
-        <tbody id="tabla-registros">
-        </tbody>
+        <tbody id="tabla-registros"></tbody>
       </table>
     </div>
   </div>
@@ -42,7 +46,7 @@
 <div id="imagenAmpliada" class="imagen-ampliada" style="display: none;">
   <div class="imagen-wrapper">
     <img id="imagenAmpliadaSrc" src="" alt="Vista ampliada" />
-    <span class="cerrar-img" onclick="cerrarImagenAmpliada()">×</span>
+    <span class="cerrar-img" onclick="cerrarImagenAmpliada()">X</span>
   </div>
 </div>
 
@@ -59,3 +63,4 @@
     document.getElementById('imagenAmpliada').style.display = 'none';
   }
 </script>
+
