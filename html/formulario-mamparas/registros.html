@@ -1,13 +1,4 @@
-﻿<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Registros de Inspeccion</title>
-  <link rel="stylesheet" href="/css/styles.css" />
-</head>
-<body>
-<main class="main-container">
+﻿<main class="main-container">
   <div class="form-container">
     <h2>Registros de Inspeccion</h2>
 
@@ -32,14 +23,12 @@
           </tr>
         </thead>
         <tbody id="tabla-registros">
-          <!-- JS inyecta los registros -->
         </tbody>
       </table>
     </div>
   </div>
 </main>
 
-<!-- Modal Detalle -->
 <div class="detalle-modal" id="detalleModal">
   <div class="detalle-modal-content">
     <h3>Detalle de la Incorreccion</h3>
@@ -50,15 +39,13 @@
   </div>
 </div>
 
-<!-- Imagen ampliada -->
 <div id="imagenAmpliada" class="imagen-ampliada" style="display: none;">
   <div class="imagen-wrapper">
     <img id="imagenAmpliadaSrc" src="" alt="Vista ampliada" />
-    <span class="cerrar-img" onclick="cerrarImagenAmpliada()">Ã—</span>
+    <span class="cerrar-img" onclick="cerrarImagenAmpliada()">×</span>
   </div>
 </div>
 
-<!-- Scripts -->
 <script src="/js/mamparas/verRegistros.js" type="module"></script>
 <script>
   function cerrarDetalle() {
@@ -72,7 +59,3 @@
     document.getElementById('imagenAmpliada').style.display = 'none';
   }
 </script>
-</body>
-</html>
-
-

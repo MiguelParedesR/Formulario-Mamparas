@@ -1,0 +1,16 @@
+﻿<main class="main-container">
+  <div class="form-container">
+    <h2>Panel Mamparas</h2>
+    <p style="margin-bottom:12px; color: var(--tpp-dark);">Accesos rápidos al módulo.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+      <button onclick="go('/html/formulario-mamparas/registro.html')">Nueva inspeccion</button>
+      <button onclick="go('/html/formulario-mamparas/registros.html')">Ver registros</button>
+      <button onclick="go('/html/formulario-mamparas/reportes.html')">Reportes</button>
+    </div>
+  </div>
+</main>
+<script>
+  function go(path){
+    window.dispatchEvent(new CustomEvent('sidebar:navigate',{detail:path}));
+  }
+</script>

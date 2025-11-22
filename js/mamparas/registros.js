@@ -1,9 +1,8 @@
-import { supabase, mostrarModal, subirImagen, guardarInspeccion } from './script.js';
+﻿import { supabase, mostrarModal, subirImagen, guardarInspeccion } from './script.js';
 
 // Elementos del DOM
 const form = document.getElementById('form-inspeccion');
 const btnAgregarDetalle = document.getElementById('btnAgregarDetalle');
-btnAgregarDetalle.textContent = 'DETALLE';
 const btnGuardarDetalle = document.getElementById('btnGuardarDetalle');
 const detalleModal = document.getElementById('detalleModal');
 const contenidoDetalle = document.getElementById('contenidoDetalle');
@@ -12,14 +11,20 @@ const selectIncorreccion = document.getElementById('incorreccion');
 const cerrarDetalleModal = document.getElementById('cerrarDetalleModal');
 const campoPlaca = document.getElementById('placa');
 
+if (!form || !btnAgregarDetalle || !btnGuardarDetalle || !detalleModal || !contenidoDetalle || !inputDetalle || !selectIncorreccion) {
+  return;
+}
+
+btnAgregarDetalle.textContent = 'DETALLE';
+
 let tipoDetalle = '';
 let datosPrevios = null;
 
-// Mostrar el modal según la opción seleccionada
+// Mostrar el modal segun la opcion seleccionada
 btnAgregarDetalle.addEventListener('click', () => {
   const valor = selectIncorreccion.value;
   if (!valor) {
-    alert('Primero seleccione el tipo de incorrección.');
+    alert('Primero seleccione el tipo de incorreccion.');
     return;
   }
 
@@ -48,15 +53,15 @@ btnAgregarDetalle.addEventListener('click', () => {
   detalleModal.classList.add('zoomIn');
 });
 
-// Mostrar formulario dinámico según tipo
+// Mostrar formulario dinamico segun tipo
 function mostrarFormularioDetalle(tipo, datos = null) {
   if (tipo === 'Mampara') {
     contenidoDetalle.innerHTML = `
-      <label>Separación Lateral Central (cm):</label>
+      <label>Separacion Lateral Central (cm):</label>
       <input type="number" id="sepLateral" value="${datos?.separacion_lateral_central || ''}" />
       <label>Altura de Mampara (cm):</label>
       <input type="number" id="alturaMampara" value="${datos?.altura_mampara || ''}" />
-      <label>Foto Panorámica de Unidad:</label>
+      <label>Foto Panoramica de Unidad:</label>
       <input type="file" id="fotoPanoramica" accept="image/*" />
       <img id="fotoPanoramicaPreview" class="preview-img" />
       <label>Foto Altura de Mampara:</label>
@@ -73,7 +78,7 @@ function mostrarFormularioDetalle(tipo, datos = null) {
     contenidoDetalle.innerHTML = `
       <label>Observaciones:</label>
       <textarea id="observacionTexto">${datos?.observacion_texto || ''}</textarea>
-      <label>Foto de Observación:</label>
+      <label>Foto de Observacion:</label>
       <input type="file" id="fotoObservacion" accept="image/*" />
       <img id="fotoObservacionPreview" class="preview-img" />
       ${datos?.foto_observacion ? `<img class="miniatura" src="${datos.foto_observacion}" />` : ''}
@@ -108,7 +113,7 @@ btnGuardarDetalle.addEventListener('click', async () => {
     const url3 = foto3 ? await subirImagen('lateral', foto3) : datosPrevios?.foto_lateral_central || '';
 
     if (!sep || !alt || !url1 || !url2 || !url3) {
-      alert('Completa todos los campos y asegúrate de subir imágenes válidas.');
+      alert('Completa todos los campos y asegúrate de subir imagenes validas.');
       return;
     }
 
@@ -126,7 +131,7 @@ btnGuardarDetalle.addEventListener('click', async () => {
     const url = foto ? await subirImagen('observacion', foto) : datosPrevios?.foto_observacion || '';
 
     if (!observacion.trim()) {
-      alert('Por favor ingrese una observación.');
+      alert('Por favor ingrese una observacion.');
       return;
     }
 
@@ -140,7 +145,7 @@ btnGuardarDetalle.addEventListener('click', async () => {
   inputDetalle.value = JSON.stringify(detalle);
   detalleModal.style.display = 'none';
   detalleModal.classList.remove('zoomIn');
-  mostrarModal('success', '✅ Detalle guardado exitosamente.');
+  mostrarModal('success', 'OK. Detalle guardado exitosamente.');
 });
 
 // Ocultar modal
@@ -173,7 +178,7 @@ campoPlaca.addEventListener('blur', async () => {
 
   if (data.length > 0) {
     datosPrevios = data[0];
-    const confirmacion = confirm(`Ya existe una inspección previa para esta placa con tipo "${datosPrevios.incorreccion}".\n¿Deseas registrar nuevamente con los mismos datos?`);
+    const confirmacion = confirm(`Ya existe una inspeccion previa para esta placa con tipo "${datosPrevios.incorreccion}".\n¿Deseas registrar nuevamente con los mismos datos?`);
     if (confirmacion) {
       rellenarFormulario(datosPrevios);
     } else {
@@ -194,7 +199,7 @@ function rellenarFormulario(datos) {
   btnAgregarDetalle.style.display = "block";
 }
 
-// Mostrar botón agregar detalle
+// Mostrar boton agregar detalle
 selectIncorreccion.addEventListener("change", () => {
   const seleccion = selectIncorreccion.value;
   if (["Mampara", "Cola de Pato", "Pernos", "Otros"].includes(seleccion)) {
@@ -238,7 +243,7 @@ form.addEventListener('submit', async (e) => {
   }
 
   if (!data.detalle) {
-    mostrarModal('error', '❌ Falta el detalle de la inspección.');
+    mostrarModal('error', 'Falta el detalle de la inspeccion.');
     return;
   }
 
@@ -259,9 +264,9 @@ form.addEventListener('submit', async (e) => {
     form.reset();
     inputDetalle.value = '';
     contenidoDetalle.innerHTML = '';
-    mostrarModal('success', '✅ Registro exitoso, gracias por tu inspeccion!');
+    mostrarModal('success', 'OK. Registro exitoso.');
   } catch (err) {
     console.error(err);
-    mostrarModal('error', '❌ Error inesperado al guardar.');
+    mostrarModal('error', 'Error inesperado al guardar.');
   }
 });
