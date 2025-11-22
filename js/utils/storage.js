@@ -48,6 +48,11 @@ export async function getRemoteBase64(url) {
   return `data:application/octet-stream;base64,${btoa(binary)}`;
 }
 
+// Alias para compatibilidad con generador-docx
+export async function getFileBase64(url) {
+  return getRemoteBase64(url);
+}
+
 /* --------------------------------------------
    Subida de archivos
 -------------------------------------------- */
