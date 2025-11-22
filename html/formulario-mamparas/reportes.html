@@ -1,31 +1,32 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Reportes</title>
-  <link rel="stylesheet" href="CSS/styles.css" />
+  <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
-<!-- Header con botón ☰ (funciona tanto en móvil como en desktop) -->
+<main class="main-container">
+<!-- Header con botÃ³n â˜° (funciona tanto en mÃ³vil como en desktop) -->
 <div class="responsive-header">
-  <button class="toggle-btn">☰</button>
+  <button class="toggle-btn">â˜°</button>
 </div>
 
 <!-- Sidebar escritorio -->
 <div class="sidebar">
-  <a href="index.html">🏠 Inicio</a>
-  <a href="registro.html">📝 Registro</a>
-  <a href="reportes.html">📊 Reportes</a>
-  <a href="registros.html">📋 Registros</a>
+  <a href="index.html">ðŸ  Inicio</a>
+  <a href="registro.html">ðŸ“ Registro</a>
+  <a href="reportes.html">ðŸ“Š Reportes</a>
+  <a href="registros.html">ðŸ“‹ Registros</a>
 </div>
 
-<!-- Sidebar móvil -->
+<!-- Sidebar mÃ³vil -->
 <div class="mobile-nav">
-  <a href="index.html">🏠 Inicio</a>
-  <a href="registro.html">📝 Registro</a>
-  <a href="reportes.html">📊 Reportes</a>
-  <a href="registros.html">📋 Registros</a>
+  <a href="index.html">ðŸ  Inicio</a>
+  <a href="registro.html">ðŸ“ Registro</a>
+  <a href="reportes.html">ðŸ“Š Reportes</a>
+  <a href="registros.html">ðŸ“‹ Registros</a>
 </div>
 
   <!-- Contenido principal -->
@@ -60,16 +61,11 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script type="module" src="js/reportes.js"></script>
-  <script src="js/sidebar.js"></script>
-  <!-- Scripts Button Obsolete 
-  <script>
-    const toggleBtn = document.getElementById('toggleMenu');
-    const mobileNav = document.getElementById('mobileNav');
+  <script type="module" src="/js/mamparas/reportes.js"></script>
+  <script src="/js/sidebar/sidebar.js"></script>
 
-    toggleBtn.addEventListener('click', () => {
-      mobileNav.classList.toggle('show');
-    });-->
   </script>
+</main>
 </body>
 </html>
+

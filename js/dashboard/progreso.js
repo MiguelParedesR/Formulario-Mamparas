@@ -1,6 +1,6 @@
-// =============================================================
+﻿// =============================================================
 // progreso.js
-// Cálculo estandarizado del avance de un informe de incidencia
+// CÃ¡lculo estandarizado del avance de un informe de incidencia
 // Compatible con formulario.js, registros.js, dashboard y DOCX.
 // =============================================================
 
@@ -18,32 +18,36 @@
 export function calcularProgresoInforme(datos = {}) {
     if (!datos) return progresoVacio();
 
-    const llaves = Object.keys(datos);
-    if (llaves.length === 0) return progresoVacio();
+    const basicos = [
+        { key: "asunto", valor: datos.asunto },
+        { key: "dirigidoA", valor: datos.dirigido_a ?? datos.dirigidoA },
+        { key: "remitente", valor: datos.remitente },
+        { key: "fechaInforme", valor: datos.fecha_informe ?? datos.fechaInforme },
+        { key: "analisis", valor: datos.analisis },
+        { key: "conclusiones", valor: datos.conclusiones },
+        { key: "recomendaciones", valor: datos.recomendaciones }
+    ];
 
     let completados = 0;
-    let faltantes = [];
+    const faltantes = [];
 
-    for (const key of llaves) {
-        const valor = datos[key];
-
-        // IMÁGENES O ARCHIVOS
-        if (Array.isArray(valor)) {
-            if (valor.length > 0) completados++;
-            else faltantes.push(key);
-            continue;
-        }
-
-        // TEXTO, FECHA, NÚMEROS, ETC.
-        if (valor !== null && valor !== undefined && valor !== "") {
+    basicos.forEach(({ key, valor }) => {
+        if (valor !== null && valor !== undefined && String(valor).trim() !== "") {
             completados++;
         } else {
             faltantes.push(key);
         }
+    });
+
+    let total = basicos.length;
+
+    const anexos = datos.anexos;
+    if (Array.isArray(anexos) && anexos.length > 0) {
+        total += 1;
+        completados += 1;
     }
 
-    const total = llaves.length;
-    const porcentaje = Math.round((completados / total) * 100);
+    const porcentaje = total === 0 ? 0 : Math.round((completados / total) * 100);
     const estado = porcentaje === 100 ? "COMPLETO" : "BORRADOR";
 
     return {
@@ -56,7 +60,7 @@ export function calcularProgresoInforme(datos = {}) {
 }
 
 /**
- * Devuelve un progreso vacío
+ * Devuelve un progreso vacÃ­o
  */
 function progresoVacio() {
     return {
@@ -85,7 +89,7 @@ export function actualizarBarraProgreso(porcentaje) {
 
     barra.style.width = `${porcentaje}%`;
 
-    // colores dinámicos
+    // colores dinÃ¡micos
     if (porcentaje < 50) barra.className = "h-2 bg-red-500 rounded-full transition-all duration-300";
     else if (porcentaje < 99) barra.className = "h-2 bg-amber-500 rounded-full transition-all duration-300";
     else barra.className = "h-2 bg-green-600 rounded-full transition-all duration-300";
@@ -102,12 +106,12 @@ export function actualizarBarraProgreso(porcentaje) {
 }
 
 // =============================================================
-// CÁLCULO AUTOMÁTICO MIENTRAS SE ESCRIBE
+// CÃLCULO AUTOMÃTICO MIENTRAS SE ESCRIBE
 // =============================================================
 
 /**
  * Inicializa listeners para recalcular el avance en tiempo real
- * @param {Function} obtenerDatos - Función que devuelve un objeto con todos los campos del formulario
+ * @param {Function} obtenerDatos - FunciÃ³n que devuelve un objeto con todos los campos del formulario
  */
 export function activarAutoProgreso(obtenerDatos) {
     const form = document.getElementById("form-incidencia");
@@ -146,3 +150,4 @@ export function obtenerEstadoListado(informe) {
         color
     };
 }
+

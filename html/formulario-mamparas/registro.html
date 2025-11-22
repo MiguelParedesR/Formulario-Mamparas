@@ -1,37 +1,38 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Registrar Inspección</title>
-  <link rel="stylesheet" href="CSS/styles.css" />
+  <title>Registrar InspecciÃ³n</title>
+  <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
-<!-- Header con botón ☰ (funciona tanto en móvil como en desktop) -->
+<main class="main-container">
+<!-- Header con botÃ³n â˜° (funciona tanto en mÃ³vil como en desktop) -->
 <div class="responsive-header">
-  <button class="toggle-btn">☰</button>
+  <button class="toggle-btn">â˜°</button>
 </div>
 
 <!-- Sidebar escritorio -->
 <div class="sidebar">
-  <a href="index.html">🏠 Inicio</a>
-  <a href="registro.html">📝 Registro</a>
-  <a href="reportes.html">📊 Reportes</a>
-  <a href="registros.html">📋 Registros</a>
+  <a href="index.html">ðŸ  Inicio</a>
+  <a href="registro.html">ðŸ“ Registro</a>
+  <a href="reportes.html">ðŸ“Š Reportes</a>
+  <a href="registros.html">ðŸ“‹ Registros</a>
 </div>
 
-<!-- Sidebar móvil -->
+<!-- Sidebar mÃ³vil -->
 <div class="mobile-nav">
-  <a href="index.html">🏠 Inicio</a>
-  <a href="registro.html">📝 Registro</a>
-  <a href="reportes.html">📊 Reportes</a>
-  <a href="registros.html">📋 Registros</a>
+  <a href="index.html">ðŸ  Inicio</a>
+  <a href="registro.html">ðŸ“ Registro</a>
+  <a href="reportes.html">ðŸ“Š Reportes</a>
+  <a href="registros.html">ðŸ“‹ Registros</a>
 </div>
 
   <!-- Contenido principal -->
   <div class="main-container">
     <div class="form-container">
-      <h2>Registro de Inspección</h2>
+      <h2>Registro de InspecciÃ³n</h2>
       <form id="form-inspeccion">
         <input type="date" id="fecha" name="fecha" required readonly>
 <input type="time" id="hora" name="hora" required readonly>
@@ -62,7 +63,7 @@
   <option value="GAMARRA BERRENECHEA">GAMARRA BERRENECHEA</option>
 </select>
 
-<!-- Campo de texto que aparecerá si se selecciona "Otra empresa" -->
+<!-- Campo de texto que aparecerÃ¡ si se selecciona "Otra empresa" -->
 <input type="text" id="nueva_empresa" name="nueva_empresa" placeholder="Ingresa el nombre de la empresa" style="display: none;" />
 
 
@@ -79,7 +80,7 @@
           <option value="Calle">Calle</option>
         </select>
 
-        <label for="incorreccion">Tipo de incorrección:</label>
+        <label for="incorreccion">Tipo de incorrecciÃ³n:</label>
         <select id="incorreccion" name="incorreccion" required>
           <option value="">Seleccione</option>
           <option value="Mampara">Mampara</option>
@@ -124,13 +125,13 @@
   <!-- Modal de Detalle -->
   <div class="detalle-modal" id="detalleModal">
     <div class="detalle-modal-content">
-      <h3>Detalle de la Incorrección</h3>
+      <h3>Detalle de la IncorrecciÃ³n</h3>
 <div id="contenidoDetalle" class="detalle-editable"></div>
       <br>
       <button id="btnGuardarDetalle">Guardar Detalle</button>
     </div>
   </div>
-<!-- Modal de retroalimentación -->
+<!-- Modal de retroalimentaciÃ³n -->
 <div id="feedbackModal" class="feedback-modal" style="display: none;">
   <div class="modal-inner">
     <div id="loadingAnimation" class="loader"></div>
@@ -139,10 +140,12 @@
 </div>
 
   <!-- Scripts -->
-  <script src="js/registros.js" type="module"></script>
-  <script type="module" src="script.js"></script>
-  <script src="js/sidebar.js"></script>
+  <script src="/js/mamparas/registros.js" type="module"></script>
+  <script type="module" src="/js/mamparas/script.js"></script>
+  <script src="/js/sidebar/sidebar.js"></script>
 </script>
   </script>
+</main>
 </body>
 </html>
+

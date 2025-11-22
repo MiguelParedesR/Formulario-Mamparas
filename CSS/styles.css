@@ -1,4 +1,4 @@
-/* ===========================
+﻿/* ===========================
    RESET & BASE
 =========================== */
 * {
@@ -8,10 +8,19 @@
   transition: all 0.3s ease-in-out;
 }
 
+:root {
+  --tpp-dark: #2f3b52;
+  --tpp-mid: #3e4b67;
+  --tpp-light: #f4f6f8;
+  --tpp-accent: #ffa500;
+  --tpp-border: #e5e7eb;
+  --tpp-text: #1f2937;
+}
+
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: #fff9f2;
-  color: #333;
+  background: var(--tpp-light);
+  color: var(--tpp-text);
   line-height: 1.4;
 }
 
@@ -21,10 +30,10 @@ body {
 .main-container {
   display: flex;
   flex-direction: row;
-  padding: 12px;
+  padding: 16px;
   gap: 16px;
-  min-height: 100vh;
-  margin-left: 220px;
+  min-height: 100%;
+  margin-left: 0;
   transition: margin-left 0.3s ease-in-out;
 }
 
@@ -37,7 +46,7 @@ body {
 =========================== 
 .sidebar {
   width: 220px;
-  background-color: #ffcc80;
+  background-color: var(--tpp-accent);
   padding-top: 20px;
   display: flex;
   flex-direction: column;
@@ -57,9 +66,9 @@ body {
 .sidebar a {
   padding: 12px 20px;
   text-decoration: none;
-  color: #333;
+  color: var(--tpp-dark);
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   display: flex;
   align-items: center;
   white-space: nowrap;
@@ -67,7 +76,7 @@ body {
 
 .sidebar a.active,
 .sidebar a:hover {
-  background-color: #ffa726;
+  background-color: var(--tpp-border);
   color: white;
 }
 
@@ -75,7 +84,7 @@ body {
   position: fixed;
   top: 20px;
   left: 20px;
-  background-color: #fb8c00;
+  background-color: var(--tpp-mid);
   color: white;
   border: none;
   padding: 10px 12px;
@@ -91,17 +100,18 @@ body {
 =========================== */
 .form-container {
   width: 100%;
-  background-color: #fff5e6;
-  border-left: 2px solid #ffa726;
-  box-shadow: 0 1px 8px rgba(255, 138, 0, 0.1);
-  padding: 12px;
+  background-color: #fff;
+  border: 1px solid var(--tpp-border);
+  box-shadow: 0 1px 8px rgba(47, 59, 82, 0.08);
+  padding: 16px;
   overflow-y: auto;
   max-height: 93vh;
+  border-radius: 12px;
   animation: fadeSlideIn 0.6s ease forwards;
 }
 
 .form-container h2 {
-  color: #fb8c00;
+  color: var(--tpp-dark);
   margin-bottom: 14px;
   font-size: 1.6rem;
 }
@@ -110,8 +120,8 @@ body {
   display: block;
   margin-bottom: 2px;
   font-weight: 600;
-  font-size: 0.85rem;
-  color: #333;
+  font-size: 0.95rem;
+  color: var(--tpp-dark);
 }
 
 .form-container input,
@@ -119,29 +129,30 @@ body {
 .form-container button,
 .form-container textarea {
   width: 100%;
-  padding: 6px;
-  font-size: 0.85rem;
+  padding: 10px;
+  font-size: 0.95rem;
   margin-bottom: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1px solid var(--tpp-border);
+  border-radius: 8px;
+  background: #fff;
 }
 
-/* Botón de formulario */
+/* BotÃ³n de formulario */
 .form-container button {
-  background-color: #fb8c00;
+  background-color: var(--tpp-mid);
   color: white;
   border: none;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(255, 138, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(47, 59, 82, 0.15);
   transition: transform 0.2s ease, background-color 0.3s ease;
-  padding: 8px;
-  font-size: 0.9rem;
+  padding: 10px;
+  font-size: 0.95rem;
 }
 
 .form-container button:hover {
-  background-color: #ef6c00;
-  transform: scale(1.03);
+  background-color: var(--tpp-mid);
+  transform: translateY(-1px);
 }
 
 /* ===========================
@@ -175,7 +186,7 @@ body {
 .detalle-modal-content h3 {
   margin-bottom: 10px;
   font-size: 1.2rem;
-  color: #fb8c00;
+  color: var(--tpp-dark);
   text-align: center;
 }
 
@@ -193,8 +204,8 @@ body {
 .detalle-modal-content button {
   display: block;
   width: 100%;
-  padding: 12px;
-  background-color: #ff6600;
+  padding: 16px;
+  background-color: var(--tpp-mid);
   color: white;
   border: none;
   border-radius: 6px;
@@ -203,7 +214,7 @@ body {
 }
 
 .detalle-modal-content button:hover {
-  background-color: #e65c00;
+  background-color: var(--tpp-dark);
 }
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.9); }
@@ -217,7 +228,7 @@ body {
   margin-top: 10px;
   margin-bottom: 5px;
   font-weight: bold;
-  color: #333;
+  color: var(--tpp-dark);
 }
 
 #contenidoDetalle input[type="text"],
@@ -227,7 +238,7 @@ body {
   width: 100%;
   padding: 10px;
   margin-bottom: 15px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--tpp-border);
   border-radius: 6px;
   font-size: 14px;
   box-sizing: border-box;
@@ -345,19 +356,19 @@ body {
 
   .form-container {
     border-left: none;
-    border-top: 2px solid #ffa726;
+    border-top: 2px solid var(--tpp-border);
   }
 }*/
-/* Estilos adicionales para el menú lateral */
+/* Estilos adicionales para el menÃº lateral */
     .sidebar {
       position: fixed;
       left: 0;
       top: 0;
       height: 100vh;
       width: 220px;
-      background-color: #fff5e6;
-      border-right: 2px solid #ffa726;
-      box-shadow: 2px 0 6px rgba(255, 138, 0, 0.15);
+      background-color: #fff;
+      border-right: 2px solid var(--tpp-border);
+      box-shadow: 2px 0 6px rgba(47, 59, 82, 0.15);
       padding-top: 60px;
       transition: transform 0.3s ease-in-out;
       z-index: 100;
@@ -370,21 +381,21 @@ body {
     .sidebar a {
       display: block;
       padding: 14px 20px;
-      color: #333;
+      color: var(--tpp-dark);
       text-decoration: none;
       font-weight: 600;
       transition: background 0.2s;
     }
 
     .sidebar a:hover {
-      background-color: #ffe0b2;
+      background-color: var(--tpp-light);
     }
 
     .toggle-btn {
       /*top: 20px;
       left: 20px;
       z-index: 101;
-      background-color: #fb8c00;
+      background-color: var(--tpp-mid);
       color: white;
       border: none;*/
       padding: 10px 12px;
@@ -393,7 +404,7 @@ body {
     }
 
     /*.main-content {
-      margin-left: 240px;
+      margin-left: 0;
       padding: 40px 20px;
       transition: margin-left 0.3s ease-in-out;
     }
@@ -468,7 +479,7 @@ body {
   width: 300px;
   font-size: 14px;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--tpp-border);
   text-transform: uppercase;
 }
 
@@ -476,7 +487,7 @@ body {
 .table-wrapper {
   overflow-y: auto;
   max-height: 710px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--tpp-border);
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
@@ -491,7 +502,7 @@ body {
 .styled-table thead {
   position: sticky;
   top: 0;
-  background-color: #ff510c;
+  background-color: var(--tpp-mid);
   color: #fff;
   z-index: 10;
 }
@@ -507,10 +518,10 @@ body {
   transition: background-color 0.3s;
 }
 
-/* Botón cerrar modal */
+/* BotÃ³n cerrar modal */
 .detalle-modal-content button {
   padding: 10px 20px;
-  background-color: #ff9b05;
+  background-color: var(--tpp-accent);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -518,22 +529,22 @@ body {
 }
 
 .detalle-modal-content button:hover {
-  background-color: #cc4100;
+  background-color: var(--tpp-dark);
 }
 /*************RESPONSIVE STYLES FOR TABLE AND SEARCH BAR */
-/* Diseño general responsivo */
+/* DiseÃ±o general responsivo */
  
 
 /* Main container adaptativo */
 .main-container {
   padding: 20px;
-  margin-left: 220px;
+  margin-left: 0;
   transition: margin-left 0.3s;
 }
  
 .styled-table {
   width: 100%;
-  min-width: 900px; /* Ancho mínimo para scroll en móviles */
+  min-width: 900px; /* Ancho mÃ­nimo para scroll en mÃ³viles */
   border-collapse: collapse;
   font-size: 14px;
   background-color: white;
@@ -548,9 +559,9 @@ body {
     width: 220px;
     height: 100vh;
     padding-top: 60px;
-    background-color: #fff5e6;
-    border-right: 2px solid #ffa726;
-    box-shadow: 2px 0 6px rgba(255, 138, 0, 0.15);
+    background-color: #fff;
+    border-right: 2px solid var(--tpp-border);
+    box-shadow: 2px 0 6px rgba(47, 59, 82, 0.15);
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
     z-index: 200;
@@ -583,7 +594,7 @@ body {
   }
 }
 /* ===========================
-   MODAL DE CONFIRMACIÓN*/
+   MODAL DE CONFIRMACIÃ“N*/
 .modal {
   display: none;
   position: fixed;
@@ -608,8 +619,8 @@ body {
 /* MOBILE NAV BAR */
 .responsive-header {
   display: none;
-  background-color: #ff4800;
-  padding: 8px;
+  background-color: var(--tpp-dark);
+  padding: 10px;
 }
 
 .responsive-header .toggle-btn {
@@ -623,18 +634,18 @@ body {
 .mobile-nav {
   display: none;
   flex-direction: column;
-  background-color: #4d1f058c;
+  background-color: rgba(63, 78, 103, 0.6);
 }
 
 .mobile-nav a {
   padding: 10px;
   color: #ecf0f1;
   text-decoration: none;
-  border-bottom: 1px solid #f3c600;
+  border-bottom: 1px solid var(--tpp-accent);
 }
 
 .mobile-nav a:hover {
-  background-color: #fa7900;
+  background-color: var(--tpp-accent);
 }
 
 /* MOSTRAR NAV EN MOVILES */
@@ -658,7 +669,7 @@ body {
   }
 }
 
-/* DESKTOP CONFIGURACIÓN */
+/* DESKTOP CONFIGURACIÃ“N */
 @media screen and (min-width: 769px) {
   .mobile-nav, .responsive-header {
     display: none;
@@ -670,14 +681,20 @@ body {
     left: 0;
     top: 0;
     height: 100%;
-    background-color: #f5a40e;
+    background-color: var(--tpp-mid);
     padding-top: 60px;
     display: flex;
     flex-direction: column;
   }
 
   .main-container {
-    margin-left: 240px;
+    margin-left: 0;
     padding: 20px;
   }
 }
+
+
+
+
+
+

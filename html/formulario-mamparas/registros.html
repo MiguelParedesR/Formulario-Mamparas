@@ -1,42 +1,43 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VER REGISTROS</title>
-  <link rel="stylesheet" href="CSS/styles.css" />
+  <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
+<main class="main-container">
 
-<!-- Header con botón ☰ (funciona tanto en móvil como en desktop) -->
+<!-- Header con botÃ³n â˜° (funciona tanto en mÃ³vil como en desktop) -->
 <div class="responsive-header">
-  <button class="toggle-btn">☰</button>
+  <button class="toggle-btn">â˜°</button>
 </div>
 
 <!-- Sidebar escritorio -->
 <div class="sidebar">
-  <a href="index.html">🏠 Inicio</a>
-  <a href="registro.html">📝 Registro</a>
-  <a href="reportes.html">📊 Reportes</a>
-  <a href="registros.html">📋 Registros</a>
+  <a href="index.html">ðŸ  Inicio</a>
+  <a href="registro.html">ðŸ“ Registro</a>
+  <a href="reportes.html">ðŸ“Š Reportes</a>
+  <a href="registros.html">ðŸ“‹ Registros</a>
 </div>
 
-<!-- Sidebar móvil -->
+<!-- Sidebar mÃ³vil -->
 <div class="mobile-nav">
-  <a href="index.html">🏠 Inicio</a>
-  <a href="registro.html">📝 Registro</a>
-  <a href="reportes.html">📊 Reportes</a>
-  <a href="registros.html">📋 Registros</a>
+  <a href="index.html">ðŸ  Inicio</a>
+  <a href="registro.html">ðŸ“ Registro</a>
+  <a href="reportes.html">ðŸ“Š Reportes</a>
+  <a href="registros.html">ðŸ“‹ Registros</a>
 </div>
 
   <!-- Contenido principal -->
   <div class="main-container">
     <div class="form-container">
-      <h2>REGISTROS DE INSPECCIÓN</h2>
+      <h2>REGISTROS DE INSPECCIÃ“N</h2>
 
-      <!-- CUADRO DE BÚSQUEDA -->
+      <!-- CUADRO DE BÃšSQUEDA -->
       <div class="search-bar">
-        <input type="text" id="buscarPlaca" placeholder="🔍 Buscar por placa...">
+        <input type="text" id="buscarPlaca" placeholder="ðŸ” Buscar por placa...">
       </div>
 
       <div class="table-wrapper">
@@ -49,14 +50,14 @@
               <th>PLACA</th>
               <th>CHOFER</th>
               <th>LUGAR</th>
-              <th>INCORRECCIÓN</th>
+              <th>INCORRECCIÃ“N</th>
               <th>RESPONSABLE</th>
               <th>OBSERVACIONES</th>
               <th>DETALLE</th>
             </tr>
           </thead>
           <tbody>
-            <!-- Se llena dinámicamente -->
+            <!-- Se llena dinÃ¡micamente -->
           </tbody>
         </table>
       </div>
@@ -76,13 +77,13 @@
   <div id="imagenAmpliada" class="imagen-ampliada" style="display: none;">
     <div class="imagen-wrapper">
       <img id="imagenAmpliadaSrc" src="" alt="Vista ampliada" />
-      <span class="cerrar-img" onclick="cerrarImagenAmpliada()">✖</span>
+      <span class="cerrar-img" onclick="cerrarImagenAmpliada()">âœ–</span>
     </div>
   </div>
 
   <!-- SCRIPTS -->
-  <script src="js/verRegistros.js" type="module"></script>
-  <script src="js/sidebar.js"></script>
+  <script src="/js/mamparas/verRegistros.js" type="module"></script>
+  <script src="/js/sidebar/sidebar.js"></script>
 
   <script>
 
@@ -100,5 +101,7 @@
     }
   </script>
   
+</main>
 </body>
 </html>
+
