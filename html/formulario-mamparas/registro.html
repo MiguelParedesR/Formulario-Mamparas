@@ -2,135 +2,115 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Registrar InspecciÃ³n</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registrar Inspeccion</title>
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
 <main class="main-container">
-<!-- Header con botÃ³n â˜° (funciona tanto en mÃ³vil como en desktop) -->
-<div class="responsive-header">
-  <button class="toggle-btn">â˜°</button>
-</div>
+  <div class="form-container">
+    <h2>Registro de Inspeccion</h2>
 
-<!-- Sidebar escritorio -->
-<div class="sidebar">
-  <a href="index.html">ðŸ  Inicio</a>
-  <a href="registro.html">ðŸ“ Registro</a>
-  <a href="reportes.html">ðŸ“Š Reportes</a>
-  <a href="registros.html">ðŸ“‹ Registros</a>
-</div>
+    <form id="form-inspeccion">
+      <div class="grid-fecha-hora">
+        <div>
+          <label for="fecha">Fecha:</label>
+          <input type="date" id="fecha" name="fecha" required readonly />
+        </div>
+        <div>
+          <label for="hora">Hora:</label>
+          <input type="time" id="hora" name="hora" required readonly />
+        </div>
+      </div>
 
-<!-- Sidebar mÃ³vil -->
-<div class="mobile-nav">
-  <a href="index.html">ðŸ  Inicio</a>
-  <a href="registro.html">ðŸ“ Registro</a>
-  <a href="reportes.html">ðŸ“Š Reportes</a>
-  <a href="registros.html">ðŸ“‹ Registros</a>
-</div>
+      <label for="empresa">Empresa:</label>
+      <select id="empresa" name="empresa" required>
+        <option value="">Seleccione</option>
+        <option value="otra">AGREGAR OTRA EMPRESA</option>
+        <option value="RYM">RYM</option>
+        <option value="TURICAR">TURICAR</option>
+        <option value="BUEN DIA">BUEN DIA</option>
+        <option value="HUARIJIRCA">HUARIJIRCA</option>
+        <option value="TEAL">TEAL</option>
+        <option value="BRANDOM">BRANDOM</option>
+        <option value="DIOS DA">DIOS DA</option>
+        <option value="KAREL">KAREL</option>
+        <option value="MALEJA">MALEJA</option>
+        <option value="MOTRIL">MOTRIL</option>
+        <option value="JK SALAS">JK SALAS</option>
+        <option value="TATTUS TRUCK">TATTUS TRUCK</option>
+        <option value="PR HERMANOS">PR HERMANOS</option>
+        <option value="SCARAMUTTI">SCARAMUTTI</option>
+        <option value="GM">GM</option>
+        <option value="TILOPSAC">TILOPSAC</option>
+        <option value="CHUCAS CARGO">CHUCAS CARGO</option>
+        <option value="V&B">V&B</option>
+        <option value="GAMARRA BERRENECHEA">GAMARRA BERRENECHEA</option>
+      </select>
+      <input type="text" id="nueva_empresa" name="nueva_empresa" placeholder="Ingresa el nombre de la empresa" style="display: none;" />
 
-  <!-- Contenido principal -->
-  <div class="main-container">
-    <div class="form-container">
-      <h2>Registro de InspecciÃ³n</h2>
-      <form id="form-inspeccion">
-        <input type="date" id="fecha" name="fecha" required readonly>
-<input type="time" id="hora" name="hora" required readonly>
+      <label for="placa">Placa:</label>
+      <input type="text" id="placa" name="placa" required />
 
+      <label for="chofer">Chofer:</label>
+      <input type="text" id="chofer" name="chofer" required />
 
-    <label for="empresa">Empresa:</label>
-<select id="empresa" name="empresa" required>
-  <option value="">Seleccione</option>
-    <option value="otra">AGREGAR OTRA EMPRESA</option>
-  <option value="RYM">RYM</option>
-  <option value="TURICAR">TURICAR</option>
-  <option value="BUEN DIA">BUEN DIA</option>
-  <option value="HUARIJIRCA">HUARIJIRCA</option>
-  <option value="TEAL">TEAL</option>
-  <option value="BRANDOM">BRANDOM</option>
-  <option value="DIOS DA">DIOS DA</option>
-  <option value="KAREL">KAREL</option>
-  <option value="MALEJA">MALEJA</option>
-  <option value="MOTRIL">MOTRIL</option>
-  <option value="JK SALAS">JK SALAS</option>
-  <option value="TATTUS TRUCK">TATTUS TRUCK</option>
-  <option value="PR HERMANOS">PR HERMANOS</option>
-  <option value="SCARAMUTTI">SCARAMUTTI</option>
-  <option value="GM">GM</option>
-  <option value="TILOPSAC">TILOPSAC</option>
-  <option value="CHUCAS CARGO">CHUCAS CARGO</option>
-  <option value="V&B">V&B</option>
-  <option value="GAMARRA BERRENECHEA">GAMARRA BERRENECHEA</option>
-</select>
+      <label for="lugar">Lugar:</label>
+      <select id="lugar" name="lugar" required>
+        <option value="">Seleccione</option>
+        <option value="Tracciones">Tracciones</option>
+        <option value="Calle">Calle</option>
+      </select>
 
-<!-- Campo de texto que aparecerÃ¡ si se selecciona "Otra empresa" -->
-<input type="text" id="nueva_empresa" name="nueva_empresa" placeholder="Ingresa el nombre de la empresa" style="display: none;" />
+      <label for="incorreccion">Tipo de Incorreccion:</label>
+      <select id="incorreccion" name="incorreccion" required>
+        <option value="">Seleccione</option>
+        <option value="Mampara">Mampara</option>
+        <option value="Cola de Pato">Cola de Pato</option>
+        <option value="Pernos">Pernos</option>
+        <option value="Otros">Otros</option>
+      </select>
 
+      <label for="responsable">Responsable:</label>
+      <select id="responsable" name="responsable" required>
+        <option value="">Seleccione</option>
+        <option value="Carlos Sanchez">Carlos Sanchez</option>
+        <option value="Francisco Elescano">Francisco Elescano</option>
+        <option value="Hernan Luna">Hernan Luna</option>
+        <option value="Roger Castro">Roger Castro</option>
+        <option value="Oscar Fernandez">Oscar Fernandez</option>
+        <option value="Miguel Paredes">Miguel Paredes</option>
+        <option value="David Echaccaya">David Echaccaya</option>
+        <option value="Juan Quelopana">Juan Quelopana</option>
+        <option value="Grover Munguia">Grover Munguia</option>
+        <option value="Ernesto Alfaro">Ernesto Alfaro</option>
+      </select>
 
-        <label for="placa">Placa:</label>
-        <input type="text" id="placa" name="placa" required>
+      <label for="observaciones">Observaciones:</label>
+      <select id="observaciones" name="observaciones" required>
+        <option value="">Seleccione</option>
+        <option value="Descarga">Descarga</option>
+        <option value="Embarque">Embarque</option>
+        <option value="Otros">Otros</option>
+      </select>
 
-        <label for="chofer">Chofer:</label>
-        <input type="text" id="chofer" name="chofer" required>
+      <input type="hidden" id="detalle" name="detalle" />
+      <button type="button" id="btnAgregarDetalle" style="display:none;">Agregar Detalle</button>
 
-        <label for="lugar">Lugar:</label>
-        <select id="lugar" name="lugar" required>
-          <option value="">Seleccione</option>
-          <option value="Tracciones">Tracciones</option>
-          <option value="Calle">Calle</option>
-        </select>
-
-        <label for="incorreccion">Tipo de incorrecciÃ³n:</label>
-        <select id="incorreccion" name="incorreccion" required>
-          <option value="">Seleccione</option>
-          <option value="Mampara">Mampara</option>
-          <option value="Cola de Pato">Cola de Pato</option>
-          <option value="Pernos">Pernos</option>
-          <option value="Otros">Otros</option>
-        </select>
-
-        <label for="responsable">Responsable:</label>
-        <select id="responsable" name="responsable" required>
-          <option value="">Seleccione</option>
-          <option value="Carlos Sanchez">Carlos Sanchez</option>
-          <option value="Francisco Elescano">Francisco Elescano</option>
-          <option value="Hernan Luna">Hernan Luna</option>
-          <option value="Roger Castro">Roger Castro</option>
-          <option value="Oscar Fernandez">Oscar Fernandez</option>
-          <option value="Miguel Paredes">Miguel Paredes</option>
-          <option value="David Echaccaya">David Echaccaya</option>
-          <option value="Juan Quelopana">Juan Quelopana</option>
-          <option value="Grover Munguia">Grover Munguia</option>
-          <option value="Ernesto Alfaro">Ernesto Alfaro</option>
-        </select>
-
-        <label for="observaciones">Observaciones:</label>
-        <select id="observaciones" name="observaciones" required>
-          <option value="">Seleccione</option>
-          <option value="Descarga">Descarga</option>
-          <option value="Embarque">Embarque</option>
-          <option value="Otros">Otros</option>
-        </select>
-
-        <input type="hidden" id="detalle" name="detalle" />
-        <button type="button" id="btnAgregarDetalle" style="display:none;">Agregar Detalle</button>
-
-
-        <br><br>
-        <button type="submit">Registrar</button>
-      </form>
-    </div>
+      <button type="submit">Registrar</button>
+    </form>
   </div>
+</main>
 
-  <!-- Modal de Detalle -->
-  <div class="detalle-modal" id="detalleModal">
-    <div class="detalle-modal-content">
-      <h3>Detalle de la IncorrecciÃ³n</h3>
-<div id="contenidoDetalle" class="detalle-editable"></div>
-      <br>
-      <button id="btnGuardarDetalle">Guardar Detalle</button>
-    </div>
+<!-- Modal de Detalle -->
+<div class="detalle-modal" id="detalleModal">
+  <div class="detalle-modal-content">
+    <h3>Detalle de la Incorreccion</h3>
+    <div id="contenidoDetalle" class="detalle-editable"></div>
+    <button id="btnGuardarDetalle">Guardar Detalle</button>
   </div>
+</div>
+
 <!-- Modal de retroalimentaciÃ³n -->
 <div id="feedbackModal" class="feedback-modal" style="display: none;">
   <div class="modal-inner">
@@ -139,13 +119,10 @@
   </div>
 </div>
 
-  <!-- Scripts -->
-  <script src="/js/mamparas/registros.js" type="module"></script>
-  <script type="module" src="/js/mamparas/script.js"></script>
-  <script src="/js/sidebar/sidebar.js"></script>
-</script>
-  </script>
-</main>
+<!-- Scripts -->
+<script type="module" src="/js/mamparas/registros.js"></script>
+<script type="module" src="/js/mamparas/script.js"></script>
 </body>
 </html>
+
 

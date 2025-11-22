@@ -137,6 +137,14 @@ body {
   background: #fff;
 }
 
+
+.grid-fecha-hora {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
 /* BotÃ³n de formulario */
 .form-container button {
   background-color: var(--tpp-mid);
@@ -692,6 +700,7 @@ body {
     padding: 20px;
   }
 }
+
 
 
 

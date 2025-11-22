@@ -2,70 +2,35 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Reportes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reportes de Mamparas</title>
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
 <main class="main-container">
-<!-- Header con botÃ³n â˜° (funciona tanto en mÃ³vil como en desktop) -->
-<div class="responsive-header">
-  <button class="toggle-btn">â˜°</button>
-</div>
+  <div class="form-container">
+    <h2>Generar Reportes</h2>
 
-<!-- Sidebar escritorio -->
-<div class="sidebar">
-  <a href="index.html">ðŸ  Inicio</a>
-  <a href="registro.html">ðŸ“ Registro</a>
-  <a href="reportes.html">ðŸ“Š Reportes</a>
-  <a href="registros.html">ðŸ“‹ Registros</a>
-</div>
-
-<!-- Sidebar mÃ³vil -->
-<div class="mobile-nav">
-  <a href="index.html">ðŸ  Inicio</a>
-  <a href="registro.html">ðŸ“ Registro</a>
-  <a href="reportes.html">ðŸ“Š Reportes</a>
-  <a href="registros.html">ðŸ“‹ Registros</a>
-</div>
-
-  <!-- Contenido principal -->
-  <div class="main-container">
-    <div class="form-container">
-      <h2>Generar Reportes</h2>
-      <form id="form-reportes">
-        <label for="mes">Seleccionar Mes:</label>
-        <input type="month" id="mes" name="mes" required>
-
-        <label for="operador">Seleccionar Operador:</label>
-        <select id="operador" name="operador" required>
+    <div class="grid-fecha-hora">
+      <div>
+        <label for="mesSelect">Seleccionar Mes:</label>
+        <input type="month" id="mesSelect" />
+      </div>
+      <div>
+        <label for="operadorSelect">Seleccionar Operador:</label>
+        <select id="operadorSelect">
           <option value="Todos">Todos</option>
-          <option value="Carlos Sanchez">Carlos Sanchez</option>
-          <option value="Francisco Elescano">Francisco Elescano</option>
-          <option value="Hernan Luna">Hernan Luna</option>
-          <option value="Roger Castro">Roger Castro</option>
-          <option value="Oscar Fernandez">Oscar Fernandez</option>
-          <option value="Miguel Paredes">Miguel Paredes</option>
-          <option value="David Echaccaya">David Echaccaya</option>
-          <option value="Juan Quelopana">Juan Quelopana</option>
-          <option value="Grover Munguia">Grover Munguia</option>
-          <option value="Ernesto Alfaro">Ernesto Alfaro</option>
         </select>
-
-        <br>
-        <button type="submit">Exportar a Excel</button>
-      </form>
+      </div>
     </div>
+
+    <button id="btnExportar">Exportar a Excel</button>
   </div>
-
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script type="module" src="/js/mamparas/reportes.js"></script>
-  <script src="/js/sidebar/sidebar.js"></script>
-
-  </script>
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script type="module" src="/js/mamparas/reportes.js"></script>
 </body>
 </html>
 

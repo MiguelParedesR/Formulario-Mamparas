@@ -2,106 +2,77 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VER REGISTROS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registros de Inspeccion</title>
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
 <main class="main-container">
+  <div class="form-container">
+    <h2>Registros de Inspeccion</h2>
 
-<!-- Header con botÃ³n â˜° (funciona tanto en mÃ³vil como en desktop) -->
-<div class="responsive-header">
-  <button class="toggle-btn">â˜°</button>
-</div>
+    <div class="search-bar">
+      <input type="text" id="buscarPlaca" placeholder="Buscar por placa..." />
+    </div>
 
-<!-- Sidebar escritorio -->
-<div class="sidebar">
-  <a href="index.html">ðŸ  Inicio</a>
-  <a href="registro.html">ðŸ“ Registro</a>
-  <a href="reportes.html">ðŸ“Š Reportes</a>
-  <a href="registros.html">ðŸ“‹ Registros</a>
-</div>
-
-<!-- Sidebar mÃ³vil -->
-<div class="mobile-nav">
-  <a href="index.html">ðŸ  Inicio</a>
-  <a href="registro.html">ðŸ“ Registro</a>
-  <a href="reportes.html">ðŸ“Š Reportes</a>
-  <a href="registros.html">ðŸ“‹ Registros</a>
-</div>
-
-  <!-- Contenido principal -->
-  <div class="main-container">
-    <div class="form-container">
-      <h2>REGISTROS DE INSPECCIÃ“N</h2>
-
-      <!-- CUADRO DE BÃšSQUEDA -->
-      <div class="search-bar">
-        <input type="text" id="buscarPlaca" placeholder="ðŸ” Buscar por placa...">
-      </div>
-
-      <div class="table-wrapper">
-        <table id="tabla-registros" class="styled-table">
-          <thead>
-            <tr>
-              <th>FECHA</th>
-              <th>HORA</th>
-              <th>EMPRESA</th>
-              <th>PLACA</th>
-              <th>CHOFER</th>
-              <th>LUGAR</th>
-              <th>INCORRECCIÃ“N</th>
-              <th>RESPONSABLE</th>
-              <th>OBSERVACIONES</th>
-              <th>DETALLE</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Se llena dinÃ¡micamente -->
-          </tbody>
-        </table>
-      </div>
+    <div class="table-wrapper">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Empresa</th>
+            <th>Placa</th>
+            <th>Chofer</th>
+            <th>Lugar</th>
+            <th>Incorreccion</th>
+            <th>Responsable</th>
+            <th>Observaciones</th>
+            <th>Detalle</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-registros">
+          <!-- JS inyecta los registros -->
+        </tbody>
+      </table>
     </div>
   </div>
-
-  <!-- MODAL PARA DETALLES -->
-  <div class="detalle-modal" id="detalleModal">
-    <div class="detalle-modal-content">
-      <div id="detalleCompleto" class="detalle-contenido"></div>
-      <br>
-      <button onclick="cerrarDetalle()">CERRAR</button>
-    </div>
-  </div>
-
-  <!-- CONTENEDOR DE IMAGEN AMPLIADA -->
-  <div id="imagenAmpliada" class="imagen-ampliada" style="display: none;">
-    <div class="imagen-wrapper">
-      <img id="imagenAmpliadaSrc" src="" alt="Vista ampliada" />
-      <span class="cerrar-img" onclick="cerrarImagenAmpliada()">âœ–</span>
-    </div>
-  </div>
-
-  <!-- SCRIPTS -->
-  <script src="/js/mamparas/verRegistros.js" type="module"></script>
-  <script src="/js/sidebar/sidebar.js"></script>
-
-  <script>
-
-    function cerrarDetalle() {
-      document.getElementById('detalleModal').style.display = 'none';
-    }
-
-    function verImagenAmpliada(url) {
-      document.getElementById('imagenAmpliadaSrc').src = url;
-      document.getElementById('imagenAmpliada').style.display = 'flex';
-    }
-
-    function cerrarImagenAmpliada() {
-      document.getElementById('imagenAmpliada').style.display = 'none';
-    }
-  </script>
-  
 </main>
+
+<!-- Modal Detalle -->
+<div class="detalle-modal" id="detalleModal">
+  <div class="detalle-modal-content">
+    <h3>Detalle de la Incorreccion</h3>
+    <table class="detalle-tabla">
+      <tbody id="detalleContenido"></tbody>
+    </table>
+    <button onclick="cerrarDetalle()">Cerrar</button>
+  </div>
+</div>
+
+<!-- Imagen ampliada -->
+<div id="imagenAmpliada" class="imagen-ampliada" style="display: none;">
+  <div class="imagen-wrapper">
+    <img id="imagenAmpliadaSrc" src="" alt="Vista ampliada" />
+    <span class="cerrar-img" onclick="cerrarImagenAmpliada()">Ã—</span>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="/js/mamparas/verRegistros.js" type="module"></script>
+<script>
+  function cerrarDetalle() {
+    document.getElementById('detalleModal').style.display = 'none';
+  }
+  function verImagenAmpliada(url) {
+    document.getElementById('imagenAmpliadaSrc').src = url;
+    document.getElementById('imagenAmpliada').style.display = 'flex';
+  }
+  function cerrarImagenAmpliada() {
+    document.getElementById('imagenAmpliada').style.display = 'none';
+  }
+</script>
 </body>
 </html>
+
 
