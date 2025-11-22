@@ -2,13 +2,11 @@
 // DASHBOARD.JS — NAVEGACIÓN SPA PARA TARJETAS DEL DASHBOARD TPP
 // ============================================================================
 //
-// Este archivo controla la navegación desde las tarjetas del dashboard
-// hacia el resto de módulos, usando el router SPA manejado por sidebar.js.
-//
-// ✔ NO recarga la página
-// ✔ Llama al evento `sidebar:navigate`
-// ✔ Compatible con producción
-// ✔ Sin dependencias externas
+// ✔ Controla navegación desde el dashboard a los módulos
+// ✔ Compatible con SPA (sidebar-loader.js)
+// ✔ No recarga la página
+// ✔ No afecta otros módulos
+// ✔ Código limpio, estable y sin dependencias externas
 // ============================================================================
 
 
@@ -17,29 +15,30 @@
  * @param {string} tipo  Ej: "CABLE", "MERCADERIA", "CHOQUE", "SINIESTRO"
  */
 export function navigateToFormulario(tipo) {
-    if (!tipo) return;
+  if (!tipo) return;
 
-    const url = `./html/formulario.html?tipo=${encodeURIComponent(tipo)}`;
+  const url = `./html/formulario.html?tipo=${encodeURIComponent(tipo)}`;
 
-    console.log(`➡️ Navegando a: ${url}`);
+  console.log(`➡️ Navegando a: ${url}`);
 
-    window.dispatchEvent(
-        new CustomEvent("sidebar:navigate", { detail: url })
-    );
+  window.dispatchEvent(
+    new CustomEvent("sidebar:navigate", { detail: url })
+  );
 }
 
 
 /**
- * Navega al módulo de mamparas
+ * Navega correctamente al módulo de Mamparas
+ * (ruta real del proyecto)
  */
 export function navigateToMamparas() {
-    const url = "./html/mamparas.html";
+  const url = "./html/formulario-mamparas/registro.html";
 
-    console.log(`➡️ Navegando a: ${url}`);
+  console.log(`➡️ Navegando a: ${url}`);
 
-    window.dispatchEvent(
-        new CustomEvent("sidebar:navigate", { detail: url })
-    );
+  window.dispatchEvent(
+    new CustomEvent("sidebar:navigate", { detail: url })
+  );
 }
 
 

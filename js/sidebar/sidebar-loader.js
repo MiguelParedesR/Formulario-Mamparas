@@ -1,6 +1,13 @@
 // ============================================================================
-// SIDEBAR-LOADER v3 — PRODUCCIÓN TPP
-// Lógica estable para SPA + Sidebar persistente
+// SIDEBAR-LOADER — PRODUCCIÓN TPP
+// v3 — Loader SPA + Sidebar persistente limpio y optimizado
+// ============================================================================
+//
+// ✔ Carga e inyecta el sidebar.html en el contenedor correcto
+// ✔ Evita duplicados y problemas con el SPA
+// ✔ Aplica cache-busting para evitar archivos obsoletos
+// ✔ Inicializa sidebar.js de forma segura
+// ✔ No rompe otras vistas ni el flujo del proyecto
 // ============================================================================
 
 const SIDEBAR_HTML = "/html/base/sidebar.html";
@@ -22,59 +29,79 @@ function ensureCss(href) {
   link.rel = "stylesheet";
   link.href = href;
   link.crossOrigin = "anonymous";
+
   document.head.appendChild(link);
 }
 
 // ============================================================================
-//  Inserta el HTML del sidebar
+//  Inserta el HTML del sidebar si no existe
 // ============================================================================
 async function injectSidebarHTML() {
   const container = document.getElementById("sidebar-container");
+
   if (!container) {
-    console.error("❌ No existe #sidebar-container");
+    console.error("❌ sidebar-loader: No existe #sidebar-container");
     return;
   }
 
+  // Evita duplicado del sidebar
   if (container.querySelector("#sidebar")) return;
 
-  const res = await fetch(SIDEBAR_HTML, { cache: "no-cache" });
-  if (!res.ok) throw new Error(res.status);
+  const response = await fetch(`${SIDEBAR_HTML}?v=${Date.now()}`, {
+    cache: "no-cache",
+  });
 
-  container.innerHTML = await res.text();
+  if (!response.ok) {
+    console.error("❌ No se pudo cargar sidebar.html");
+    return;
+  }
+
+  container.innerHTML = await response.text();
 }
 
 // ============================================================================
 //  Importar sidebar.js y ejecutar initSidebar()
 // ============================================================================
 async function initSidebarJS() {
-  const module = await import(SIDEBAR_JS);
-  const initSidebar = module.initSidebar;
+  try {
+    const module = await import(`${SIDEBAR_JS}?v=${Date.now()}`);
+    const initSidebar = module.initSidebar;
 
-  if (typeof initSidebar !== "function") {
-    console.error("❌ initSidebar() no encontrado en sidebar.js");
-    return;
+    if (typeof initSidebar !== "function") {
+      console.error("❌ sidebar-loader: initSidebar() no encontrado");
+      return;
+    }
+
+    // Iniciar sidebar SPA
+    await initSidebar("#sidebar-container", {
+      htmlPath: SIDEBAR_HTML,
+      enableRouting: true,
+    });
+  } catch (err) {
+    console.error("❌ Error cargando sidebar.js", err);
   }
-
-  await initSidebar("#sidebar-container", {
-    htmlPath: SIDEBAR_HTML,
-    enableRouting: true,
-  });
 }
 
 // ============================================================================
-//  LÓGICA PRINCIPAL (auto-ejecutable)
+//  Loader principal auto-ejecutable
 // ============================================================================
 (function loadSidebar() {
+  // Evita múltiples cargas
   if (window.__SIDEBAR_LOADED__) return;
 
   if (!sidebarBootstrapPromise) {
     sidebarBootstrapPromise = (async () => {
       ensureCss(FONT_AWESOME);
       ensureCss(SIDEBAR_CSS);
+
       await injectSidebarHTML();
       await initSidebarJS();
+
       window.__SIDEBAR_LOADED__ = true;
-    })().catch((err) => console.error("❌ Error iniciando sidebar:", err));
+      console.log("✅ sidebar-loader inicializado correctamente");
+    })().catch((err) => {
+      console.error("❌ Error iniciando sidebar-loader:", err);
+    });
   }
 
   return sidebarBootstrapPromise;

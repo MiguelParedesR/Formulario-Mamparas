@@ -1,101 +1,126 @@
-const CACHE_NAME = "tpp-pwa-v25";
-const ASSETS_TO_CACHE = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/assets/logo.png",
-  "/assets/templates/informe-base.docx",
+// ============================================================================
+// SERVICE-WORKER — MODO SEGURO TPP (Sin fallos, producción estable)
+// ============================================================================
+//
+// ✔ No usa cache.addAll()
+// ✔ No falla si un archivo no existe
+// ✔ Cachea solo lo que se confirma que existe
+// ✔ Evita interferir con el SPA / router
+// ✔ No hace precache de HTML (para evitar vistas obsoletas)
+// ✔ Compatible con Supabase
+// ✔ Network-first para vistas dinámicas
+//
+// ============================================================================
+
+const CACHE_NAME = "tpp-cache-v2";
+
+// Archivos que intentará cachear si existen:
+const STATIC_ASSETS = [
+  "/css/global.css",
   "/css/dashboard/dashboard.css",
   "/css/estilos-sidebar/sidebar.css",
-  "/css/global.css",
-  "/css/styles.css",
-  "/css/tailwind.css",
-  "/html/base/sidebar.html",
-  "/html/formulario-mamparas/registro.html",
-  "/html/formulario-mamparas/registros.html",
-  "/html/formulario-mamparas/reportes.html",
-  "/html/formulario.html",
-  "/html/registros.html",
-  "/js/config.js",
-  "/js/dashboard/dashboard.js",
-  "/js/dashboard/progreso.js",
-  "/js/formularios/campos-cable.js",
-  "/js/formularios/campos-choque.js",
-  "/js/formularios/campos-mercaderia.js",
-  "/js/formularios/campos-siniestro.js",
-  "/js/formularios/formulario.js",
-  "/js/formularios/generador-docx.js",
-  "/js/mamparas/registros.js",
-  "/js/mamparas/reportes.js",
-  "/js/mamparas/script.js",
-  "/js/mamparas/verRegistros.js",
-  "/js/registros/registros.js",
   "/js/sidebar/sidebar-loader.js",
   "/js/sidebar/sidebar.js",
-  "/js/utils/helpers.js",
-  "/js/utils/modal.js",
-  "/js/utils/storage.js",
-  "/js/utils/supabase.js",
+  "/js/dashboard.js",
+  "/manifest.json",
+  "/favicon.ico",
 ];
 
+// ============================================================================
+// INSTALL — Cachea solo los archivos que EXISTEN (modo seguro)
+// ============================================================================
 self.addEventListener("install", (event) => {
+  console.log("[SW] Instalando...");
+
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
-      await cache.addAll(ASSETS_TO_CACHE);
-      await self.skipWaiting();
+
+      for (const url of STATIC_ASSETS) {
+        try {
+          const res = await fetch(url, { cache: "no-cache" });
+          if (res.ok) {
+            await cache.put(url, res.clone());
+            console.log("[SW] Cacheado:", url);
+          } else {
+            console.warn("[SW] Archivo no existe, omitido:", url);
+          }
+        } catch (err) {
+          console.warn("[SW] Error cacheando (omitido):", url);
+        }
+      }
     })()
   );
+
+  self.skipWaiting();
 });
 
+// ============================================================================
+// ACTIVATE — Limpieza de caches antiguos
+// ============================================================================
 self.addEventListener("activate", (event) => {
+  console.log("[SW] Activado");
+
   event.waitUntil(
-    (async () => {
-      const keys = await caches.keys();
-      await Promise.all(
-        keys.map((key) => (key === CACHE_NAME ? Promise.resolve() : caches.delete(key)))
-      );
-      await self.clients.claim();
-    })()
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => {
+            console.log("[SW] Eliminando cache viejo:", key);
+            return caches.delete(key);
+          })
+      )
+    )
   );
+
+  self.clients.claim();
 });
+
+// ============================================================================
+// FETCH — Estrategia combinada
+// ============================================================================
+// ✔ Network-first para HTML (SPA nunca se rompe)
+// ✔ Cache-first para CSS/JS/IMG
+// ✔ Ignoramos Supabase
+// ============================================================================
 
 self.addEventListener("fetch", (event) => {
-  const { request } = event;
-  if (request.method !== "GET" || new URL(request.url).origin !== location.origin) {
+  const req = event.request;
+
+  // No intervenir Supabase
+  if (req.url.includes("supabase.co")) return;
+
+  // Vista SPA: siempre desde red
+  if (req.headers.get("accept")?.includes("text/html")) {
+    event.respondWith(
+      fetch(req).catch(() => caches.match(req))
+    );
     return;
   }
 
-  const isHTML =
-    request.destination === "document" ||
-    request.headers.get("accept")?.includes("text/html") ||
-    request.url.endsWith(".html");
-
-  if (isHTML) {
-    event.respondWith(networkFirst(request));
-  } else {
-    event.respondWith(cacheFirst(request));
-  }
+  // Cache-first para archivos estáticos
+  event.respondWith(
+    caches.match(req).then((cached) => {
+      return (
+        cached ||
+        fetch(req)
+          .then((networkRes) => {
+            // Cachear solo estáticos
+            if (req.url.match(/\.(css|js|png|jpg|jpeg|svg|webp|ico)$/)) {
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(req, networkRes.clone());
+              });
+            }
+            return networkRes;
+          })
+          .catch(() => cached)
+      );
+    })
+  );
 });
 
-async function networkFirst(request) {
-  try {
-    const response = await fetch(request);
-    const cache = await caches.open(CACHE_NAME);
-    cache.put(request, response.clone());
-    return response;
-  } catch (err) {
-    const cached = await caches.match(request);
-    if (cached) return cached;
-    return caches.match("/index.html");
-  }
-}
-
-async function cacheFirst(request) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-  const response = await fetch(request);
-  const cache = await caches.open(CACHE_NAME);
-  cache.put(request, response.clone());
-  return response;
-}
+// ============================================================================
+// LOG
+// ============================================================================
+console.log("✅ SW Modo Seguro TPP Activo");

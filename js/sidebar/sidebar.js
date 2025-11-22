@@ -1,16 +1,22 @@
 // ============================================================================
-// SIDEBAR.JS - SPA + Sidebar persistente
-//  - Mobile slide + toggles
-//  - Collapse desktop + flyout
-//  - Submenus independientes
-//  - Navegacion SPA con loadPartial()
-//  - Resaltado de enlace activo
-//  - Cierre al hacer click fuera y resize seguro
+// SIDEBAR.JS — SPA + Sidebar persistente para TPP
+// ============================================================================
+// ✔ Mobile slide
+// ✔ Collapse desktop
+// ✔ Flyout para modo colapsado
+// ✔ Submenús independientes
+// ✔ Router SPA con loadPartial()
+// ✔ Resaltado automático del enlace activo
+// ✔ Expansión automática del submenú correcto
+// ✔ Seguro, limpio y compatible con producción
 // ============================================================================
 
 const MAIN_SELECTOR = "#dashboardContent";
 const DESKTOP_BREAK = 1024;
 
+/**
+ * Inicializa el sidebar SPA
+ */
 export async function initSidebar(
   containerSelector = "#sidebar-container",
   options = {}
@@ -31,10 +37,11 @@ export async function initSidebar(
     return;
   }
 
+  // Inyectar HTML si aún no está cargado
   if (!container.querySelector("#sidebar")) {
     try {
-      const resp = await fetch(htmlPath, { cache: "no-cache" });
-      container.insertAdjacentHTML("afterbegin", await resp.text());
+      const res = await fetch(htmlPath, { cache: "no-cache" });
+      container.innerHTML = await res.text();
     } catch (e) {
       console.error("⚠️ Error cargando sidebar.html:", e);
       return;
@@ -45,15 +52,16 @@ export async function initSidebar(
   const toggleFloating = container.querySelector("#sidebarUniversalToggle");
   const toggleInternal = container.querySelector("#sidebarInternalToggle");
   const collapseBtn = container.querySelector("#collapseBtn");
-  const menuRoot = sidebar?.querySelector(".menu");
+  const menuRoot = sidebar.querySelector(".menu");
 
   if (!sidebar || !toggleFloating || !toggleInternal || !collapseBtn) {
-    console.error("⚠️ initSidebar: No se encontraron los toggles requeridos.");
+    console.error("⚠️ initSidebar: Faltan elementos del sidebar.");
     return;
   }
 
   let isNavigating = false;
 
+  // Responsive
   const isDesktop = () => window.innerWidth >= DESKTOP_BREAK;
 
   function adjustContentMargin() {
@@ -68,6 +76,7 @@ export async function initSidebar(
     }
   }
 
+  // Mobile open/close
   function openMobile() {
     sidebar.classList.add("show");
     document.body.classList.remove("sidebar-hidden");
@@ -81,15 +90,20 @@ export async function initSidebar(
   toggleFloating.addEventListener("click", openMobile);
   toggleInternal.addEventListener("click", closeMobile);
 
+  // Collapse desktop
   collapseBtn.addEventListener("click", () => {
     const collapsed = sidebar.classList.toggle("collapsed");
+
     if (collapsed) document.body.classList.add("sidebar-collapsed");
     else document.body.classList.remove("sidebar-collapsed");
+
     adjustContentMargin();
   });
 
+  // Submenús
   function setSubmenuState(li, open) {
     li.classList.toggle("active", open);
+
     const submenu = li.querySelector(":scope > .submenu");
     if (!submenu) return;
 
@@ -105,18 +119,21 @@ export async function initSidebar(
   function bindMenuEvents(root, { isFlyout = false } = {}) {
     if (!root) return;
 
+    // Click en submenús
     root.querySelectorAll(".has-submenu > .menu-link").forEach((link) => {
       link.addEventListener("click", (e) => {
         e.preventDefault();
+
         const li = link.parentElement;
         const isTopLevel = li.closest(".menu") === menuRoot;
-        const shouldOpenFlyout =
+
+        const openFlyoutMode =
           isTopLevel &&
           !isFlyout &&
           isDesktop() &&
           sidebar.classList.contains("collapsed");
 
-        if (shouldOpenFlyout) {
+        if (openFlyoutMode) {
           openFlyout(li);
         } else {
           toggleSubmenu(li);
@@ -124,20 +141,25 @@ export async function initSidebar(
       });
     });
 
-    root.querySelectorAll(".submenu-link, .menu-link").forEach((link) => {
-      const li = link.parentElement;
-      if (li?.classList.contains("has-submenu")) return;
-
-      link.addEventListener("click", (e) => {
+    // Navegación SPA
+    root
+      .querySelectorAll(".submenu-link, .menu-link")
+      .forEach((link) => {
         const href = link.getAttribute("href");
-        if (!href || !href.includes(".html")) return;
+        const parent = link.parentElement;
 
-        e.preventDefault();
-        loadPartial(href);
+        if (parent.classList.contains("has-submenu")) return;
+
+        if (href && href.includes(".html")) {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            loadPartial(href);
+          });
+        }
       });
-    });
   }
 
+  // Flyout (desplegable lateral)
   function openFlyout(li) {
     if (!isDesktop() || !sidebar.classList.contains("collapsed")) return;
 
@@ -162,8 +184,10 @@ export async function initSidebar(
 
     fly.appendChild(clone);
     document.body.appendChild(fly);
+
     bindMenuEvents(fly, { isFlyout: true });
 
+    // Cerrar al hacer clic fuera
     setTimeout(() => {
       document.addEventListener("click", function close(ev) {
         if (!fly.contains(ev.target) && !li.contains(ev.target)) {
@@ -174,6 +198,7 @@ export async function initSidebar(
     }, 30);
   }
 
+  // Marcar enlace activo
   function highlightActive(href) {
     sidebar
       .querySelectorAll(".menu-link, .submenu-link")
@@ -182,28 +207,32 @@ export async function initSidebar(
     if (!href) return;
 
     let target = sidebar.querySelector(`a[href="${href}"]`);
+
     if (!target) {
-      const pathOnly = href.split("?")[0];
-      target = sidebar.querySelector(`a[href="${pathOnly}"]`);
+      const base = href.split("?")[0];
+      target = sidebar.querySelector(`a[href="${base}"]`);
     }
+
     if (!target) return;
 
     target.classList.add("active-link");
 
     let node = target.parentElement;
+
     while (node) {
-      if (node.classList?.contains?.("has-submenu")) {
+      if (node.classList?.contains("has-submenu")) {
         setSubmenuState(node, true);
       }
       node = node.parentElement;
     }
   }
 
+  // Expande submenú según ruta
   function expandSubmenuByHref(href) {
     if (!href) return;
+
     const url = new URL(href, window.location.origin);
-    const params = url.searchParams;
-    const tipo = params.get("tipo");
+    const tipo = url.searchParams.get("tipo");
 
     const mapTipo = {
       CABLE: "cable",
@@ -214,66 +243,77 @@ export async function initSidebar(
 
     let targetLi = null;
 
+    // Por tipo= en la URL
     if (tipo && mapTipo[tipo]) {
       targetLi = sidebar.querySelector(`li[data-submenu="${mapTipo[tipo]}"]`);
-    } else if (url.pathname.includes("/mamparas")) {
+    }
+
+    // Por módulo Mamparas
+    else if (url.pathname.includes("formulario-mamparas")) {
       targetLi = sidebar.querySelector(`li[data-submenu="mamparas"]`);
     }
 
     if (targetLi) {
       setSubmenuState(targetLi, true);
+
       const parent = targetLi.closest('li[data-submenu="incidencias"]');
       if (parent) setSubmenuState(parent, true);
     }
   }
 
+  // Ejecutar scripts de vistas SPA
   async function executeScripts(scripts) {
     for (const script of scripts) {
-      const srcAttr = script.getAttribute("src");
-      const typeAttr = script.getAttribute("type");
-      const newScript = document.createElement("script");
+      const src = script.getAttribute("src");
+      const type = script.getAttribute("type");
+      const s = document.createElement("script");
 
-      if (typeAttr) newScript.type = typeAttr;
+      if (type) s.type = type;
 
-      if (srcAttr) {
-        const cacheBust = srcAttr.includes("?") ? "&" : "?";
-        newScript.src = `${srcAttr}${cacheBust}_=${Date.now()}`;
+      if (src) {
+        const cacheBust = src.includes("?") ? "&" : "?";
+        s.src = `${src}${cacheBust}_=${Date.now()}`;
 
         await new Promise((resolve, reject) => {
-          newScript.onload = resolve;
-          newScript.onerror = reject;
-          document.body.appendChild(newScript);
+          s.onload = resolve;
+          s.onerror = reject;
+          document.body.appendChild(s);
         });
-        newScript.remove();
+
+        s.remove();
       } else {
-        newScript.textContent = script.textContent;
-        document.body.appendChild(newScript);
-        newScript.remove();
+        s.textContent = script.textContent;
+        document.body.appendChild(s);
+        s.remove();
       }
     }
   }
 
-  function buildStateUrl(targetUrl) {
-    const navUrl = new URL(window.location.origin + window.location.pathname);
-    navUrl.searchParams.set("view", targetUrl.pathname);
-    targetUrl.searchParams.forEach((value, key) =>
-      navUrl.searchParams.set(key, value)
-    );
-    return navUrl;
-  }
-
+  // Normaliza ruta
   function normalizeHref(href) {
-    const targetUrl = new URL(
+    const parsed = new URL(
       href,
       window.location.origin + window.location.pathname
     );
-    const fetchUrl = `${targetUrl.pathname}${targetUrl.search}`;
-    const stateUrl = buildStateUrl(targetUrl);
-    const menuHref = `${targetUrl.pathname}${targetUrl.search}`;
 
-    return { fetchUrl, stateUrl, menuHref };
+    const fetchUrl = parsed.pathname + parsed.search;
+
+    // URL para historial
+    const newStateUrl = new URL(window.location.href);
+    newStateUrl.searchParams.set("view", parsed.pathname);
+
+    parsed.searchParams.forEach((v, k) =>
+      newStateUrl.searchParams.set(k, v)
+    );
+
+    return {
+      fetchUrl,
+      stateUrl: newStateUrl,
+      menuHref: parsed.pathname + parsed.search,
+    };
   }
 
+  // Cargar vistas SPA
   async function loadPartial(href, { push = true } = {}) {
     if (!enableRouting || !href || isNavigating) return;
 
@@ -281,17 +321,19 @@ export async function initSidebar(
 
     try {
       isNavigating = true;
+
       const req = await fetch(target.fetchUrl, { cache: "no-cache" });
       if (!req.ok) throw new Error(`HTTP ${req.status}`);
 
       const html = await req.text();
       const dom = new DOMParser().parseFromString(html, "text/html");
-      const scripts = Array.from(dom.querySelectorAll("script"));
-      scripts.forEach((s) => s.remove());
 
       const main = dom.querySelector("main");
-
       if (!main) throw new Error("No se encontró <main> en la vista cargada.");
+
+      // Scripts de vista
+      const scripts = [...dom.querySelectorAll("script")];
+      scripts.forEach((s) => s.remove());
 
       mainContainer.innerHTML = main.innerHTML;
       mainContainer.scrollTo(0, 0);
@@ -305,14 +347,15 @@ export async function initSidebar(
       }
 
       await executeScripts(scripts);
-      const pageTitle = dom.querySelector("title")?.textContent;
-      if (pageTitle) document.title = pageTitle;
+
+      const title = dom.querySelector("title")?.textContent;
+      if (title) document.title = title;
 
       highlightActive(target.menuHref);
       expandSubmenuByHref(target.menuHref);
       adjustContentMargin();
-    } catch (err) {
-      console.error("⚠️ loadPartial error:", err);
+    } catch (e) {
+      console.error("⚠️ loadPartial error:", e);
     } finally {
       isNavigating = false;
     }
@@ -321,49 +364,48 @@ export async function initSidebar(
   function hrefFromLocation() {
     const params = new URLSearchParams(window.location.search);
     const view = params.get("view");
+
     if (!view) return null;
+
     params.delete("view");
     const search = params.toString();
+
     return search ? `${view}?${search}` : view;
   }
 
+  // Bind menú
   if (menuRoot) {
     bindMenuEvents(menuRoot);
   }
 
+  // Eventos del router SPA
   window.addEventListener("sidebar:navigate", (ev) => {
-    const href = ev.detail;
-    if (href) loadPartial(href);
+    if (ev.detail) loadPartial(ev.detail);
   });
 
   window.addEventListener("popstate", (ev) => {
     const href = ev.state?.href || hrefFromLocation();
-    if (href) {
-      loadPartial(href, { push: false });
-    } else {
-      highlightActive("/index.html");
-    }
+    if (href) loadPartial(href, { push: false });
   });
 
+  // Cerrar en mobile
   document.addEventListener("click", (ev) => {
-    if (isDesktop()) return;
-    if (!sidebar.contains(ev.target) && !toggleFloating.contains(ev.target)) {
-      closeMobile();
+    if (!isDesktop()) {
+      if (
+        !sidebar.contains(ev.target) &&
+        !toggleFloating.contains(ev.target)
+      ) {
+        closeMobile();
+      }
     }
   });
 
-  window.addEventListener("resize", () => {
-    if (isDesktop()) {
-      sidebar.classList.add("show");
-      document.body.classList.remove("sidebar-hidden");
-    } else {
-      sidebar.classList.remove("collapsed");
-      document.body.classList.remove("sidebar-collapsed");
-    }
-    adjustContentMargin();
-  });
+  // Ajuste en resize
+  window.addEventListener("resize", adjustContentMargin);
 
+  // Inicialización automática
   const initialHref = hrefFromLocation();
+
   if (initialHref) {
     loadPartial(initialHref, { push: false });
   } else {
@@ -373,7 +415,6 @@ export async function initSidebar(
 
   if (isDesktop()) {
     sidebar.classList.add("show");
-    document.body.classList.remove("sidebar-hidden");
   } else {
     closeMobile();
   }
