@@ -8,7 +8,7 @@
    ============================================================================ */
 
 import { supabase } from "../utils/supabase.js";
-import { subirAnexo } from "../utils/storage.js";
+import { uploadFiles } from "../utils/storage.js";
 
 /* ===============================
    1. CAPTURA DE ELEMENTOS HTML
@@ -222,24 +222,16 @@ function recalcularProgreso() {
    7. MANEJO DE ANEXOS (Storage)
    =============================== */
 async function procesarAnexos(id) {
-  const files = anexosInput.files;
+  const files = Array.from(anexosInput.files);
   if (!files.length) return [];
 
-  const resultados = [];
+  const uploaded = await uploadFiles(id, files);
 
-  for (const file of files) {
-    const path = await subirAnexo(id, file);
-    resultados.push({
-      nombre: file.name,
-      path,
-      url: `${
-        supabase.storage.from("incidencias-anexos").getPublicUrl(path).data
-          .publicUrl
-      }`,
-    });
-  }
-
-  return resultados;
+  return uploaded.map((file) => ({
+    name: file.name || "anexo",
+    path: file.path,
+    url: file.url,
+  }));
 }
 
 /* ===============================

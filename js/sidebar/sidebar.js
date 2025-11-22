@@ -102,6 +102,42 @@ export async function initSidebar(
     setSubmenuState(li, !li.classList.contains("active"));
   }
 
+  function bindMenuEvents(root, { isFlyout = false } = {}) {
+    if (!root) return;
+
+    root.querySelectorAll(".has-submenu > .menu-link").forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const li = link.parentElement;
+        const isTopLevel = li.closest(".menu") === menuRoot;
+        const shouldOpenFlyout =
+          isTopLevel &&
+          !isFlyout &&
+          isDesktop() &&
+          sidebar.classList.contains("collapsed");
+
+        if (shouldOpenFlyout) {
+          openFlyout(li);
+        } else {
+          toggleSubmenu(li);
+        }
+      });
+    });
+
+    root.querySelectorAll(".submenu-link, .menu-link").forEach((link) => {
+      const li = link.parentElement;
+      if (li?.classList.contains("has-submenu")) return;
+
+      link.addEventListener("click", (e) => {
+        const href = link.getAttribute("href");
+        if (!href || !href.includes(".html")) return;
+
+        e.preventDefault();
+        loadPartial(href);
+      });
+    });
+  }
+
   function openFlyout(li) {
     if (!isDesktop() || !sidebar.classList.contains("collapsed")) return;
 
@@ -126,6 +162,7 @@ export async function initSidebar(
 
     fly.appendChild(clone);
     document.body.appendChild(fly);
+    bindMenuEvents(fly, { isFlyout: true });
 
     setTimeout(() => {
       document.addEventListener("click", function close(ev) {
@@ -291,33 +328,7 @@ export async function initSidebar(
   }
 
   if (menuRoot) {
-    menuRoot
-      .querySelectorAll(":scope > li.has-submenu > .menu-link")
-      .forEach((link) => {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const li = link.parentElement;
-          if (isDesktop() && sidebar.classList.contains("collapsed")) {
-            openFlyout(li);
-          } else {
-            toggleSubmenu(li);
-          }
-        });
-      });
-
-    menuRoot
-      .querySelectorAll(
-        ".submenu-link, :scope > li:not(.has-submenu) > .menu-link"
-      )
-      .forEach((link) => {
-        link.addEventListener("click", (e) => {
-          const href = link.getAttribute("href");
-          if (!href || !href.includes(".html")) return;
-
-          e.preventDefault();
-          loadPartial(href);
-        });
-      });
+    bindMenuEvents(menuRoot);
   }
 
   window.addEventListener("sidebar:navigate", (ev) => {
