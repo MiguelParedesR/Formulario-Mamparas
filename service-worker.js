@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "tpp-cache-v35";
+﻿const CACHE_NAME = "tpp-cache-v39";
 
 // Archivos que intentaremos cachear si existen:
 const STATIC_ASSETS = [
