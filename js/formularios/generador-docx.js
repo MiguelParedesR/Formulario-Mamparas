@@ -19,38 +19,29 @@ export async function generarDocxIncidencia(incidencia) {
     }
 
     const Docxtemplater = window.docxtemplater || window.Docxtemplater;
-    if (!window.PizZip || !Docxtemplater) {
-      throw new Error("Faltan dependencias de docxtemplater/pizzip en la pagina.");
+    const ImageModule = window.ImageModule;
+    if (!window.PizZip || !Docxtemplater || !ImageModule) {
+      throw new Error(
+        "Faltan dependencias de docxtemplater/pizzip/image-module en la pagina."
+      );
     }
 
     const zip = new window.PizZip(templateBinary);
-    const doc = Docxtemplater.prototype?.loadZip
-      ? new Docxtemplater().loadZip(zip)
-      : new Docxtemplater(zip);
+    const imageModule = new ImageModule({
+      centered: true,
+      getImage(tagValue) {
+        return base64ToArrayBuffer(tagValue?.data || tagValue);
+      },
+      getSize(img, tagValue) {
+        const width = tagValue?.width || 600;
+        const height = tagValue?.height || Math.round(width * 0.65);
+        return [width, height];
+      },
+    });
 
-    const datos = {
-      asunto: incidencia.asunto,
-      tipo: incidencia.tipo_incidencia,
-      dirigidoA: incidencia.dirigido_a,
-      remitente: incidencia.remitente,
-      fechaInforme: incidencia.fecha_informe,
-      analisis: incidencia.analisis || "",
-      conclusiones: incidencia.conclusiones || "",
-      recomendaciones: incidencia.recomendaciones || "",
-      ...expandirCamposJSON(incidencia.campos || {}),
-      imagenes: [],
-    };
+    const doc = new Docxtemplater(zip, { modules: [imageModule] });
 
-    if (incidencia.anexos && Array.isArray(incidencia.anexos)) {
-      for (const archivo of incidencia.anexos) {
-        if (!archivo.url) continue;
-        const base64 = await getFileBase64(archivo.url);
-        datos.imagenes.push({
-          data: base64.split(",")[1],
-          extension: obtenerExtension(archivo.mime),
-        });
-      }
-    }
+    const datos = await prepararDatosDocx(incidencia);
 
     doc.setData(datos);
     doc.render();
@@ -68,6 +59,51 @@ export async function generarDocxIncidencia(incidencia) {
     ocultarModalCarga();
     alert("Error creando el archivo Word.");
   }
+}
+
+async function prepararDatosDocx(incidencia) {
+  const campos = incidencia.campos || {};
+  const datos = {
+    asunto: incidencia.asunto || "",
+    tipo: incidencia.tipo_incidencia || "",
+    dirigidoA: incidencia.dirigido_a || "",
+    remitente: incidencia.remitente || "",
+    fechaInforme: incidencia.fecha_informe || "",
+    hechos: campos.hechos || "",
+    analisis: incidencia.analisis || "",
+    conclusiones: incidencia.conclusiones || "",
+    recomendaciones: incidencia.recomendaciones || "",
+    ...expandirCamposJSON(campos),
+    imagenes: [],
+  };
+
+  datos.imagenes = await construirImagenes(incidencia.anexos || []);
+  return datos;
+}
+
+async function construirImagenes(anexos = []) {
+  const lista = [];
+  for (const archivo of anexos) {
+    if (!archivo?.url) continue;
+
+    try {
+      const base64Url = await getFileBase64(archivo.url);
+      const dimensiones = await obtenerDimensionesDesdeBase64(base64Url);
+      const normalizadas = normalizarDimensiones(dimensiones.width, dimensiones.height);
+
+      lista.push({
+        nombre: archivo.name || obtenerNombreArchivo(archivo.url),
+        imagen: {
+          data: limpiarBase64(base64Url),
+          width: normalizadas.width,
+          height: normalizadas.height,
+        },
+      });
+    } catch (err) {
+      console.warn("No se pudo procesar anexo para DOCX:", archivo, err);
+    }
+  }
+  return lista;
 }
 
 async function cargarDocx(url) {
@@ -92,13 +128,6 @@ function expandirCamposJSON(json) {
   return plano;
 }
 
-function obtenerExtension(mime) {
-  if (!mime) return "png";
-  if (mime.includes("jpeg")) return "jpg";
-  if (mime.includes("png")) return "png";
-  return "png";
-}
-
 function descargarDOCX(blob, nombre) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -116,4 +145,49 @@ function mostrarModalCarga() {
 
 function ocultarModalCarga() {
   console.log("DOCX generado");
+}
+
+function base64ToArrayBuffer(base64) {
+  const binaryString = window.atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+function limpiarBase64(dataUrl = "") {
+  return dataUrl.includes(",") ? dataUrl.split(",")[1] : dataUrl;
+}
+
+function obtenerNombreArchivo(url = "") {
+  const cleanUrl = url.split("?")[0] || "";
+  const partes = cleanUrl.split("/");
+  return partes[partes.length - 1] || "anexo";
+}
+
+async function obtenerDimensionesDesdeBase64(dataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve({ width: img.width, height: img.height });
+    img.onerror = () => resolve({ width: 0, height: 0 });
+    img.src = dataUrl;
+  });
+}
+
+function normalizarDimensiones(width, height, maxWidth = 600) {
+  if (!width || !height) {
+    return { width: maxWidth, height: Math.round(maxWidth * 0.6) };
+  }
+
+  if (width <= maxWidth) {
+    return { width, height };
+  }
+
+  const ratio = maxWidth / width;
+  return {
+    width: maxWidth,
+    height: Math.max(Math.round(height * ratio), 200),
+  };
 }

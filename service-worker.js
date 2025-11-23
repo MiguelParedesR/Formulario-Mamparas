@@ -1,5 +1,5 @@
 ﻿
-const CACHE_NAME = "tpp-cache-v3";
+const CACHE_NAME = "tpp-cache-v8";
 
 // Archivos que intentaremos cachear si existen:
 const STATIC_ASSETS = [
@@ -9,6 +9,7 @@ const STATIC_ASSETS = [
   "/css/estilos-sidebar/sidebar.css",
   "/js/sidebar/sidebar-loader.js",
   "/js/sidebar/sidebar.js",
+  "/js/libs/docxtemplater-image-module.js",
   "/js/dashboard.js",
   "/manifest.json",
   "/favicon.ico",
@@ -77,8 +78,14 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
+  const url = new URL(req.url);
 
-  if (req.method !== "GET" || req.url.includes("supabase.co")) {
+  if (
+    req.method !== "GET" ||
+    url.protocol !== "http:" && url.protocol !== "https:" ||
+    url.origin !== self.location.origin ||
+    url.href.includes("supabase.co")
+  ) {
     return;
   }
 
@@ -96,14 +103,14 @@ self.addEventListener("fetch", (event) => {
       try {
         const networkRes = await fetch(req);
 
-        if (networkRes.ok && STATIC_FILE_REGEX.test(new URL(req.url).pathname)) {
+        if (networkRes.ok && STATIC_FILE_REGEX.test(url.pathname)) {
           const cache = await caches.open(CACHE_NAME);
           await cache.put(req, networkRes.clone());
         }
 
         return networkRes;
       } catch (err) {
-        return cached;
+        return cached || Response.error();
       }
     })()
   );

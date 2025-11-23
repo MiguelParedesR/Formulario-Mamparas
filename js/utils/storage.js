@@ -43,18 +43,53 @@ export function getBase64(file) {
 -------------------------------------------- */
 export async function getRemoteBase64(url) {
   const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`No se pudo obtener el archivo remoto (${res.status})`);
+  }
+
+  const contentType =
+    res.headers.get("content-type") || inferMimeFromUrl(url) || "application/octet-stream";
+
   const buffer = await res.arrayBuffer();
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
+  const base64 = arrayBufferToBase64(buffer);
 
-  bytes.forEach((b) => (binary += String.fromCharCode(b)));
-
-  return `data:application/octet-stream;base64,${btoa(binary)}`;
+  return `data:${contentType};base64,${base64}`;
 }
 
 // Alias para compatibilidad con generador-docx
 export async function getFileBase64(url) {
   return getRemoteBase64(url);
+}
+
+function arrayBufferToBase64(buffer) {
+  let binary = "";
+  const bytes = new Uint8Array(buffer);
+
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+
+  return btoa(binary);
+}
+
+function inferMimeFromUrl(url = "") {
+  const cleanUrl = url.split("?")[0] || "";
+  const ext = cleanUrl.split(".").pop();
+  if (!ext) return null;
+
+  switch (ext.toLowerCase()) {
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "png":
+      return "image/png";
+    case "webp":
+      return "image/webp";
+    case "gif":
+      return "image/gif";
+    default:
+      return null;
+  }
 }
 
 /* --------------------------------------------

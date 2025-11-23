@@ -1,37 +1,67 @@
-﻿<!-- 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas -->
-<main class="p-6 space-y-6 max-w-5xl mx-auto">
+<!-- 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas -->
+<main class="p-6 space-y-6 max-w-6xl mx-auto text-gray-800">
   <div class="space-y-1">
-    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+    <h1 class="text-2xl font-bold flex items-center gap-3 text-slate-900">
       <i class="fas fa-clipboard-list text-indigo-600"></i>
       Registro de Inspección
     </h1>
-    <p class="text-sm text-gray-600">Completa los datos y adjunta el detalle obligatorio.</p>
+    <p class="text-sm text-gray-600">
+      Completa los datos y adjunta el detalle obligatorio para asegurar la trazabilidad de cada inspección.
+    </p>
   </div>
 
-  <section class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-5">
-    <form id="form-inspeccion" class="space-y-5">
+  <section class="bg-white border border-gray-100 rounded-2xl shadow-xl p-6 sm:p-8 space-y-6">
+    <form id="form-inspeccion" class="space-y-6">
 
       <!-- FECHA + HORA -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-semibold text-gray-700" for="fecha">Fecha</label>
-          <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="date" id="fecha" name="fecha" required
-            readonly />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-slate-700" for="fecha">Fecha</label>
+          <div class="relative">
+            <input
+              class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+              type="date"
+              id="fecha"
+              name="fecha"
+              required
+              readonly
+            />
+            <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <i class="far fa-calendar"></i>
+            </span>
+          </div>
+          <p class="text-xs text-gray-500">Se autocompleta para evitar errores.</p>
         </div>
-        <div>
-          <label class="block text-sm font-semibold text-gray-700" for="hora">Hora</label>
-          <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="time" id="hora" name="hora" required
-            readonly />
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-slate-700" for="hora">Hora</label>
+          <div class="relative">
+            <input
+              class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+              type="time"
+              id="hora"
+              name="hora"
+              required
+              readonly
+            />
+            <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <i class="far fa-clock"></i>
+            </span>
+          </div>
         </div>
       </div>
 
       <!-- EMPRESA + PLACA -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700" for="empresa">Empresa</label>
-          <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="empresa" name="empresa" required>
+          <label class="block text-sm font-semibold text-slate-700" for="empresa">Empresa</label>
+          <select
+            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            id="empresa"
+            name="empresa"
+            required
+          >
             <option value="">Seleccione</option>
-            <option value="otra">AGREGAR OTRA EMPRESA</option>
+            <option value="otra">Agregar otra empresa</option>
             <option value="RYM">RYM</option>
             <option value="TURICAR">TURICAR</option>
             <option value="BUEN DIA">BUEN DIA</option>
@@ -49,30 +79,54 @@
             <option value="GM">GM</option>
             <option value="TILOPSAC">TILOPSAC</option>
             <option value="CHUCAS CARGO">CHUCAS CARGO</option>
-            <option value="V&B">V&B</option>
+            <option value="V&amp;B">V&amp;B</option>
             <option value="GAMARRA BERRENECHEA">GAMARRA BERRENECHEA</option>
           </select>
-
-          <input class="w-full rounded-lg border-gray-300 px-3 py-2 mt-2" type="text" id="nueva_empresa"
-            name="nueva_empresa" placeholder="Ingresa el nombre de la empresa" style="display:none;" />
+          <input
+            class="w-full rounded-xl border border-dashed border-indigo-200 bg-indigo-50 px-4 py-2 text-sm text-indigo-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            type="text"
+            id="nueva_empresa"
+            name="nueva_empresa"
+            placeholder="Ingresa el nombre de la empresa"
+            style="display:none;"
+          />
         </div>
 
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700" for="placa">Placa</label>
-          <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="text" id="placa" name="placa" required />
+          <label class="block text-sm font-semibold text-slate-700" for="placa">Placa</label>
+          <input
+            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm uppercase tracking-wide text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            type="text"
+            id="placa"
+            name="placa"
+            placeholder="ABC-123"
+            required
+          />
         </div>
       </div>
 
       <!-- CHOFER + LUGAR -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700" for="chofer">Chofer</label>
-          <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="text" id="chofer" name="chofer" required />
+          <label class="block text-sm font-semibold text-slate-700" for="chofer">Chofer</label>
+          <input
+            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            type="text"
+            id="chofer"
+            name="chofer"
+            placeholder="Nombre completo"
+            required
+          />
         </div>
 
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700" for="lugar">Lugar</label>
-          <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="lugar" name="lugar" required>
+          <label class="block text-sm font-semibold text-slate-700" for="lugar">Lugar</label>
+          <select
+            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            id="lugar"
+            name="lugar"
+            required
+          >
             <option value="">Seleccione</option>
             <option value="Tracciones">Tracciones</option>
             <option value="Calle">Calle</option>
@@ -81,24 +135,35 @@
       </div>
 
       <!-- INCORRECCION + RESPONSABLE -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700" for="incorreccion">
+          <label class="block text-sm font-semibold text-slate-700" for="incorreccion">
             Tipo de incorrección
           </label>
-          <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="incorreccion" name="incorreccion" required>
+          <select
+            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            id="incorreccion"
+            name="incorreccion"
+            required
+          >
             <option value="">Seleccione</option>
             <option value="Mampara">Mampara</option>
             <option value="Cola de Pato">Cola de Pato</option>
             <option value="Pernos">Pernos</option>
             <option value="Otros">Otros</option>
           </select>
+          <p class="text-xs text-gray-500">Activa el botón de detalle según el tipo elegido.</p>
         </div>
 
         <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700" for="responsable">Responsable</label>
-          <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="responsable" name="responsable" required>
+          <label class="block text-sm font-semibold text-slate-700" for="responsable">Responsable</label>
+          <select
+            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            id="responsable"
+            name="responsable"
+            required
+          >
             <option value="">Seleccione</option>
             <option value="Carlos Sanchez">Carlos Sanchez</option>
             <option value="Francisco Elescano">Francisco Elescano</option>
@@ -117,10 +182,15 @@
 
       <!-- OBSERVACIONES -->
       <div class="space-y-2">
-        <label class="block text-sm font-semibold text-gray-700" for="observaciones">
+        <label class="block text-sm font-semibold text-slate-700" for="observaciones">
           Observaciones
         </label>
-        <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="observaciones" name="observaciones" required>
+        <select
+          class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+          id="observaciones"
+          name="observaciones"
+          required
+        >
           <option value="">Seleccione</option>
           <option value="Descarga">Descarga</option>
           <option value="Embarque">Embarque</option>
@@ -133,13 +203,20 @@
 
       <!-- BOTONES -->
       <div class="flex flex-wrap gap-3 items-center">
-        <button type="button" id="btnAgregarDetalle"
-          class="px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg text-sm font-semibold"
-          style="display:none;">
-          Agregar Detalle
+        <button
+          type="button"
+          id="btnAgregarDetalle"
+          class="px-4 py-2 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-700 text-sm font-semibold shadow-sm hover:bg-indigo-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+          style="display:none;"
+        >
+          <i class="fas fa-list-ul mr-2 text-xs"></i>
+          Agregar detalle
         </button>
 
-        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold">
+        <button
+          type="submit"
+          class="px-6 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold shadow-lg hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+        >
           Registrar
         </button>
       </div>
@@ -148,20 +225,22 @@
   </section>
 
   <!-- MODAL DETALLE -->
-  <div id="detalleModal" class="fixed inset-0 bg-black/40 items-center justify-center" style="display:none;">
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-5 space-y-4">
+  <div id="detalleModal" class="fixed inset-0 bg-black/40 items-center justify-center px-4" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl p-6 space-y-5">
 
-      <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold text-gray-800">Detalle de la Incorrección</h3>
-        <button id="cerrarDetalleModal" class="text-gray-500 hover:text-gray-700">&times;</button>
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h3 class="text-lg font-semibold text-gray-800">Detalle de la incorrección</h3>
+        <button id="cerrarDetalleModal" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
       </div>
 
       <div id="contenidoDetalle" class="space-y-3"></div>
 
       <div class="flex justify-end gap-2">
-        <button id="btnGuardarDetalle"
-          class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">
-          Guardar Detalle
+        <button
+          id="btnGuardarDetalle"
+          class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 shadow-md"
+        >
+          Guardar detalle
         </button>
       </div>
 
@@ -170,13 +249,19 @@
 
   <!-- MODAL FEEDBACK -->
   <div id="feedbackModal" class="fixed inset-0 bg-black/40 items-center justify-center" style="display:none;">
-    <div class="bg-white rounded-xl shadow-lg w-72 p-5 text-center space-y-3 modal-inner">
-      <div id="loadingAnimation"
-        class="mx-auto h-10 w-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin">
+    <div class="bg-white rounded-2xl shadow-2xl w-72 p-5 text-center space-y-3 modal-inner">
+      <div
+        id="loadingAnimation"
+        class="mx-auto h-10 w-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"
+      >
       </div>
-      <p id="feedbackMessage" class="message text-sm"></p>
+      <p id="feedbackMessage" class="message text-sm font-medium"></p>
     </div>
   </div>
 </main>
 
 <script type="module" src="/js/mamparas/script.js"></script>
+<script>
+// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
+console.log("QA Mamparas: archivo corregido");
+</script>

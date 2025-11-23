@@ -1,14 +1,9 @@
-﻿// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
+// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
 import { supabase } from "./script.js";
 
-/* ========================================
-   🔵 RENDERIZAR UNA FILA DE LA TABLA
-   ======================================== */
 function renderFila(reg) {
   const detalleObj =
-    typeof reg.detalle === "string"
-      ? JSON.parse(reg.detalle || "{}")
-      : reg.detalle || {};
+    typeof reg.detalle === "string" ? JSON.parse(reg.detalle || "{}") : reg.detalle || {};
 
   return `
     <tr class="hover:bg-gray-100 transition">
@@ -22,7 +17,7 @@ function renderFila(reg) {
         <td>${reg.responsable || ""}</td>
 
         <td>
-            <button 
+            <button
               class="px-3 py-1 bg-indigo-600 text-white rounded text-xs"
               onclick='mostrarDetalle(${JSON.stringify(detalleObj)})'>
               Ver
@@ -32,9 +27,6 @@ function renderFila(reg) {
   `;
 }
 
-/* ========================================
-   🔵 CARGAR REGISTROS DESDE SUPABASE
-   ======================================== */
 async function cargarRegistros() {
   const cuerpo = document.getElementById("tabla-registros");
   if (!cuerpo) return;
@@ -66,9 +58,6 @@ async function cargarRegistros() {
   cuerpo.innerHTML = data.map(renderFila).join("");
 }
 
-/* ========================================
-   🔵 FILTRO POR PLACA
-   ======================================== */
 function activarFiltroPlaca() {
   const input = document.getElementById("buscarPlaca");
   if (!input) return;
@@ -79,26 +68,17 @@ function activarFiltroPlaca() {
 
     filas.forEach((fila) => {
       const celda = fila.cells[3];
-      fila.style.display =
-        celda && celda.textContent.toUpperCase().includes(filtro)
-          ? ""
-          : "none";
+      fila.style.display = celda && celda.textContent.toUpperCase().includes(filtro) ? "" : "none";
     });
   });
 }
 
-/* ========================================
-   🔵 INICIALIZACIÓN
-   ======================================== */
 function initListado() {
   cargarRegistros();
   activarFiltroPlaca();
   console.log("QA Mamparas: archivo corregido");
 }
 
-/* ========================================
-   🔵 AUTO-EJECUCIÓN
-   ======================================== */
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initListado);
 } else {

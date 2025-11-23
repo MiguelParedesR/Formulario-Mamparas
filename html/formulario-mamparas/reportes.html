@@ -1,46 +1,84 @@
-﻿<!-- 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas -->
-<main class="p-6 space-y-6 max-w-4xl mx-auto">
+<!-- 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas -->
+<main class="p-6 space-y-6 max-w-4xl mx-auto text-gray-800">
 
   <div class="space-y-1">
-    <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+    <h1 class="text-2xl font-bold flex items-center gap-3 text-slate-900">
       <i class="fas fa-file-export text-indigo-600"></i>
       Reportes
     </h1>
-    <p class="text-sm text-gray-600">Exporta los registros filtrando por mes y operador.</p>
+    <p class="text-sm text-gray-600">
+      Exporta los registros filtrando por mes y operador. Puedes usar la opción “Todos” para descargar el histórico.
+    </p>
   </div>
 
   <!-- CONTENEDOR PRINCIPAL -->
-  <section class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-4">
+  <section class="bg-white border border-gray-100 rounded-2xl shadow-xl p-6 sm:p-8 space-y-6">
 
-    <!-- SELECCIÓN DE MES / OPERADOR -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
-      <div>
+      <div class="space-y-2">
         <label class="block text-sm font-semibold text-gray-700" for="mes">
-          Seleccionar Mes
+          Seleccionar mes
         </label>
-        <input class="w-full rounded-lg border-gray-300 px-3 py-2" type="month" id="mes" />
+        <div class="relative">
+          <span class="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">
+            <i class="far fa-calendar-alt"></i>
+          </span>
+          <input
+            class="w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            type="month"
+            id="mes"
+          />
+        </div>
+        <p class="text-xs text-gray-500">El período se aplica sobre los registros de Supabase.</p>
       </div>
 
-      <div>
+      <div class="space-y-2">
         <label class="block text-sm font-semibold text-gray-700" for="operador">
-          Seleccionar Operador
+          Seleccionar operador
         </label>
-        <select class="w-full rounded-lg border-gray-300 px-3 py-2" id="operador">
-          <option value="Todos">Todos</option>
-        </select>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">
+            <i class="fas fa-user-check"></i>
+          </span>
+          <select
+            class="w-full rounded-xl border border-gray-200 bg-white pl-10 pr-10 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 appearance-none"
+            id="operador"
+          >
+            <option value="Todos">Todos (sin filtro)</option>
+          </select>
+          <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+            <i class="fas fa-chevron-down text-xs"></i>
+          </span>
+        </div>
+        <p class="text-xs text-gray-500">Se cargan automáticamente los responsables registrados.</p>
       </div>
 
     </div>
 
     <!-- BOTÓN EXPORTAR -->
-    <button id="btnExportarExcel"
-      class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">
-      Exportar a Excel
+    <button
+      id="btnExportarExcel"
+      class="px-6 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold shadow-lg hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 flex items-center gap-2 w-fit"
+    >
+      <i class="fas fa-download text-xs"></i>
+      <span>Exportar a Excel</span>
     </button>
 
   </section>
 </main>
+
+<!-- MODAL FEEDBACK -->
+<div id="feedbackModal" class="fixed inset-0 bg-black/40 items-center justify-center" style="display:none;">
+  <div class="bg-white rounded-2xl shadow-2xl w-72 p-5 text-center space-y-3 modal-inner">
+    <div
+      id="loadingAnimation"
+      class="mx-auto h-10 w-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"
+    >
+    </div>
+    <p id="feedbackMessage" class="message text-sm font-medium"></p>
+  </div>
+</div>
 
 <!-- LIBRERÍAS NECESARIAS -->
 <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
@@ -48,5 +86,8 @@
 
 <!-- SCRIPT PRINCIPAL DEL MÓDULO -->
 <script type="module" src="/js/mamparas/reportes.js"></script>
-
+<script>
+// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
+console.log("QA Mamparas: archivo corregido");
+</script>
 <!-- 🚫 NO BORRAR — Fin archivo restaurado/corregido módulo Mamparas -->

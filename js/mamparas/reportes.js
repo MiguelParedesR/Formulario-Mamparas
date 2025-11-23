@@ -1,49 +1,96 @@
-﻿// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
+// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
 import { supabase, mostrarModal } from "./script.js";
 
-/* ======================================================
-   🔵 CARGAR OPERADORES ÚNICOS DESDE SUPABASE
-   ====================================================== */
-async function cargarOperadores() {
-  const { data, error } = await supabase.from("inspecciones").select("responsable");
+const OPERADORES_REFERENCIA = [
+  "Carlos Sanchez",
+  "Francisco Elescano",
+  "Hernan Luna",
+  "Roger Castro",
+  "Oscar Fernandez",
+  "Miguel Paredes",
+  "David Echaccaya",
+  "Juan Quelopana",
+  "Grover Munguia",
+  "Ernesto Alfaro",
+];
 
-  if (error) {
-    console.error("Error cargando operadores:", error.message);
-    return;
+function setExportButtonState(cargando) {
+  const btn = document.getElementById("btnExportarExcel");
+  if (!btn) return;
+
+  if (cargando) {
+    if (!btn.dataset.originalLabel) {
+      btn.dataset.originalLabel = btn.innerHTML;
+    }
+    btn.disabled = true;
+    btn.classList.add("opacity-60", "cursor-not-allowed");
+    btn.innerHTML = `
+      <span class="flex items-center gap-2">
+        <span class="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
+        Generando...
+      </span>
+    `;
+  } else {
+    btn.disabled = false;
+    btn.classList.remove("opacity-60", "cursor-not-allowed");
+    if (btn.dataset.originalLabel) {
+      btn.innerHTML = btn.dataset.originalLabel;
+    }
   }
+}
 
-  const operadores = [...new Set((data || []).map(r => r.responsable).filter(Boolean))];
-
+async function cargarOperadores() {
   const select = document.getElementById("operador");
   if (!select) return;
 
+  select.innerHTML = '<option value="">Cargando operadores...</option>';
+
+  const { data, error } = await supabase.from("inspecciones").select("responsable");
+  let operadores = [];
+
+  if (!error && data) {
+    operadores = [
+      ...new Set(
+        data
+          .map((r) => (r?.responsable || "").trim())
+          .filter((valor) => valor && valor.length > 0)
+      ),
+    ];
+  }
+
+  if (!operadores.length) {
+    operadores = [...OPERADORES_REFERENCIA];
+  } else {
+    const faltantes = OPERADORES_REFERENCIA.filter((op) => !operadores.includes(op));
+    operadores = [...operadores, ...faltantes];
+  }
+
+  operadores.sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));
+
   select.innerHTML = `
-    <option value="Todos">Todos</option>
-    ${operadores.map(op => `<option value="${op}">${op}</option>`).join("")}
+    <option value="Todos">Todos (sin filtro)</option>
+    ${operadores.map((op) => `<option value="${op}">${op}</option>`).join("")}
   `;
 }
 
 document.addEventListener("DOMContentLoaded", cargarOperadores);
 
-/* ======================================================
-   🔵 EXPORTAR A EXCEL
-   ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("btnExportarExcel");
   if (btn) btn.addEventListener("click", exportarExcel);
 });
 
-/* ======================================================
-   🔵 CREACIÓN DE EXCEL SEGÚN FILTRO
-   ====================================================== */
+// 🚫 NO BORRAR — Exportación Excel funcional
 async function exportarExcel() {
   const mes = document.getElementById("mes")?.value;
   const operador = document.getElementById("operador")?.value;
 
   if (!mes) {
-    alert("Seleccione un mes.");
+    mostrarModal("error", "Seleccione un mes para generar el reporte.");
     return;
   }
+
+  setExportButtonState(true);
 
   const [anio, numMes] = mes.split("-");
 
@@ -60,13 +107,11 @@ async function exportarExcel() {
   const { data, error } = await query;
 
   if (error || !data || data.length === 0) {
-    alert(error ? "Error al obtener los datos." : "No hay registros.");
+    mostrarModal("error", error ? "Error al obtener los datos." : "No hay registros para el filtro seleccionado.");
+    setExportButtonState(false);
     return;
   }
 
-  /* -----------------------------
-     Crear Excel
-     ----------------------------- */
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet("Reporte");
 
@@ -79,7 +124,7 @@ async function exportarExcel() {
     "LUGAR",
     "INCORRECCION",
     "RESPONSABLE",
-    "OBSERVACIONES"
+    "OBSERVACIONES",
   ]);
 
   data.forEach((r) => {
@@ -92,19 +137,14 @@ async function exportarExcel() {
       r.lugar,
       r.incorreccion,
       r.responsable,
-      r.observaciones
+      r.observaciones,
     ]);
   });
 
-  /* -----------------------------
-     DESCARGAR EXCEL
-     ----------------------------- */
   const buffer = await workbook.xlsx.writeBuffer();
-  saveAs(
-    new Blob([buffer]),
-    `reporte_${anio}_${numMes}.xlsx`
-  );
+  saveAs(new Blob([buffer]), `reporte_${anio}_${numMes}.xlsx`);
 
+  setExportButtonState(false);
   mostrarModal("success", "Reporte generado y descargado exitosamente.");
 }
 
