@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "tpp-cache-v42";
+﻿const CACHE_NAME = "tpp-cache-v43";
 
 // Archivos que intentaremos cachear si existen:
 const STATIC_ASSETS = [
@@ -119,3 +119,4 @@ self.addEventListener("fetch", (event) => {
 // LOG
 // ============================================================================
 console.log("[SW] Modo Seguro TPP activo");
+

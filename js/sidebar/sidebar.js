@@ -68,11 +68,13 @@ export async function initSidebar(
     if (!mainContainer) return;
 
     if (isDesktop()) {
-      mainContainer.style.marginLeft = sidebar.classList.contains("collapsed")
-        ? "70px"
-        : "250px";
+      document.body.classList.remove("sidebar-hidden");
+      sidebar.classList.add("show");
+      mainContainer.style.removeProperty("margin-left");
+      mainContainer.style.removeProperty("width");
     } else {
       mainContainer.style.marginLeft = "0px";
+      mainContainer.style.width = "100%";
     }
   }
 

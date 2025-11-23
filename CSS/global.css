@@ -24,19 +24,11 @@ body {
     background: #f4f6f8;
 }
 
-body.sidebar-collapsed {
-    /* Mantener para compatibilidad con versiones anteriores */
-}
-
-body.sidebar-hidden {
-    /* Clase utilizada para m��vil; su comportamiento se controla mǭs abajo */
-}
-
 /* Contenido principal del SPA */
 #dashboardContent {
     position: relative;
     margin-left: var(--sidebar-width);
-    width: calc(100vw - var(--sidebar-width));
+    width: calc(100% - var(--sidebar-width));
     min-height: 100vh;
     height: auto;
     padding: clamp(20px, 3vw, 42px);
@@ -49,12 +41,21 @@ body.sidebar-hidden {
 
 body.sidebar-collapsed #dashboardContent {
     margin-left: var(--sidebar-width-collapsed);
-    width: calc(100vw - var(--sidebar-width-collapsed));
+    width: calc(100% - var(--sidebar-width-collapsed));
 }
 
 /* Estado cuando el sidebar está oculto en mobile */
-.sidebar-hidden #sidebar {
-    transform: translateX(-260px);
+@media (max-width: 1023px) {
+    #dashboardContent,
+    body.sidebar-collapsed #dashboardContent {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Estado cuando el sidebar está oculto en mobile */
+    .sidebar-hidden #sidebar {
+        transform: translateX(-260px);
+    }
 }
 
 /* Botones */
