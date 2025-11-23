@@ -1,4 +1,4 @@
-// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
+﻿// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
 import { supabase, mostrarModal } from "./script.js";
 
 const OPERADORES_REFERENCIA = [

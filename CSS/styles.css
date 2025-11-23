@@ -109,7 +109,7 @@ body {
   transition: margin-left 0.3s ease-in-out;
 }
 
-.sidebar.collapsed + .main-container {
+.sidebar.collapsed+.main-container {
   margin-left: 60px;
 }
 
@@ -276,11 +276,13 @@ body {
   margin-top: 1rem;
 }
 
-.detalle-tabla th, .detalle-tabla td {
+.detalle-tabla th,
+.detalle-tabla td {
   padding: 6px 10px;
   text-align: left;
   border-bottom: 1px solid #ccc;
 }
+
 .detalle-modal-content button {
   display: block;
   width: 100%;
@@ -296,10 +298,19 @@ body {
 .detalle-modal-content button:hover {
   background-color: var(--tpp-dark);
 }
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
+
 /* ===========================
    ESTILO CAMPOS DETALLE MODAL
 =========================== */
@@ -342,7 +353,7 @@ body {
 
 .miniatura:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 /* ===========================
@@ -354,7 +365,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.9);
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -385,7 +396,7 @@ body {
   text-align: center;
   cursor: pointer;
   line-height: 30px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 /* ===========================
@@ -396,6 +407,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -407,6 +419,7 @@ body {
     transform: scale(0.95);
     opacity: 0;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -440,50 +453,50 @@ body {
   }
 }*/
 /* Estilos adicionales para el menÃº lateral */
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      height: 100vh;
-      width: 220px;
-      background-color: #fff;
-      border-right: 2px solid var(--tpp-border);
-      box-shadow: 2px 0 6px rgba(47, 59, 82, 0.15);
-      padding-top: 60px;
-      transition: transform 0.3s ease-in-out;
-      z-index: 100;
-    }
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 220px;
+  background-color: #fff;
+  border-right: 2px solid var(--tpp-border);
+  box-shadow: 2px 0 6px rgba(47, 59, 82, 0.15);
+  padding-top: 60px;
+  transition: transform 0.3s ease-in-out;
+  z-index: 100;
+}
 
-    .sidebar.collapsed {
-      transform: translateX(-100%);
-    }
+.sidebar.collapsed {
+  transform: translateX(-100%);
+}
 
-    .sidebar a {
-      display: block;
-      padding: 14px 20px;
-      color: var(--tpp-dark);
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
+.sidebar a {
+  display: block;
+  padding: 14px 20px;
+  color: var(--tpp-dark);
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s;
+}
 
-    .sidebar a:hover {
-      background-color: var(--tpp-light);
-    }
+.sidebar a:hover {
+  background-color: var(--tpp-light);
+}
 
-    .toggle-btn {
-      /*top: 20px;
+.toggle-btn {
+  /*top: 20px;
       left: 20px;
       z-index: 101;
       background-color: var(--tpp-mid);
       color: white;
       border: none;*/
-      padding: 10px 12px;
-      border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(255, 138, 0, 0.4);
-    }
+  padding: 10px 12px;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(255, 138, 0, 0.4);
+}
 
-    /*.main-content {
+/*.main-content {
       margin-left: 0;
       padding: 40px 20px;
       transition: margin-left 0.3s ease-in-out;
@@ -498,12 +511,14 @@ body {
         margin-left: 20px;
       }
     }*/
-    /******************/
+/******************/
 /* Estilos para el modal de confirmacion boton Guardar Detalle*/
 .feedback-modal {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
@@ -517,7 +532,7 @@ body {
   border-radius: 10px;
   text-align: center;
   min-width: 250px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .loader {
@@ -543,11 +558,16 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-/* NUEVOS ESTILOS PARA LA TABLA Y CUADRO DE BUSQUEDA */ 
+/* NUEVOS ESTILOS PARA LA TABLA Y CUADRO DE BUSQUEDA */
 /* Estilo del buscador */
 .search-bar {
   margin-bottom: 10px;
@@ -569,7 +589,7 @@ body {
   max-height: 710px;
   border: 1px solid var(--tpp-border);
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .styled-table {
@@ -587,7 +607,8 @@ body {
   z-index: 10;
 }
 
-.styled-table th, .styled-table td {
+.styled-table th,
+.styled-table td {
   padding: 12px 15px;
   border-bottom: 1px solid #ddd;
   text-align: left;
@@ -611,9 +632,10 @@ body {
 .detalle-modal-content button:hover {
   background-color: var(--tpp-dark);
 }
+
 /*************RESPONSIVE STYLES FOR TABLE AND SEARCH BAR */
 /* DiseÃ±o general responsivo */
- 
+
 
 /* Main container adaptativo */
 .main-container {
@@ -621,15 +643,16 @@ body {
   margin-left: 0;
   transition: margin-left 0.3s;
 }
- 
+
 .styled-table {
   width: 100%;
-  min-width: 900px; /* Ancho mÃ­nimo para scroll en mÃ³viles */
+  min-width: 900px;
+  /* Ancho mÃ­nimo para scroll en mÃ³viles */
   border-collapse: collapse;
   font-size: 14px;
   background-color: white;
 }
- 
+
 /* MEDIA QUERIES PARA RESPONSIVIDAD */
 @media screen and (max-width: 768px) {
   .sidebar {
@@ -654,7 +677,8 @@ body {
   .main-container {
     margin-left: 0;
   }
-/*
+
+  /*
   .toggle-btn {
     display: block;
     position: fixed;
@@ -673,6 +697,7 @@ body {
     max-height: 400px;
   }
 }
+
 /* ===========================
    MODAL DE CONFIRMACIÃ“N*/
 .modal {
@@ -683,7 +708,7 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   align-items: center;
   justify-content: center;
 }
@@ -751,7 +776,9 @@ body {
 
 /* DESKTOP CONFIGURACIÃ“N */
 @media screen and (min-width: 769px) {
-  .mobile-nav, .responsive-header {
+
+  .mobile-nav,
+  .responsive-header {
     display: none;
   }
 
@@ -772,10 +799,3 @@ body {
     padding: 20px;
   }
 }
-
-
-
-
-
-
-

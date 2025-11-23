@@ -1,15 +1,16 @@
 /* ============================================================================
-   FORMULARIO MODULAR PARA INCIDENCIAS TPP
-   - Tipo recibido desde dashboard / sidebar (URL ?tipo=)
-   - Asunto autogenerado + campo extra junto al asunto
-   - Seccion de hechos con numerado automatico
-   - Barra de progreso
-   - Anexos (Storage) + registro JSON
-   - Guardado en Supabase con trazas de payload/response
-   ============================================================================ */
+   FORMULARIO DE INCIDENCIAS - TPP
+   Arquitectura modular, limpia y preparada para SPA + Tailwind
+   Compatible con formulario.html reconstruido
+   ========================================================================= */
 
 import { supabase } from "../utils/supabase.js";
 import { uploadFiles } from "../utils/storage.js";
+import { generateWordFinal } from "./generador-docx.js";
+
+/* ---------------------------------------------------------------------------
+   CONSTANTES DE PLANTILLA / TIPOS DE INCIDENCIA
+--------------------------------------------------------------------------- */
 
 const ASUNTOS = {
   CABLE: "SUSTRACCION DE CABLE RH",
@@ -25,10 +26,14 @@ const VALID_ANEXO_FORMATS = [
   "image/webp",
   "application/pdf",
 ];
+
 const VALID_ANEXO_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "pdf"];
 const MAX_ANEXOS = 10;
 
-// Elementos base
+/* ---------------------------------------------------------------------------
+   REFERENCIAS A ELEMENTOS DEL DOM
+--------------------------------------------------------------------------- */
+
 const tipoDescripcion = document.getElementById("tipoDescripcion");
 const asuntoInput = document.getElementById("asunto");
 const campoExtraContainer = document.getElementById("campoExtraContainer");
@@ -49,13 +54,22 @@ const btnSubirAnexos = document.getElementById("btnSubirAnexos");
 
 const progressBar = document.getElementById("progressBar");
 const progressLabel = document.getElementById("progressLabel");
+
 const lightboxOverlay = document.getElementById("lightboxOverlay");
 const lightboxImage = document.getElementById("lightboxImage");
 const lightboxCloseBtn = document.getElementById("lightboxClose");
 
+/* ---------------------------------------------------------------------------
+   ESTADO DEL FORMULARIO
+--------------------------------------------------------------------------- */
+
 let tipoSeleccionado = null;
 const extraRefs = { contenedor: null, placa: null };
 let anexosArchivos = [];
+
+/* ---------------------------------------------------------------------------
+   DETECTAR TIPO DESDE LA URL (?tipo=)
+--------------------------------------------------------------------------- */
 
 function detectarTipoDesdeURL() {
   const url = new URL(window.location.href);
@@ -64,14 +78,22 @@ function detectarTipoDesdeURL() {
   return tipoParam;
 }
 
+/* ---------------------------------------------------------------------------
+   CONFIGURAR FORMULARIO AL CARGAR EL TIPO
+--------------------------------------------------------------------------- */
+
 function configurarTipo(tipo) {
   tipoSeleccionado = tipo;
+
   asuntoInput.value = ASUNTOS[tipoSeleccionado];
   tipoDescripcion.textContent = `Plantilla cargada: ${ASUNTOS[tipoSeleccionado]}`;
+
   renderCamposExtra(tipoSeleccionado);
   recalcularProgreso();
 }
-
+/* ---------------------------------------------------------------------------
+   GENERAR CAMPOS EXTRA (Contenedor / Placa / Ambos)
+--------------------------------------------------------------------------- */
 function renderCamposExtra(tipo) {
   if (!campoExtraContainer) return;
 
@@ -80,8 +102,10 @@ function renderCamposExtra(tipo) {
   extraRefs.placa = null;
 
   const baseClasses =
-    "w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition";
+    "w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 " +
+    "focus:ring-indigo-500 focus:border-indigo-500 transition";
 
+  // CABLE / MERCADERIA → SOLO CONTENEDOR
   if (tipo === "CABLE" || tipo === "MERCADERIA") {
     const label = document.createElement("label");
     label.className = "text-sm font-semibold text-gray-700";
@@ -91,16 +115,21 @@ function renderCamposExtra(tipo) {
     input.id = "serieContenedor";
     input.placeholder = "SERIE DEL CONTENEDOR";
     input.className = baseClasses;
-    extraRefs.contenedor = input;
 
+    extraRefs.contenedor = input;
     input.addEventListener("input", recalcularProgreso);
 
-    const wrapper = document.createElement("div");
-    wrapper.className = "space-y-2";
-    wrapper.appendChild(label);
-    wrapper.appendChild(input);
-    campoExtraContainer.appendChild(wrapper);
-  } else if (tipo === "CHOQUE") {
+    const wrap = document.createElement("div");
+    wrap.className = "space-y-2";
+    wrap.appendChild(label);
+    wrap.appendChild(input);
+
+    campoExtraContainer.appendChild(wrap);
+    return;
+  }
+
+  // CHOQUE → SOLO PLACA
+  if (tipo === "CHOQUE") {
     const label = document.createElement("label");
     label.className = "text-sm font-semibold text-gray-700";
     label.textContent = "Placa de unidad";
@@ -109,33 +138,40 @@ function renderCamposExtra(tipo) {
     input.id = "placaUnidad";
     input.placeholder = "PLACA DE UNIDAD";
     input.className = baseClasses;
+
     extraRefs.placa = input;
     input.addEventListener("input", recalcularProgreso);
 
-    const wrapper = document.createElement("div");
-    wrapper.className = "space-y-2";
-    wrapper.appendChild(label);
-    wrapper.appendChild(input);
-    campoExtraContainer.appendChild(wrapper);
-  } else if (tipo === "SINIESTRO") {
-    const contLabel = document.createElement("label");
-    contLabel.className = "text-sm font-semibold text-gray-700";
-    contLabel.textContent = "Contenedor";
+    const wrap = document.createElement("div");
+    wrap.className = "space-y-2";
+    wrap.appendChild(label);
+    wrap.appendChild(input);
+
+    campoExtraContainer.appendChild(wrap);
+    return;
+  }
+
+  // SINIESTRO → CONTENEDOR + PLACA
+  if (tipo === "SINIESTRO") {
+    const contLbl = document.createElement("label");
+    contLbl.className = "text-sm font-semibold text-gray-700";
+    contLbl.textContent = "Contenedor";
 
     const contInput = document.createElement("input");
     contInput.id = "contenedorSiniestro";
     contInput.placeholder = "CONTENEDOR";
     contInput.className = baseClasses;
-    extraRefs.contenedor = contInput;
 
-    const placaLabel = document.createElement("label");
-    placaLabel.className = "text-sm font-semibold text-gray-700";
-    placaLabel.textContent = "Placa de unidad";
+    const placaLbl = document.createElement("label");
+    placaLbl.className = "text-sm font-semibold text-gray-700";
+    placaLbl.textContent = "Placa de unidad";
 
     const placaInput = document.createElement("input");
     placaInput.id = "placaSiniestro";
     placaInput.placeholder = "PLACA DE UNIDAD";
     placaInput.className = baseClasses;
+
+    extraRefs.contenedor = contInput;
     extraRefs.placa = placaInput;
 
     contInput.addEventListener("input", recalcularProgreso);
@@ -144,39 +180,46 @@ function renderCamposExtra(tipo) {
     const grid = document.createElement("div");
     grid.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
 
-    const contWrap = document.createElement("div");
-    contWrap.className = "space-y-2";
-    contWrap.appendChild(contLabel);
-    contWrap.appendChild(contInput);
+    const w1 = document.createElement("div");
+    w1.className = "space-y-2";
+    w1.appendChild(contLbl);
+    w1.appendChild(contInput);
 
-    const placaWrap = document.createElement("div");
-    placaWrap.className = "space-y-2";
-    placaWrap.appendChild(placaLabel);
-    placaWrap.appendChild(placaInput);
+    const w2 = document.createElement("div");
+    w2.className = "space-y-2";
+    w2.appendChild(placaLbl);
+    w2.appendChild(placaInput);
 
-    grid.appendChild(contWrap);
-    grid.appendChild(placaWrap);
+    grid.appendChild(w1);
+    grid.appendChild(w2);
+
     campoExtraContainer.appendChild(grid);
   }
 }
 
+/* ---------------------------------------------------------------------------
+   OBTENER VALOR EXTRA (contenedor / placa)
+--------------------------------------------------------------------------- */
 function obtenerValorExtra() {
-  const valorExtra = { contenedor: null, placa: null };
+  const valor = { contenedor: null, placa: null };
 
   if (tipoSeleccionado === "CABLE" || tipoSeleccionado === "MERCADERIA") {
-    valorExtra.contenedor = extraRefs.contenedor?.value?.trim() || null;
+    valor.contenedor = extraRefs.contenedor?.value?.trim() || null;
   } else if (tipoSeleccionado === "CHOQUE") {
-    valorExtra.placa = extraRefs.placa?.value?.trim() || null;
+    valor.placa = extraRefs.placa?.value?.trim() || null;
   } else if (tipoSeleccionado === "SINIESTRO") {
-    valorExtra.contenedor = extraRefs.contenedor?.value?.trim() || null;
-    valorExtra.placa = extraRefs.placa?.value?.trim() || null;
+    valor.contenedor = extraRefs.contenedor?.value?.trim() || null;
+    valor.placa = extraRefs.placa?.value?.trim() || null;
   }
 
-  return valorExtra;
+  return valor;
 }
 
+/* ---------------------------------------------------------------------------
+   RECALCULAR PROGRESO DEL FORMULARIO
+--------------------------------------------------------------------------- */
 function recalcularProgreso() {
-  const camposBase = [
+  const camposRequired = [
     asuntoInput,
     dirigidoAInput,
     remitenteInput,
@@ -185,32 +228,19 @@ function recalcularProgreso() {
     analisisInput,
     conclusionesInput,
     recomendacionesInput,
-  ].filter(Boolean);
+  ];
 
-  if (tipoSeleccionado === "CABLE" || tipoSeleccionado === "MERCADERIA") {
-    if (extraRefs.contenedor) camposBase.push(extraRefs.contenedor);
-  } else if (tipoSeleccionado === "CHOQUE") {
-    if (extraRefs.placa) camposBase.push(extraRefs.placa);
-  } else if (tipoSeleccionado === "SINIESTRO") {
-    if (extraRefs.contenedor) camposBase.push(extraRefs.contenedor);
-    if (extraRefs.placa) camposBase.push(extraRefs.placa);
-  }
+  if (extraRefs.contenedor) camposRequired.push(extraRefs.contenedor);
+  if (extraRefs.placa) camposRequired.push(extraRefs.placa);
 
-  let llenos = 0;
-  camposBase.forEach((el) => {
-    if (el.value && el.value.trim() !== "") llenos++;
-  });
+  const total = camposRequired.length;
+  let llenos = camposRequired.filter(
+    (el) => el && el.value.trim() !== ""
+  ).length;
 
-  let total = camposBase.length;
+  if (anexosArchivos.length > 0) llenos++;
 
-  const anexosSeleccionados = anexosArchivos.length;
-  if (anexosSeleccionados > 0) {
-    llenos += 1;
-    total += 1;
-  }
-
-  const progreso = total === 0 ? 0 : Math.round((llenos / total) * 100);
-
+  const progreso = Math.round((llenos / (total + 1)) * 100);
   progressLabel.textContent = progreso + "%";
 
   let color = "bg-red-500";
@@ -218,78 +248,60 @@ function recalcularProgreso() {
   else if (progreso >= 50) color = "bg-amber-500";
 
   progressBar.style.width = progreso + "%";
-  progressBar.className = `h-2 rounded-full transition-all duration-300 ${color}`;
+  progressBar.className = `h-2 rounded-full transition-all ${color}`;
 }
-
-async function procesarAnexos(id) {
-  const files = anexosArchivos.map((item) => item.file);
-  if (!files.length) return [];
-
-  try {
-    const uploaded = await uploadFiles(id, files);
-
-    return uploaded.map((file) => ({
-      name: file.name || "anexo",
-      path: file.path,
-      url: file.url,
-    }));
-  } catch (err) {
-    console.error("Error subiendo anexos:", err);
-    alert(
-      err?.message ||
-        "No se pudieron subir los anexos. Verifica el bucket de Storage en Supabase."
-    );
-    return [];
-  }
-}
-
+/* ---------------------------------------------------------------------------
+   VALIDAR FORMATO DE ARCHIVO
+--------------------------------------------------------------------------- */
 function esFormatoPermitido(file) {
   const mime = file.type?.toLowerCase?.() || "";
   if (mime && VALID_ANEXO_FORMATS.includes(mime)) return true;
 
-  const extension = file.name?.split(".").pop()?.toLowerCase();
-  return extension ? VALID_ANEXO_EXTENSIONS.includes(extension) : false;
+  const ext = file.name?.split(".").pop()?.toLowerCase();
+  return ext ? VALID_ANEXO_EXTENSIONS.includes(ext) : false;
 }
 
+/* ---------------------------------------------------------------------------
+   SINCRONIZAR input[type=file] con DataTransfer
+--------------------------------------------------------------------------- */
 function sincronizarInputAnexos() {
   if (!anexosInput || typeof DataTransfer === "undefined") return;
-  const dataTransfer = new DataTransfer();
-  anexosArchivos.forEach((item) => dataTransfer.items.add(item.file));
-  anexosInput.files = dataTransfer.files;
+
+  const dt = new DataTransfer();
+  anexosArchivos.forEach((item) => dt.items.add(item.file));
+  anexosInput.files = dt.files;
 }
 
+/* ---------------------------------------------------------------------------
+   RENDER PREVIEW ANEXOS
+--------------------------------------------------------------------------- */
 function renderizarAnexosPreview() {
-  if (!anexosPreview) return;
-
   anexosPreview.innerHTML = "";
 
   if (!anexosArchivos.length) {
-    const empty = document.createElement("p");
-    empty.className = "text-xs text-white/60 col-span-full text-center";
-    empty.textContent = "Aún no has cargado evidencias.";
-    anexosPreview.appendChild(empty);
+    const msg = document.createElement("p");
+    msg.className = "text-xs text-white/60 col-span-full text-center";
+    msg.textContent = "Aún no has cargado evidencias.";
+    anexosPreview.appendChild(msg);
     return;
   }
 
   anexosArchivos.forEach((item) => {
+    const isPdf = item.type === "application/pdf" || item.name.toLowerCase().endsWith(".pdf");
+
     const card = document.createElement("div");
-    card.className = "anexo-card cursor-pointer";
+    card.className = "anexo-card cursor-pointer group relative";
     card.tabIndex = 0;
 
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
     removeBtn.className = "anexo-remove";
     removeBtn.textContent = "❌";
-    removeBtn.addEventListener("click", (event) => {
-      event.stopPropagation();
+    removeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       eliminarAnexo(item.id);
     });
-
     card.appendChild(removeBtn);
-
-    const isPdf =
-      item.type === "application/pdf" ||
-      item.name?.toLowerCase().endsWith(".pdf");
 
     if (isPdf) {
       card.classList.add("anexo-card--pdf");
@@ -298,44 +310,38 @@ function renderizarAnexosPreview() {
       icon.className = "anexo-pdf-icon";
       icon.innerHTML = "<i class='fas fa-file-pdf'></i>";
 
-      const label = document.createElement("p");
-      label.className = "anexo-file-name";
-      label.textContent = item.name || "archivo.pdf";
+      const name = document.createElement("p");
+      name.className = "anexo-file-name";
+      name.textContent = item.name;
 
       card.appendChild(icon);
-      card.appendChild(label);
+      card.appendChild(name);
     } else {
       const img = document.createElement("img");
       img.src = item.url;
-      img.alt = item.name || "Evidencia";
+      img.alt = item.name;
+      img.className = "rounded-lg shadow-md object-cover";
       card.appendChild(img);
     }
 
     card.addEventListener("click", () => {
-      if (isPdf) {
-        window.open(item.url, "_blank", "noopener");
-      } else {
-        abrirLightbox(item.url);
-      }
-    });
-
-    card.addEventListener("keyup", (event) => {
-      if (event.key === "Enter") {
-        card.click();
-      }
+      if (isPdf) window.open(item.url, "_blank");
+      else abrirLightbox(item.url);
     });
 
     anexosPreview.appendChild(card);
   });
 }
 
+/* ---------------------------------------------------------------------------
+   AGREGAR ANEXOS
+--------------------------------------------------------------------------- */
 function agregarAnexos(files) {
   if (!files?.length) return;
 
   const disponibles = MAX_ANEXOS - anexosArchivos.length;
   if (disponibles <= 0) {
-    alert(`Solo se permiten ${MAX_ANEXOS} evidencias por informe.`);
-    return;
+    return alert(`Solo se permiten ${MAX_ANEXOS} evidencias por informe.`);
   }
 
   const permitidos = [];
@@ -343,33 +349,23 @@ function agregarAnexos(files) {
 
   files.forEach((file) => {
     if (esFormatoPermitido(file)) permitidos.push(file);
-    else rechazados.push(file.name || "archivo");
+    else rechazados.push(file.name);
   });
 
   if (rechazados.length) {
-    alert(
-      `Formato no permitido en: ${rechazados
-        .slice(0, 4)
-        .join(", ")}${rechazados.length > 4 ? "..." : ""}`
-    );
+    alert(`Formato no permitido: ${rechazados.join(", ")}`);
   }
 
   const seleccion = permitidos.slice(0, disponibles);
-  if (!seleccion.length) return;
 
   seleccion.forEach((file) => {
-    const url = URL.createObjectURL(file);
     const entry = {
-      id:
-        typeof crypto !== "undefined" && crypto.randomUUID
-          ? crypto.randomUUID()
-          : `anexo-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      id: crypto.randomUUID?.() || "anexo-" + Date.now(),
       file,
-      name: file.name || "adjunto",
-      type: file.type || "",
-      url,
+      name: file.name,
+      type: file.type,
+      url: URL.createObjectURL(file),
     };
-
     anexosArchivos.push(entry);
   });
 
@@ -378,66 +374,64 @@ function agregarAnexos(files) {
   recalcularProgreso();
 }
 
+/* ---------------------------------------------------------------------------
+   ELIMINAR ANEXO
+--------------------------------------------------------------------------- */
 function eliminarAnexo(id) {
-  const index = anexosArchivos.findIndex((item) => item.id === id);
-  if (index === -1) return;
+  const idx = anexosArchivos.findIndex((x) => x.id === id);
+  if (idx === -1) return;
 
-  const [removed] = anexosArchivos.splice(index, 1);
-  if (removed?.url) URL.revokeObjectURL(removed.url);
+  const removed = anexosArchivos.splice(idx, 1)[0];
+  if (removed.url) URL.revokeObjectURL(removed.url);
 
   sincronizarInputAnexos();
   renderizarAnexosPreview();
   recalcularProgreso();
 }
 
+/* ---------------------------------------------------------------------------
+   CONFIGURAR DROPZONE + INPUT FILE
+--------------------------------------------------------------------------- */
 function setupAnexosSection() {
   if (!anexosInput) return;
 
   btnSubirAnexos?.addEventListener("click", () => anexosInput.click());
 
-  anexosInput.addEventListener("change", (event) => {
-    const files = Array.from(event.target.files || []);
-    agregarAnexos(files);
+  anexosInput.addEventListener("change", (e) => {
+    agregarAnexos(Array.from(e.target.files || []));
     anexosInput.value = "";
   });
 
   if (!dropZoneAnexos) return;
 
-  const handleDragOver = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const activate = (e) => {
+    e.preventDefault();
     dropZoneAnexos.classList.add("drop-zone--active");
   };
 
-  const handleDragLeave = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const related = event.relatedTarget;
-    if (related && dropZoneAnexos.contains(related)) return;
-
+  const deactivate = (e) => {
+    e.preventDefault();
     dropZoneAnexos.classList.remove("drop-zone--active");
   };
 
   ["dragenter", "dragover"].forEach((evt) =>
-    dropZoneAnexos.addEventListener(evt, handleDragOver)
+    dropZoneAnexos.addEventListener(evt, activate)
   );
+
   ["dragleave", "drop"].forEach((evt) =>
-    dropZoneAnexos.addEventListener(evt, handleDragLeave)
+    dropZoneAnexos.addEventListener(evt, deactivate)
   );
 
-  dropZoneAnexos.addEventListener("drop", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    dropZoneAnexos.classList.remove("drop-zone--active");
-
-    const files = Array.from(event.dataTransfer?.files || []);
-    if (files.length) agregarAnexos(files);
+  dropZoneAnexos.addEventListener("drop", (e) => {
+    e.preventDefault();
+    agregarAnexos(Array.from(e.dataTransfer.files || []));
   });
 }
 
+/* ---------------------------------------------------------------------------
+   LIGHTBOX – Ver imagen ampliada
+--------------------------------------------------------------------------- */
 function lockBodyScroll() {
-  if (!document?.body) return;
   if (!document.body.dataset.prevOverflow) {
     document.body.dataset.prevOverflow = document.body.style.overflow || "";
   }
@@ -445,9 +439,7 @@ function lockBodyScroll() {
 }
 
 function unlockBodyScroll() {
-  if (!document?.body) return;
-  const prev = document.body.dataset.prevOverflow ?? "";
-  document.body.style.overflow = prev;
+  document.body.style.overflow = document.body.dataset.prevOverflow || "";
   delete document.body.dataset.prevOverflow;
 }
 
@@ -462,80 +454,94 @@ function abrirLightbox(url) {
   });
 
   lightboxOverlay.setAttribute("aria-hidden", "false");
+
   lockBodyScroll();
   document.addEventListener("keydown", handleLightboxEsc);
 }
 
 function cerrarLightbox() {
-  if (!lightboxOverlay || lightboxOverlay.classList.contains("hidden")) {
-    unlockBodyScroll();
-    document.removeEventListener("keydown", handleLightboxEsc);
-    return;
-  }
+  if (!lightboxOverlay) return;
 
-  const finalize = () => {
+  const end = () => {
     lightboxOverlay.classList.add("hidden");
-    lightboxOverlay.removeEventListener("transitionend", finalize);
+    lightboxOverlay.removeEventListener("transitionend", end);
   };
 
   lightboxOverlay.classList.remove("active");
   lightboxOverlay.setAttribute("aria-hidden", "true");
-  lightboxOverlay.addEventListener("transitionend", finalize);
+  lightboxOverlay.addEventListener("transitionend", end);
 
   unlockBodyScroll();
   document.removeEventListener("keydown", handleLightboxEsc);
 }
 
-function handleLightboxEsc(event) {
-  if (event.key === "Escape") cerrarLightbox();
+function handleLightboxEsc(e) {
+  if (e.key === "Escape") cerrarLightbox();
 }
 
-lightboxCloseBtn?.addEventListener("click", (event) => {
-  event.preventDefault();
-  cerrarLightbox();
-});
-
-lightboxOverlay?.addEventListener("click", (event) => {
-  if (
-    event.target === lightboxOverlay ||
-    event.target?.hasAttribute("data-lightbox-dismiss")
-  ) {
+lightboxCloseBtn?.addEventListener("click", cerrarLightbox);
+lightboxOverlay?.addEventListener("click", (e) => {
+  if (e.target === lightboxOverlay || e.target.hasAttribute("data-lightbox-dismiss")) {
     cerrarLightbox();
   }
 });
 
 window.abrirLightbox = abrirLightbox;
-
+/* ============================================================================
+   VALIDACIONES — Campos extra según tipo
+============================================================================ */
 function validarCamposExtra() {
-  const valorExtra = obtenerValorExtra();
+  const extra = obtenerValorExtra();
 
-  if (
-    (tipoSeleccionado === "CABLE" || tipoSeleccionado === "MERCADERIA") &&
-    !valorExtra.contenedor
-  ) {
+  if ((tipoSeleccionado === "CABLE" || tipoSeleccionado === "MERCADERIA") &&
+      !extra.contenedor) {
     alert("Completa la serie del contenedor.");
     return false;
   }
 
-  if (tipoSeleccionado === "CHOQUE" && !valorExtra.placa) {
+  if (tipoSeleccionado === "CHOQUE" && !extra.placa) {
     alert("Completa la placa de la unidad.");
     return false;
   }
 
-  if (
-    tipoSeleccionado === "SINIESTRO" &&
-    (!valorExtra.contenedor || !valorExtra.placa)
-  ) {
-    alert("Completa contenedor y placa de la unidad.");
+  if (tipoSeleccionado === "SINIESTRO" &&
+      (!extra.contenedor || !extra.placa)) {
+    alert("Completa contenedor y placa.");
     return false;
   }
 
   return true;
 }
 
+/* ============================================================================
+   SUBIR ANEXOS A SUPABASE STORAGE
+============================================================================ */
+async function procesarAnexos(idRegistro) {
+  if (!anexosArchivos.length) return [];
+
+  const files = anexosArchivos.map((x) => x.file);
+
+  try {
+    const uploaded = await uploadFiles(idRegistro, files);
+
+    return uploaded.map((file) => ({
+      name: file.name,
+      path: file.path,
+      url: file.url,
+    }));
+  } catch (err) {
+    console.error(err);
+    alert("Error al subir anexos.");
+    return [];
+  }
+}
+
+/* ============================================================================
+   GUARDAR INCIDENCIA (BORRADOR O COMPLETO)
+============================================================================ */
 async function guardarIncidencia(estado = "BORRADOR") {
   if (!tipoSeleccionado) {
-    alert("No se pudo detectar el tipo de incidencia desde la navegacion.");
+    alert("No se detectó el tipo de incidencia.");
     return;
   }
 
@@ -543,35 +549,24 @@ async function guardarIncidencia(estado = "BORRADOR") {
 
   const valorExtra = obtenerValorExtra();
 
-  const dirigido_a = dirigidoAInput.value;
-  const remitente = remitenteInput.value;
-  const fecha_informe = fechaInformeInput.value;
-
-  const analisis = analisisInput.value;
-  const conclusiones = conclusionesInput.value;
-  const recomendaciones = recomendacionesInput.value;
-  const hechos = hechosInput?.value || "";
-
-  const progreso = parseInt(progressLabel.textContent);
-
   const payload = {
     tipo_incidencia: tipoSeleccionado,
     asunto: asuntoInput.value,
-    dirigido_a,
-    remitente,
-    fecha_informe,
-    analisis,
-    conclusiones,
-    recomendaciones,
+    dirigido_a: dirigidoAInput.value,
+    remitente: remitenteInput.value,
+    fecha_informe: fechaInformeInput.value,
+    analisis: analisisInput.value,
+    conclusiones: conclusionesInput.value,
+    recomendaciones: recomendacionesInput.value,
     campos: {
       valorExtra,
-      hechos,
+      hechos: hechosInput.value || "",
     },
-    progreso,
+    progreso: parseInt(progressLabel.textContent),
     estado,
   };
 
-  console.log("Supabase insert payload:", payload);
+  console.log("Supabase payload:", payload);
 
   const { data, error } = await supabase
     .from("incidencias")
@@ -579,77 +574,54 @@ async function guardarIncidencia(estado = "BORRADOR") {
     .select()
     .single();
 
-  console.log("Supabase insert response:", { data, error });
-
   if (error) {
     console.error(error);
-    alert("Error guardando incidencia");
+    alert("Error guardando incidencia.");
     return;
   }
 
-  const anexosProcesados = await procesarAnexos(data.id);
+  // Subir anexos a Storage
+  const anexos = await procesarAnexos(data.id);
 
-  if (anexosProcesados.length > 0) {
-    const anexosPayload = { anexos: anexosProcesados };
-    console.log("Supabase anexos update payload:", anexosPayload);
-
-    const { data: updateData, error: updateError } = await supabase
+  if (anexos.length > 0) {
+    await supabase
       .from("incidencias")
-      .update(anexosPayload)
-      .eq("id", data.id)
-      .select()
-      .single();
-
-    console.log("Supabase anexos update response:", {
-      data: updateData,
-      error: updateError,
-    });
+      .update({ anexos })
+      .eq("id", data.id);
   }
 
-  alert("Informe guardado correctamente");
+  alert("Informe guardado correctamente.");
 }
 
-[
-  dirigidoAInput,
-  remitenteInput,
-  fechaInformeInput,
-  hechosInput,
-  analisisInput,
-  conclusionesInput,
-  recomendacionesInput,
-].forEach((el) => el?.addEventListener("input", recalcularProgreso));
-
-setupAnexosSection();
-renderizarAnexosPreview();
-
-document
-  .getElementById("btnGuardarBorrador")
-  .addEventListener("click", (e) => {
+/* ============================================================================
+   EVENTOS — BOTONES PRINCIPALES
+============================================================================ */
+document.getElementById("btnGuardarBorrador")
+  ?.addEventListener("click", (e) => {
     e.preventDefault();
     guardarIncidencia("BORRADOR");
   });
 
-document
-  .getElementById("btnGuardarCompleto")
-  .addEventListener("click", (e) => {
+document.getElementById("btnGuardarCompleto")
+  ?.addEventListener("click", (e) => {
     e.preventDefault();
     guardarIncidencia("COMPLETO");
   });
 
-document.getElementById("btnVolverDashboard").addEventListener("click", () => {
-  window.dispatchEvent(
-    new CustomEvent("sidebar:navigate", {
-      detail: "./index.html",
-    })
-  );
-});
+document.getElementById("btnVolverDashboard")
+  ?.addEventListener("click", () => {
+    window.dispatchEvent(
+      new CustomEvent("sidebar:navigate", { detail: "./index.html" })
+    );
+  });
 
-document.getElementById("btnExportarWord").addEventListener("click", () => {
-  alert("Exportacion Word lista en Fase 2");
-});
-
+/* ============================================================================
+   NUMERACIÓN AUTOMÁTICA EN TEXTAREAS
+============================================================================ */
 function setupNumberedTextarea(el) {
   if (!el) return;
+
+  // Inicializar si está vacío
   if (!el.value.trim()) {
     el.value = "1. ";
     el.setSelectionRange(el.value.length, el.value.length);
@@ -658,16 +630,18 @@ function setupNumberedTextarea(el) {
   el.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      const start = el.selectionStart;
-      const end = el.selectionEnd;
-      const before = el.value.slice(0, start);
-      const lineNumber = before.split(/\n/).length + 1;
-      const insert = `\n${lineNumber}. `;
-      const after = el.value.slice(end);
-      const newValue = before + insert + after;
-      el.value = newValue;
-      const pos = before.length + insert.length;
-      el.setSelectionRange(pos, pos);
+
+      const before = el.value.slice(0, el.selectionStart);
+      const after = el.value.slice(el.selectionEnd);
+
+      const nextLine = before.split("\n").length + 1;
+      const insert = `\n${nextLine}. `;
+
+      el.value = before + insert + after;
+
+      const cursor = before.length + insert.length;
+      el.setSelectionRange(cursor, cursor);
+
       recalcularProgreso();
     }
   });
@@ -680,15 +654,215 @@ function setupNumberedTextarea(el) {
   });
 }
 
+/* ============================================================================
+   INICIALIZAR FORMULARIO
+============================================================================ */
 const tipoDetectado = detectarTipoDesdeURL();
+
 if (tipoDetectado) {
   configurarTipo(tipoDetectado);
 } else {
-  tipoDescripcion.textContent =
-    "Selecciona el tipo desde el dashboard o la barra lateral.";
+  tipoDescripcion.textContent = "Seleccione el tipo en dashboard o sidebar.";
 }
 
-setupNumberedTextarea(hechosInput);
-setupNumberedTextarea(analisisInput);
-setupNumberedTextarea(conclusionesInput);
-setupNumberedTextarea(recomendacionesInput);
+// Inicializar textareas numeradas
+[hechosInput, analisisInput, conclusionesInput, recomendacionesInput]
+  .forEach(setupNumberedTextarea);
+
+// Inicializar anexos
+setupAnexosSection();
+renderizarAnexosPreview();
+
+/* ============================================================================
+   HELPERS INTERNOS — Normalización y limpieza
+============================================================================ */
+
+/**
+ * Limpia texto para mejor compatibilidad con DOCX
+ */
+function limpiarTextoParaWord(texto = "") {
+  if (!texto) return "";
+
+  return texto
+    .replace(/\s+$/g, "")        // quitar espacios al final
+    .replace(/\n{3,}/g, "\n\n")  // evitar demasiados saltos
+    .replace(/[^\S\r\n]+/g, " ") // normalizar espacios
+    .trim();
+}
+
+/**
+ * Convierte texto multilinea en array numerado (para Word)
+ */
+function procesarTextoNumerado(raw) {
+  if (!raw) return [];
+
+  return raw
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+}
+
+/**
+ * Arma un objeto final ordenado para exportar a Word o guardar
+ */
+function armarPayloadFinal() {
+  const valorExtra = obtenerValorExtra();
+
+  return {
+    tipo: tipoSeleccionado,
+    asunto: limpiarTextoParaWord(asuntoInput.value),
+    dirigido_a: limpiarTextoParaWord(dirigidoAInput.value),
+    remitente: limpiarTextoParaWord(remitenteInput.value),
+    fecha_informe: fechaInformeInput.value,
+    analisis: procesarTextoNumerado(analisisInput.value),
+    conclusiones: procesarTextoNumerado(conclusionesInput.value),
+    recomendaciones: procesarTextoNumerado(recomendacionesInput.value),
+    hechos: procesarTextoNumerado(hechosInput.value),
+    extras: valorExtra,
+    anexos: anexosArchivos.map((a) => ({
+      name: a.name,
+      type: a.type,
+      localURL: a.url,
+    })),
+  };
+}
+
+/* ============================================================================
+   🔗 EXPORTAR WORD — Integración oficial con generador-docx.js
+============================================================================ */
+
+/**
+ * Construye el payload EXACTO requerido por generateWordFinal().
+ * Incluye:
+ *  - Campos visibles del formulario
+ *  - Valores extra (según tipo)
+ *  - Evidencias locales (sin guardar)
+ *  - Evidencias ya guardadas en Supabase (si existe id)
+ */
+async function armarPayloadWord() {
+  const valorExtra = obtenerValorExtra();
+
+  const payload = {
+    asunto: asuntoInput.value || "",
+    valorExtra,
+    dirigido_a: dirigidoAInput.value || "",
+    remitente: remitenteInput.value || "",
+    fecha_informe: fechaInformeInput.value || "",
+    hechos: hechosInput.value || "",
+    analisis: analisisInput.value || "",
+    conclusiones: conclusionesInput.value || "",
+    recomendaciones: recomendacionesInput.value || "",
+    anexos: [],
+  };
+
+  // 1️⃣ anexos locales (no subidos aún)
+  if (anexosArchivos?.length) {
+    payload.anexos = anexosArchivos.map((a) => ({
+      name: a.name,
+      url: a.url,
+      type: a.type,
+    }));
+  }
+
+  // 2️⃣ anexos guardados en BD (si edición)
+  const url = new URL(window.location.href);
+  const id = url.searchParams.get("id");
+
+  if (id) {
+    const { data } = await supabase
+      .from("incidencias")
+      .select("anexos")
+      .eq("id", id)
+      .single();
+
+    if (data?.anexos?.length) {
+      payload.anexos.push(...data.anexos);
+    }
+  }
+
+  return payload;
+}
+
+/* ============================================================================
+   BOTÓN EXPORTAR → GENERAR WORD REAL
+============================================================================ */
+
+document.getElementById("btnExportarWord")
+  .addEventListener("click", async () => {
+    try {
+      const payload = await armarPayloadWord();
+      await generateWordFinal(payload);
+    } catch (err) {
+      console.error("❌ Error exportando Word:", err);
+      alert("No se pudo generar el documento Word.");
+    }
+  });
+
+/* ============================================================================
+   BOTÓN EXPORTAR DESHABILITADO SEGÚN PROGRESO
+============================================================================ */
+
+function actualizarEstadoBotonWord() {
+  const progreso = parseInt(progressLabel.textContent);
+  const btn = document.getElementById("btnExportarWord");
+  if (!btn) return;
+
+  if (progreso < 40) {
+    btn.disabled = true;
+    btn.classList.add("opacity-40", "cursor-not-allowed");
+  } else {
+    btn.disabled = false;
+    btn.classList.remove("opacity-40", "cursor-not-allowed");
+  }
+}
+
+setInterval(actualizarEstadoBotonWord, 500);
+
+/* ============================================================================
+   AUTOSAVE (Modo pasivo, no interfiere)
+============================================================================ */
+
+let autosaveTimer = null;
+
+function iniciarAutosave() {
+  if (autosaveTimer) clearTimeout(autosaveTimer);
+
+  autosaveTimer = setTimeout(() => {
+    console.log("🟡 AUTOSAVE READY (desactivado por ahora)");
+  }, 2000);
+}
+
+[
+  asuntoInput,
+  dirigidoAInput,
+  remitenteInput,
+  fechaInformeInput,
+  hechosInput,
+  analisisInput,
+  conclusionesInput,
+  recomendacionesInput,
+].forEach((el) => el?.addEventListener("input", iniciarAutosave));
+
+/* ============================================================================
+   RESET SUAVE
+============================================================================ */
+
+function resetFormularioParcial() {
+  hechosInput.value = "1. ";
+  analisisInput.value = "1. ";
+  conclusionesInput.value = "1. ";
+  recomendacionesInput.value = "1. ";
+
+  anexosArchivos = [];
+  renderizarAnexosPreview();
+  recalcularProgreso();
+
+  console.log("🔄 Formulario parcialmente restablecido.");
+}
+
+window.resetFormularioParcial = resetFormularioParcial;
+
+/* ============================================================================
+   🎉 FIN DEL ARCHIVO — FORMULARIO COMPLETO, LIMPIO Y FUNCIONAL
+============================================================================ */
+

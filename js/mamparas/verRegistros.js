@@ -1,4 +1,4 @@
-// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
+﻿// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
 
 function crearFila(label, value) {
   return `
@@ -36,12 +36,21 @@ function crearMiniatura(url, etiqueta) {
 }
 
 window.mostrarDetalle = function (registro) {
+  console.log("QA Mamparas: mostrarDetalle invocado", registro?.placa || registro);
   const modal = document.getElementById("detalleModal");
   const general = document.getElementById("detalleGeneral");
   const detalleTabla = document.getElementById("detalleContenido");
   const contImagenes = document.getElementById("detalleImagenes");
 
-  if (!modal || !general || !detalleTabla || !contImagenes) return;
+  if (!modal || !general || !detalleTabla || !contImagenes) {
+    console.warn("QA Mamparas: elementos del modal no encontrados", {
+      modal: !!modal,
+      general: !!general,
+      detalleTabla: !!detalleTabla,
+      contImagenes: !!contImagenes,
+    });
+    return;
+  }
 
   const det = normalizarDetalle(registro?.detalle);
   const generalRows = [
@@ -87,8 +96,11 @@ window.mostrarDetalle = function (registro) {
 
   contImagenes.innerHTML = miniaturas || '<p class="text-sm text-gray-500">No hay evidencias cargadas.</p>';
 
-  modal.style.display = "flex";
+  modal.style.setProperty("display", "flex", "important");
+  modal.style.opacity = "1";
+  modal.style.visibility = "visible";
   modal.classList.remove("hidden");
+  console.log("QA Mamparas: modal desplegado");
 };
 
 window.verImagenAmpliada = function (url) {

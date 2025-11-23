@@ -125,16 +125,14 @@ function renderTabla(lista) {
 
             <td class="px-3 py-2">
                 <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="h-2 rounded-full ${
-                      estado.color
-                    }" style="width:${estado.porcentaje}%"></div>
+                    <div class="h-2 rounded-full ${estado.color
+      }" style="width:${estado.porcentaje}%"></div>
                 </div>
                 <span class="text-xs text-gray-600">${estado.porcentaje}%</span>
             </td>
 
-            <td class="px-3 py-2 text-sm font-semibold ${
-              estado.estado === "COMPLETO" ? "text-green-600" : "text-amber-600"
-            }">
+            <td class="px-3 py-2 text-sm font-semibold ${estado.estado === "COMPLETO" ? "text-green-600" : "text-amber-600"
+      }">
                 ${estado.estado}
             </td>
 
@@ -233,9 +231,8 @@ function renderCamposExtraModal(tipo, valorExtra = {}) {
     modalExtraContainer.innerHTML = `
       <div class="space-y-2">
         <label class="text-sm font-semibold text-gray-700">Serie del contenedor</label>
-        <input id="modalSerieContenedor" class="${baseClasses}" placeholder="SERIE DEL CONTENEDOR" value="${
-          valorExtra.contenedor || ""
-        }"/>
+        <input id="modalSerieContenedor" class="${baseClasses}" placeholder="SERIE DEL CONTENEDOR" value="${valorExtra.contenedor || ""
+      }"/>
       </div>
     `;
     modalExtraRefs.contenedor = document.getElementById("modalSerieContenedor");
@@ -243,9 +240,8 @@ function renderCamposExtraModal(tipo, valorExtra = {}) {
     modalExtraContainer.innerHTML = `
       <div class="space-y-2">
         <label class="text-sm font-semibold text-gray-700">Placa de unidad</label>
-        <input id="modalPlacaUnidad" class="${baseClasses}" placeholder="PLACA DE UNIDAD" value="${
-          valorExtra.placa || ""
-        }"/>
+        <input id="modalPlacaUnidad" class="${baseClasses}" placeholder="PLACA DE UNIDAD" value="${valorExtra.placa || ""
+      }"/>
       </div>
     `;
     modalExtraRefs.placa = document.getElementById("modalPlacaUnidad");
@@ -254,15 +250,13 @@ function renderCamposExtraModal(tipo, valorExtra = {}) {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="space-y-2">
           <label class="text-sm font-semibold text-gray-700">Contenedor</label>
-          <input id="modalContenedorSiniestro" class="${baseClasses}" placeholder="CONTENEDOR" value="${
-            valorExtra.contenedor || ""
-          }"/>
+          <input id="modalContenedorSiniestro" class="${baseClasses}" placeholder="CONTENEDOR" value="${valorExtra.contenedor || ""
+      }"/>
         </div>
         <div class="space-y-2">
           <label class="text-sm font-semibold text-gray-700">Placa de unidad</label>
-          <input id="modalPlacaSiniestro" class="${baseClasses}" placeholder="PLACA DE UNIDAD" value="${
-            valorExtra.placa || ""
-          }"/>
+          <input id="modalPlacaSiniestro" class="${baseClasses}" placeholder="PLACA DE UNIDAD" value="${valorExtra.placa || ""
+      }"/>
         </div>
       </div>
     `;
@@ -420,7 +414,7 @@ async function manejarAnexosModal(e) {
     console.error("Error subiendo anexos:", err);
     mostrarFeedback(
       err?.message ||
-        "No se pudieron subir los anexos. Revisa el bucket de Storage en Supabase.",
+      "No se pudieron subir los anexos. Revisa el bucket de Storage en Supabase.",
       "error"
     );
     modalAnexosInput.value = "";

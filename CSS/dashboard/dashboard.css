@@ -17,6 +17,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0);
@@ -30,7 +31,7 @@
 }
 
 .dashboard-card:hover {
-    box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
     transform: scale(1.02);
 }
 
@@ -40,11 +41,10 @@
     right: 15px;
     top: 10px;
     font-size: 80px;
-    color: rgba(0,0,0,0.06);
+    color: rgba(0, 0, 0, 0.06);
     pointer-events: none;
 }
 
 .dashboard-icon-bg i {
     opacity: 0.10 !important;
 }
-
