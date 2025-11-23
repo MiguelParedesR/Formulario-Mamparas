@@ -39,7 +39,12 @@ export async function generarDocxIncidencia(incidencia) {
       },
     });
 
-    const doc = new Docxtemplater(zip, { modules: [imageModule] });
+    const doc = new Docxtemplater(zip, {
+      modules: [imageModule],
+      paragraphLoop: true,
+      linebreaks: true,
+      delimiters: { start: "{", end: "}" },
+    });
 
     const datos = await prepararDatosDocx(incidencia);
 
