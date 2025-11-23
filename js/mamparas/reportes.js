@@ -73,12 +73,21 @@ async function cargarOperadores() {
   `;
 }
 
-document.addEventListener("DOMContentLoaded", cargarOperadores);
+function initReportes() {
+  cargarOperadores();
 
-document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("btnExportarExcel");
-  if (btn) btn.addEventListener("click", exportarExcel);
-});
+  if (btn && !btn.dataset.listenerAttached) {
+    btn.addEventListener("click", exportarExcel);
+    btn.dataset.listenerAttached = "true";
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initReportes);
+} else {
+  initReportes();
+}
 
 // 🚫 NO BORRAR — Exportación Excel funcional
 async function exportarExcel() {

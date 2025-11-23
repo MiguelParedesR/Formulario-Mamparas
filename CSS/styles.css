@@ -15,6 +15,44 @@
   --tpp-accent: #ffa500;
   --tpp-border: #e5e7eb;
   --tpp-text: #1f2937;
+  --tpp-sidebar-width: 250px;
+}
+
+/* ===========================
+   LAYOUT PANELES MAMPARAS
+=========================== */
+.mamparas-root {
+  width: 100%;
+  min-height: 100vh;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: var(--tpp-light);
+  transition: margin-left 0.3s ease, padding 0.3s ease;
+}
+
+@media (min-width: 1024px) {
+  .mamparas-root {
+    margin-left: var(--tpp-sidebar-width);
+    padding-left: clamp(2rem, 3vw, 3.5rem);
+    padding-right: clamp(2rem, 3vw, 3.5rem);
+  }
+}
+
+@media (max-width: 1023px) {
+  .mamparas-root {
+    margin-left: 0;
+    padding-top: 4.5rem;
+  }
+}
+
+.mamparas-panel {
+  width: 100%;
+  border-radius: 1.5rem;
+  border: 1px solid var(--tpp-border);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  background: #fff;
 }
 
 body {
