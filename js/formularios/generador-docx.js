@@ -9,6 +9,7 @@
 
 import PizZip from "https://cdn.jsdelivr.net/npm/pizzip@3.1.4/+esm";
 import Docxtemplater from "https://esm.sh/docxtemplater@3.67.5";
+import ImageModule from "https://esm.sh/docxtemplater-image-module@3.1.0";
 import { getFileBase64 } from "../utils/storage.js";
 
 /* ----------------------------------------------------------
@@ -125,9 +126,15 @@ async function renderWord(context) {
   const templateBinary = await loadTemplate();
   const zip = new PizZip(templateBinary);
 
+  const imageModule = new ImageModule({
+    getImage: (tagValue) => base64ToArrayBuffer(tagValue),
+    getSize: () => [520, 360],
+  });
+
   const doc = new Docxtemplater(zip, {
     paragraphLoop: true,
     linebreaks: true,
+    modules: [imageModule],
   });
 
   doc.setData(context);
