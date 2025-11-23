@@ -68,3 +68,178 @@ img, svg {
 html {
     scroll-behavior: smooth;
 }
+
+/* ============================================================
+   Columna de evidencias + Lightbox
+   ============================================================ */
+.evidencias-column {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.4) transparent;
+}
+
+@media (max-width: 1279px) {
+    .evidencias-column {
+        max-height: none;
+    }
+}
+
+.evidencias-column::-webkit-scrollbar {
+    width: 6px;
+}
+
+.evidencias-column::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.evidencias-column::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.4);
+    border-radius: 999px;
+}
+
+.drop-zone--active {
+    border-color: rgba(251, 191, 36, 0.9) !important;
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 10px 35px rgba(15, 23, 42, 0.35);
+}
+
+.anexo-card {
+    position: relative;
+    border-radius: 18px;
+    background: rgba(15,23,42,0.35);
+    border: 1px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+    padding: 0;
+    min-height: 150px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.anexo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.4);
+}
+
+.anexo-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+}
+
+.anexo-card--pdf {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.5rem 1rem;
+    text-align: center;
+}
+
+.anexo-pdf-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #facc15;
+}
+
+.anexo-file-name {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.8);
+    word-break: break-word;
+    padding: 0 0.5rem;
+}
+
+.anexo-remove {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: rgba(15,23,42,0.85);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.anexo-remove:hover {
+    background: rgba(248, 113, 113, 0.9);
+}
+
+.lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(6px);
+    z-index: 6500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.lightbox-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+}
+
+.lightbox-content {
+    position: relative;
+    z-index: 1;
+    max-width: min(90vw, 900px);
+    max-height: min(85vh, 720px);
+    width: 100%;
+    background: rgba(15,23,42,0.4);
+    border-radius: 24px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.lightbox-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 16px;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 1rem;
+    background: rgba(15,23,42,0.85);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lightbox-close:hover {
+    background: rgba(248, 113, 113, 0.9);
+}

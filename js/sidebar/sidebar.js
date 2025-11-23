@@ -296,28 +296,30 @@ export async function initSidebar(
       window.location.origin + window.location.pathname
     );
 
-    const fetchUrl = parsed.pathname + parsed.search;
+    const relativePath = parsed.pathname + parsed.search;
+    const stateUrl = new URL(window.location.href);
+    stateUrl.searchParams.set("view", parsed.pathname);
 
-    // URL para historial
-    const newStateUrl = new URL(window.location.href);
-    newStateUrl.searchParams.set("view", parsed.pathname);
-
-    parsed.searchParams.forEach((v, k) =>
-      newStateUrl.searchParams.set(k, v)
-    );
+    parsed.searchParams.forEach((v, k) => stateUrl.searchParams.set(k, v));
 
     return {
-      fetchUrl,
-      stateUrl: newStateUrl,
-      menuHref: parsed.pathname + parsed.search,
+      href: parsed.href,
+      fetchUrl: parsed.href,
+      stateUrl,
+      menuHref: relativePath,
+      sameOrigin: parsed.origin === window.location.origin,
     };
   }
-
   // Cargar vistas SPA
   async function loadPartial(href, { push = true } = {}) {
     if (!enableRouting || !href || isNavigating) return;
 
     const target = normalizeHref(href);
+
+    if (!target.sameOrigin) {
+      window.location.href = target.href;
+      return;
+    }
 
     try {
       isNavigating = true;
@@ -329,7 +331,7 @@ export async function initSidebar(
       const dom = new DOMParser().parseFromString(html, "text/html");
 
       const main = dom.querySelector("main");
-      if (!main) throw new Error("No se encontró <main> en la vista cargada.");
+      if (!main) throw new Error("No se encontro <main> en la vista cargada.");
 
       // Scripts de vista
       const scripts = [...dom.querySelectorAll("script")];
@@ -340,7 +342,7 @@ export async function initSidebar(
 
       if (push) {
         history.pushState(
-          { href: target.fetchUrl },
+          { href: target.menuHref },
           "",
           target.stateUrl.toString()
         );
@@ -355,12 +357,12 @@ export async function initSidebar(
       expandSubmenuByHref(target.menuHref);
       adjustContentMargin();
     } catch (e) {
-      console.error("⚠️ loadPartial error:", e);
+      console.error("loadPartial error:", e);
+      window.location.href = target.href;
     } finally {
       isNavigating = false;
     }
   }
-
   function hrefFromLocation() {
     const params = new URLSearchParams(window.location.search);
     const view = params.get("view");

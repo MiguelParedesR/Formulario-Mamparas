@@ -1,86 +1,110 @@
 // 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
 
-window.mostrarDetalle = function (detalle) {
+function crearFila(label, value) {
+  return `
+    <tr>
+      <th class="text-left text-gray-500 text-xs uppercase tracking-wide py-1 pr-3">${label}</th>
+      <td class="text-sm text-gray-800 py-1">${value || "-"}</td>
+    </tr>
+  `;
+}
+
+function normalizarDetalle(detalle) {
+  if (!detalle) return {};
+  if (typeof detalle === "string") {
+    try {
+      return JSON.parse(detalle || "{}");
+    } catch (error) {
+      console.error("Detalle inv\u00E1lido:", error);
+      return {};
+    }
+  }
+  return detalle;
+}
+
+function crearMiniatura(url, etiqueta) {
+  if (!url) return "";
+  return `
+    <button
+      type="button"
+      class="w-24 h-24 rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:scale-105 transition"
+      onclick="verImagenAmpliada('${url}')"
+    >
+      <img src="${url}" alt="${etiqueta}" class="w-full h-full object-cover" loading="lazy" />
+    </button>
+  `;
+}
+
+window.mostrarDetalle = function (registro) {
   const modal = document.getElementById("detalleModal");
-  const contenido = document.getElementById("detalleContenido");
+  const general = document.getElementById("detalleGeneral");
+  const detalleTabla = document.getElementById("detalleContenido");
+  const contImagenes = document.getElementById("detalleImagenes");
 
-  if (!modal || !contenido) return;
+  if (!modal || !general || !detalleTabla || !contImagenes) return;
 
-  if (!detalle || typeof detalle !== "object") {
-    contenido.innerHTML = `
-      <tr><td class="py-2 text-gray-600">Sin detalle disponible.</td></tr>
-    `;
-    modal.classList.remove("hidden");
+  const det = normalizarDetalle(registro?.detalle);
+  const generalRows = [
+    crearFila("Fecha", registro?.fecha),
+    crearFila("Hora", registro?.hora),
+    crearFila("Empresa", registro?.empresa),
+    crearFila("Placa", registro?.placa),
+    crearFila("Chofer", registro?.chofer),
+    crearFila("Lugar", registro?.lugar),
+    crearFila("Incorrecci\u00F3n", registro?.incorreccion),
+    crearFila("Responsable", registro?.responsable),
+    crearFila("Observaciones", registro?.observaciones),
+  ];
+
+  general.innerHTML = generalRows.join("");
+
+  if (!det || !det.tipo) {
+    detalleTabla.innerHTML = crearFila("Detalle", "Sin informaci\u00F3n registrada.");
+    contImagenes.innerHTML = "";
     modal.style.display = "flex";
+    modal.classList.remove("hidden");
     return;
   }
 
-  if (detalle.tipo === "Mampara") {
-    contenido.innerHTML = `
-      <tr>
-        <th class="text-left py-1 pr-2 text-gray-700">Separación central</th>
-        <td class="py-1">${detalle.separacion_lateral_central || "-"} cm</td>
-      </tr>
-
-      <tr>
-        <th class="text-left py-1 pr-2 text-gray-700">Altura mampara</th>
-        <td class="py-1">${detalle.altura_mampara || "-"} cm</td>
-      </tr>
-
-      <tr>
-        <th class="text-left py-1 pr-2 text-gray-700">Fotos</th>
-        <td class="py-2 flex gap-3">
-          ${renderFoto(detalle.foto_panoramica_unidad)}
-          ${renderFoto(detalle.foto_altura_mampara)}
-          ${renderFoto(detalle.foto_lateral_central)}
-        </td>
-      </tr>
-    `;
+  if (det.tipo === "Mampara") {
+    detalleTabla.innerHTML = [
+      crearFila("Tipo de detalle", det.tipo),
+      crearFila("Separaci\u00F3n lateral (cm)", det?.datos?.separacion_lateral_central),
+      crearFila("Altura de mampara (cm)", det?.datos?.altura_mampara),
+    ].join("");
   } else {
-    contenido.innerHTML = `
-      <tr>
-        <th class="text-left py-1 pr-2 text-gray-700">Descripción</th>
-        <td class="py-1">${detalle.observacion_texto || "-"}</td>
-      </tr>
-
-      <tr>
-        <th class="text-left py-1 pr-2 text-gray-700">Foto</th>
-        <td class="py-2">
-          ${renderFoto(detalle.foto_observacion)}
-        </td>
-      </tr>
-    `;
+    detalleTabla.innerHTML = [
+      crearFila("Tipo de detalle", det.tipo),
+      crearFila("Observaci\u00F3n", det?.datos?.observacion_texto),
+    ].join("");
   }
+
+  const imagenes = det?.imagenes || {};
+  const miniaturas = Object.entries(imagenes)
+    .map(([clave, url]) => crearMiniatura(url, clave))
+    .filter(Boolean)
+    .join("");
+
+  contImagenes.innerHTML = miniaturas || '<p class="text-sm text-gray-500">No hay evidencias cargadas.</p>';
 
   modal.style.display = "flex";
   modal.classList.remove("hidden");
 };
 
-window.renderFoto = function (url) {
-  if (!url) return "";
-  return `
-    <img
-      src="${url}"
-      class="w-20 h-20 rounded-lg border shadow cursor-pointer object-cover"
-      onclick="verImagenAmpliada('${url}')"
-    />
-  `;
-};
-
 window.verImagenAmpliada = function (url) {
-  const img = document.getElementById("imagenAmpliadaSrc");
   const modal = document.getElementById("imagenAmpliada");
-
-  if (img && modal) {
-    img.src = url;
-    modal.style.display = "flex";
-    modal.classList.remove("hidden");
-  }
+  const img = document.getElementById("imagenAmpliadaSrc");
+  if (!modal || !img) return;
+  img.src = url;
+  modal.style.display = "flex";
+  modal.classList.remove("hidden");
 };
 
 window.cerrarDetalle = function () {
   const modal = document.getElementById("detalleModal");
-  if (modal) modal.style.display = "none";
+  if (modal) {
+    modal.style.display = "none";
+  }
 };
 
 window.cerrarImagenAmpliada = function () {
@@ -88,4 +112,5 @@ window.cerrarImagenAmpliada = function () {
   if (modal) modal.style.display = "none";
 };
 
-console.log("QA Mamparas: archivo corregido");
+// 🚫 NO BORRAR — QA Mamparas
+console.log("QA Mamparas: archivo restaurado");

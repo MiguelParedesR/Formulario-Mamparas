@@ -18,6 +18,16 @@ const ASUNTOS = {
   SINIESTRO: "SINIESTRO",
 };
 
+const VALID_ANEXO_FORMATS = [
+  "image/jpeg",
+  "image/png",
+  "image/jpg",
+  "image/webp",
+  "application/pdf",
+];
+const VALID_ANEXO_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "pdf"];
+const MAX_ANEXOS = 10;
+
 // Elementos base
 const tipoDescripcion = document.getElementById("tipoDescripcion");
 const asuntoInput = document.getElementById("asunto");
@@ -33,12 +43,19 @@ const conclusionesInput = document.getElementById("conclusiones");
 const recomendacionesInput = document.getElementById("recomendaciones");
 
 const anexosInput = document.getElementById("anexos");
+const dropZoneAnexos = document.getElementById("dropZoneAnexos");
+const anexosPreview = document.getElementById("anexosPreview");
+const btnSubirAnexos = document.getElementById("btnSubirAnexos");
 
 const progressBar = document.getElementById("progressBar");
 const progressLabel = document.getElementById("progressLabel");
+const lightboxOverlay = document.getElementById("lightboxOverlay");
+const lightboxImage = document.getElementById("lightboxImage");
+const lightboxCloseBtn = document.getElementById("lightboxClose");
 
 let tipoSeleccionado = null;
 const extraRefs = { contenedor: null, placa: null };
+let anexosArchivos = [];
 
 function detectarTipoDesdeURL() {
   const url = new URL(window.location.href);
@@ -186,7 +203,7 @@ function recalcularProgreso() {
 
   let total = camposBase.length;
 
-  const anexosSeleccionados = anexosInput?.files?.length || 0;
+  const anexosSeleccionados = anexosArchivos.length;
   if (anexosSeleccionados > 0) {
     llenos += 1;
     total += 1;
@@ -205,7 +222,7 @@ function recalcularProgreso() {
 }
 
 async function procesarAnexos(id) {
-  const files = Array.from(anexosInput.files);
+  const files = anexosArchivos.map((item) => item.file);
   if (!files.length) return [];
 
   try {
@@ -225,6 +242,269 @@ async function procesarAnexos(id) {
     return [];
   }
 }
+
+function esFormatoPermitido(file) {
+  const mime = file.type?.toLowerCase?.() || "";
+  if (mime && VALID_ANEXO_FORMATS.includes(mime)) return true;
+
+  const extension = file.name?.split(".").pop()?.toLowerCase();
+  return extension ? VALID_ANEXO_EXTENSIONS.includes(extension) : false;
+}
+
+function sincronizarInputAnexos() {
+  if (!anexosInput || typeof DataTransfer === "undefined") return;
+  const dataTransfer = new DataTransfer();
+  anexosArchivos.forEach((item) => dataTransfer.items.add(item.file));
+  anexosInput.files = dataTransfer.files;
+}
+
+function renderizarAnexosPreview() {
+  if (!anexosPreview) return;
+
+  anexosPreview.innerHTML = "";
+
+  if (!anexosArchivos.length) {
+    const empty = document.createElement("p");
+    empty.className = "text-xs text-white/60 col-span-full text-center";
+    empty.textContent = "Aún no has cargado evidencias.";
+    anexosPreview.appendChild(empty);
+    return;
+  }
+
+  anexosArchivos.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = "anexo-card cursor-pointer";
+    card.tabIndex = 0;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "anexo-remove";
+    removeBtn.textContent = "❌";
+    removeBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      eliminarAnexo(item.id);
+    });
+
+    card.appendChild(removeBtn);
+
+    const isPdf =
+      item.type === "application/pdf" ||
+      item.name?.toLowerCase().endsWith(".pdf");
+
+    if (isPdf) {
+      card.classList.add("anexo-card--pdf");
+
+      const icon = document.createElement("div");
+      icon.className = "anexo-pdf-icon";
+      icon.innerHTML = "<i class='fas fa-file-pdf'></i>";
+
+      const label = document.createElement("p");
+      label.className = "anexo-file-name";
+      label.textContent = item.name || "archivo.pdf";
+
+      card.appendChild(icon);
+      card.appendChild(label);
+    } else {
+      const img = document.createElement("img");
+      img.src = item.url;
+      img.alt = item.name || "Evidencia";
+      card.appendChild(img);
+    }
+
+    card.addEventListener("click", () => {
+      if (isPdf) {
+        window.open(item.url, "_blank", "noopener");
+      } else {
+        abrirLightbox(item.url);
+      }
+    });
+
+    card.addEventListener("keyup", (event) => {
+      if (event.key === "Enter") {
+        card.click();
+      }
+    });
+
+    anexosPreview.appendChild(card);
+  });
+}
+
+function agregarAnexos(files) {
+  if (!files?.length) return;
+
+  const disponibles = MAX_ANEXOS - anexosArchivos.length;
+  if (disponibles <= 0) {
+    alert(`Solo se permiten ${MAX_ANEXOS} evidencias por informe.`);
+    return;
+  }
+
+  const permitidos = [];
+  const rechazados = [];
+
+  files.forEach((file) => {
+    if (esFormatoPermitido(file)) permitidos.push(file);
+    else rechazados.push(file.name || "archivo");
+  });
+
+  if (rechazados.length) {
+    alert(
+      `Formato no permitido en: ${rechazados
+        .slice(0, 4)
+        .join(", ")}${rechazados.length > 4 ? "..." : ""}`
+    );
+  }
+
+  const seleccion = permitidos.slice(0, disponibles);
+  if (!seleccion.length) return;
+
+  seleccion.forEach((file) => {
+    const url = URL.createObjectURL(file);
+    const entry = {
+      id:
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `anexo-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      file,
+      name: file.name || "adjunto",
+      type: file.type || "",
+      url,
+    };
+
+    anexosArchivos.push(entry);
+  });
+
+  sincronizarInputAnexos();
+  renderizarAnexosPreview();
+  recalcularProgreso();
+}
+
+function eliminarAnexo(id) {
+  const index = anexosArchivos.findIndex((item) => item.id === id);
+  if (index === -1) return;
+
+  const [removed] = anexosArchivos.splice(index, 1);
+  if (removed?.url) URL.revokeObjectURL(removed.url);
+
+  sincronizarInputAnexos();
+  renderizarAnexosPreview();
+  recalcularProgreso();
+}
+
+function setupAnexosSection() {
+  if (!anexosInput) return;
+
+  btnSubirAnexos?.addEventListener("click", () => anexosInput.click());
+
+  anexosInput.addEventListener("change", (event) => {
+    const files = Array.from(event.target.files || []);
+    agregarAnexos(files);
+    anexosInput.value = "";
+  });
+
+  if (!dropZoneAnexos) return;
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dropZoneAnexos.classList.add("drop-zone--active");
+  };
+
+  const handleDragLeave = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const related = event.relatedTarget;
+    if (related && dropZoneAnexos.contains(related)) return;
+
+    dropZoneAnexos.classList.remove("drop-zone--active");
+  };
+
+  ["dragenter", "dragover"].forEach((evt) =>
+    dropZoneAnexos.addEventListener(evt, handleDragOver)
+  );
+  ["dragleave", "drop"].forEach((evt) =>
+    dropZoneAnexos.addEventListener(evt, handleDragLeave)
+  );
+
+  dropZoneAnexos.addEventListener("drop", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dropZoneAnexos.classList.remove("drop-zone--active");
+
+    const files = Array.from(event.dataTransfer?.files || []);
+    if (files.length) agregarAnexos(files);
+  });
+}
+
+function lockBodyScroll() {
+  if (!document?.body) return;
+  if (!document.body.dataset.prevOverflow) {
+    document.body.dataset.prevOverflow = document.body.style.overflow || "";
+  }
+  document.body.style.overflow = "hidden";
+}
+
+function unlockBodyScroll() {
+  if (!document?.body) return;
+  const prev = document.body.dataset.prevOverflow ?? "";
+  document.body.style.overflow = prev;
+  delete document.body.dataset.prevOverflow;
+}
+
+function abrirLightbox(url) {
+  if (!url || !lightboxOverlay || !lightboxImage) return;
+
+  lightboxImage.src = url;
+  lightboxOverlay.classList.remove("hidden");
+
+  requestAnimationFrame(() => {
+    lightboxOverlay.classList.add("active");
+  });
+
+  lightboxOverlay.setAttribute("aria-hidden", "false");
+  lockBodyScroll();
+  document.addEventListener("keydown", handleLightboxEsc);
+}
+
+function cerrarLightbox() {
+  if (!lightboxOverlay || lightboxOverlay.classList.contains("hidden")) {
+    unlockBodyScroll();
+    document.removeEventListener("keydown", handleLightboxEsc);
+    return;
+  }
+
+  const finalize = () => {
+    lightboxOverlay.classList.add("hidden");
+    lightboxOverlay.removeEventListener("transitionend", finalize);
+  };
+
+  lightboxOverlay.classList.remove("active");
+  lightboxOverlay.setAttribute("aria-hidden", "true");
+  lightboxOverlay.addEventListener("transitionend", finalize);
+
+  unlockBodyScroll();
+  document.removeEventListener("keydown", handleLightboxEsc);
+}
+
+function handleLightboxEsc(event) {
+  if (event.key === "Escape") cerrarLightbox();
+}
+
+lightboxCloseBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  cerrarLightbox();
+});
+
+lightboxOverlay?.addEventListener("click", (event) => {
+  if (
+    event.target === lightboxOverlay ||
+    event.target?.hasAttribute("data-lightbox-dismiss")
+  ) {
+    cerrarLightbox();
+  }
+});
+
+window.abrirLightbox = abrirLightbox;
 
 function validarCamposExtra() {
   const valorExtra = obtenerValorExtra();
@@ -339,7 +619,8 @@ async function guardarIncidencia(estado = "BORRADOR") {
   recomendacionesInput,
 ].forEach((el) => el?.addEventListener("input", recalcularProgreso));
 
-anexosInput?.addEventListener("change", recalcularProgreso);
+setupAnexosSection();
+renderizarAnexosPreview();
 
 document
   .getElementById("btnGuardarBorrador")

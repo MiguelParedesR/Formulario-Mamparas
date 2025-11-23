@@ -1,5 +1,5 @@
 <main class="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-10">
-  <div class="max-w-6xl mx-auto space-y-8">
+  <div class="max-w-7xl mx-auto space-y-8">
     <!-- Encabezado -->
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-slide select-none">
       <div class="space-y-2">
@@ -9,7 +9,7 @@
         </h1>
 
         <p class="text-sm text-gray-500" id="tipoDescripcion">
-          El tipo se define desde el dashboard o el sidebar; el asunto se carga de forma autom·tica.
+          El tipo se define desde el dashboard o el sidebar; el asunto se carga de forma autom√°tica.
         </p>
       </div>
 
@@ -26,88 +26,103 @@
         </div>
 
         <p id="progressStatus" class="mt-1 text-[11px] text-gray-500">
-          Puedes guardar borradores incompletos y continuar m·s tarde.
+          Puedes guardar borradores incompletos y continuar m√°s tarde.
         </p>
       </div>
     </div>
 
     <!-- FORMULARIO PRINCIPAL -->
     <section class="bg-white rounded-3xl border border-gray-100 shadow-xl p-6 sm:p-8 space-y-8 animate-slide">
-      <form id="form-incidencia" class="space-y-8">
-        <!-- Datos principales -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="rounded-2xl border border-gray-100 bg-slate-50 p-5 shadow-sm space-y-4">
-            <div class="space-y-2">
-              <label class="text-sm font-semibold text-gray-700">Asunto (autom·tico)</label>
-              <input
-                id="asunto"
-                readonly
-                class="w-full bg-white rounded-xl border border-gray-200 text-sm shadow-sm px-4 py-2 text-gray-700 select-none"
-              />
-            </div>
-
-            <div id="campoExtraContainer" class="space-y-2">
-              <!-- Campo extra din·mico seg˙n tipo -->
-            </div>
-          </div>
-
-          <div class="rounded-2xl border border-gray-100 bg-slate-50 p-5 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="space-y-2">
-              <label class="text-sm font-semibold text-gray-700">A:</label>
-              <input
-                id="dirigidoA"
-                class="w-full rounded-xl border border-gray-300 shadow-sm text-sm px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-              />
-            </div>
-
-            <div class="space-y-2">
-              <label class="text-sm font-semibold text-gray-700">De:</label>
-              <input
-                id="remitente"
-                class="w-full rounded-xl border border-gray-300 shadow-sm text-sm px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-              />
-            </div>
-
-            <div class="space-y-2 sm:col-span-2">
-              <label class="text-sm font-semibold text-gray-700">Fecha del informe</label>
-              <input
-                id="fechaInforme"
-                type="date"
-                class="w-full rounded-xl border border-gray-300 shadow-sm text-sm px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div class="space-y-6">
-          <!-- HECHOS -->
-          <section class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-3">
-            <div class="flex flex-col gap-1 md:flex-row md:items-baseline md:justify-between">
-              <div>
-                <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">SecciÛn II</p>
-                <h2 class="text-lg font-semibold text-gray-900">Hechos</h2>
+      <form id="form-incidencia" class="space-y-10">
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_360px]">
+          <!-- Columna 1 -->
+          <div class="space-y-6">
+            <section class="rounded-2xl border border-gray-100 bg-slate-50 p-5 shadow-sm space-y-5">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Secci√≥n I</p>
+                  <h2 class="text-lg font-semibold text-gray-900">Asunto y serie</h2>
+                </div>
+                <span class="text-xs text-gray-500">Carga autom√°tica seg√∫n tipo.</span>
               </div>
-              <span class="text-xs text-gray-500 md:text-right">Redacta los hechos en lista numerada.</span>
-            </div>
-            <textarea
-              id="hechos"
-              rows="3"
-              class="w-full rounded-xl border border-gray-200 shadow-sm text-sm px-4 py-3 text-gray-700 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition resize-y"
-              placeholder="1. Describa el primer hecho..."
-            ></textarea>
-            <p class="text-[11px] text-gray-500">Al presionar Enter se insertar· el siguiente n˙mero autom·ticamente.</p>
-          </section>
 
-          <!-- ANALISIS / CONCLUSIONES -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-4">
+                <div class="space-y-2">
+                  <label class="text-sm font-semibold text-gray-700">Asunto (autom√°tico)</label>
+                  <input
+                    id="asunto"
+                    readonly
+                    class="w-full bg-white rounded-xl border border-gray-200 text-sm shadow-sm px-4 py-2 text-gray-700 select-none"
+                  />
+                </div>
+
+                <div id="campoExtraContainer" class="space-y-2" aria-live="polite">
+                  <!-- Campo extra din√°mico seg√∫n tipo -->
+                </div>
+              </div>
+            </section>
+
+            <section class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-3">
+              <div class="flex flex-col gap-1 md:flex-row md:items-baseline md:justify-between">
+                <div>
+                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Secci√≥n II</p>
+                  <h2 class="text-lg font-semibold text-gray-900">Hechos</h2>
+                </div>
+                <span class="text-xs text-gray-500 md:text-right">Redacta los hechos en lista numerada.</span>
+              </div>
+              <textarea
+                id="hechos"
+                rows="7"
+                class="w-full rounded-xl border border-gray-200 shadow-sm text-sm px-4 py-3 text-gray-700 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition resize-y"
+                placeholder="1. Describa el primer hecho..."
+              ></textarea>
+              <p class="text-[11px] text-gray-500">Al presionar Enter se insertar√° el siguiente n√∫mero autom√°ticamente.</p>
+            </section>
+          </div>
+
+          <!-- Columna 2 -->
+          <div class="space-y-6">
+            <section class="rounded-2xl border border-gray-100 bg-slate-50 p-5 shadow-sm space-y-4">
+              <div>
+                <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Secci√≥n III</p>
+                <h2 class="text-lg font-semibold text-gray-900">Datos del informe</h2>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="text-sm font-semibold text-gray-700">A:</label>
+                  <input
+                    id="dirigidoA"
+                    class="w-full rounded-xl border border-gray-300 shadow-sm text-sm px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                  />
+                </div>
+
+                <div class="space-y-2">
+                  <label class="text-sm font-semibold text-gray-700">De:</label>
+                  <input
+                    id="remitente"
+                    class="w-full rounded-xl border border-gray-300 shadow-sm text-sm px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                  />
+                </div>
+
+                <div class="space-y-2 sm:col-span-2">
+                  <label class="text-sm font-semibold text-gray-700">Fecha del informe</label>
+                  <input
+                    id="fechaInforme"
+                    type="date"
+                    class="w-full rounded-xl border border-gray-300 shadow-sm text-sm px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                  />
+                </div>
+              </div>
+            </section>
+
             <section class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-3">
               <div>
-                <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">SecciÛn III</p>
-                <h2 class="text-lg font-semibold text-gray-900">An·lisis</h2>
+                <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Secci√≥n IV</p>
+                <h2 class="text-lg font-semibold text-gray-900">An√°lisis</h2>
               </div>
               <textarea
                 id="analisis"
-                rows="3"
+                rows="5"
                 class="w-full rounded-xl border border-gray-200 shadow-sm text-sm px-4 py-3 text-gray-700 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition resize-y"
                 placeholder="Analiza los hechos del incidente..."
               ></textarea>
@@ -115,49 +130,77 @@
 
             <section class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-3">
               <div>
-                <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">SecciÛn IV</p>
+                <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Secci√≥n V</p>
                 <h2 class="text-lg font-semibold text-gray-900">Conclusiones</h2>
               </div>
               <textarea
                 id="conclusiones"
-                rows="3"
+                rows="5"
                 class="w-full rounded-xl border border-gray-200 shadow-sm text-sm px-4 py-3 text-gray-700 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition resize-y"
                 placeholder="Conclusiones claras..."
               ></textarea>
             </section>
-          </div>
 
-          <!-- RECOMENDACIONES + ANEXOS -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <section class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-3">
               <div>
-                <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">SecciÛn V</p>
+                <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Secci√≥n VI</p>
                 <h2 class="text-lg font-semibold text-gray-900">Recomendaciones</h2>
               </div>
               <textarea
                 id="recomendaciones"
-                rows="3"
+                rows="5"
                 class="w-full rounded-xl border border-gray-200 shadow-sm text-sm px-4 py-3 text-gray-700 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition resize-y"
                 placeholder="Acciones correctivas..."
               ></textarea>
             </section>
-
-            <section class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-4">
-              <div class="space-y-1">
-                <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">SecciÛn VI</p>
-                <h2 class="text-lg font-semibold text-gray-900">Anexos / Evidencias</h2>
-                <p class="text-xs text-gray-500">Agrega archivos, fotos o documentos que respalden los hechos.</p>
-              </div>
-              <label class="block text-sm font-medium text-gray-700" for="anexos">Cargar archivos</label>
-              <input
-                id="anexos"
-                type="file"
-                multiple
-                class="w-full rounded-xl border border-dashed border-gray-300 bg-gray-50 text-sm px-4 py-6 text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-              />
-              <p class="text-[11px] text-gray-500">Puedes adjuntar varios archivos (m·x. 10) arrastr·ndolos aquÌ.</p>
-            </section>
           </div>
+
+          <!-- Columna 3 -->
+          <aside class="rounded-2xl border border-gray-100 bg-slate-900/95 text-white shadow-2xl p-5 lg:sticky lg:top-6">
+            <div class="evidencias-column flex flex-col gap-5">
+              <div class="space-y-1">
+                <p class="text-xs font-semibold text-amber-300 uppercase tracking-widest">Secci√≥n VII</p>
+                <h2 class="text-xl font-semibold">Anexos / Evidencias</h2>
+                <p class="text-xs text-white/60">
+                  Adjunta fotos, documentos o reportes que respalden los hechos. M√°ximo 10 archivos.
+                </p>
+              </div>
+
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <button
+                  id="btnSubirAnexos"
+                  type="button"
+                  class="inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20 transition"
+                >
+                  <i class="fas fa-cloud-upload-alt text-base"></i>
+                  Subir archivos
+                </button>
+                <span class="text-[11px] uppercase tracking-widest text-white/60">Arrastra o haz clic</span>
+              </div>
+
+              <input id="anexos" type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" multiple class="sr-only" />
+
+              <div
+                id="dropZoneAnexos"
+                class="rounded-2xl border border-white/30 border-dashed bg-white/5 px-4 py-6 text-sm text-white/70 transition hover:border-white/60"
+              >
+                <div class="flex flex-col items-center gap-3 text-center">
+                  <div class="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-xl text-white">
+                    <i class="fas fa-images"></i>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-white">Arrastra y suelta evidencias aqu√≠</p>
+                    <p class="text-xs text-white/60">Im√°genes JPG, PNG, WEBP o PDF (se mostrar√° un icono).</p>
+                  </div>
+                </div>
+              </div>
+
+              <div id="anexosPreview" class="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-live="polite"></div>
+              <p class="text-[11px] text-white/60">
+                Tip: puedes dar clic sobre una imagen para ampliarla en pantalla completa.
+              </p>
+            </div>
+          </aside>
         </div>
 
         <!-- ACCIONES -->
@@ -202,6 +245,31 @@
     </section>
   </div>
 </main>
+
+<!-- Lightbox -->
+<div
+  id="lightboxOverlay"
+  class="lightbox-overlay hidden"
+  aria-hidden="true"
+>
+  <div class="lightbox-backdrop" data-lightbox-dismiss></div>
+  <div class="lightbox-content" role="dialog" aria-modal="true">
+    <button
+      id="lightboxClose"
+      type="button"
+      class="lightbox-close"
+      aria-label="Cerrar"
+    >
+      ‚ùå
+    </button>
+    <img
+      id="lightboxImage"
+      src=""
+      alt="Previsualizaci√≥n de evidencia"
+      class="lightbox-image"
+    />
+  </div>
+</div>
 
 <!-- Logica modular -->
 <script type="module" src="/js/formularios/formulario.js"></script>

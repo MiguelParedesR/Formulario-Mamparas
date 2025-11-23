@@ -1,49 +1,57 @@
-<!-- ?Ys? NO BORRAR ??" Bloque restaurado/corregido del módulo Mamparas -->
+<!-- ðŸš« NO BORRAR â€” Bloque restaurado/corregido del m&oacute;dulo Mamparas -->
 <main class="mamparas-root min-h-screen bg-slate-50 py-8 text-gray-800">
-  <div class="max-w-7xl mx-auto px-6 space-y-8">
-    <div class="space-y-2">
+  <div class="w-full px-6 space-y-8">
+    <header class="space-y-2">
       <h1 class="text-2xl font-bold flex items-center gap-3 text-gray-900">
         <i class="fas fa-database text-indigo-600"></i>
-        Registros de Inspección
+        Registros de Inspecci&oacute;n
       </h1>
-      <p class="text-sm text-gray-500">Consulta, filtra y revisa los registros almacenados desde cualquier dispositivo.</p>
-    </div>
+      <p class="text-sm text-gray-500">
+        Consulta, filtra y revisa los registros almacenados desde cualquier dispositivo.
+      </p>
+    </header>
 
-    <!-- BUSCADOR -->
-    <div class="mt-4 mb-6">
-      <label class="block text-sm font-semibold text-gray-700" for="buscarPlaca">Buscar por placa</label>
-      <div class="relative mt-2 w-full sm:max-w-sm">
-        <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
-          <i class="fas fa-search"></i>
-        </span>
-        <input
-          class="w-full rounded-lg border border-gray-300 bg-white px-10 py-2 text-sm text-gray-700 uppercase tracking-wide shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-          type="text"
-          id="buscarPlaca"
-          placeholder="Ej: ABC123"
-        />
+    <section class="w-full bg-white rounded-2xl border border-gray-100 shadow-md p-6 space-y-6">
+      <!-- BUSCADOR -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <p class="text-base font-semibold text-gray-800">Filtrar registros</p>
+          <p class="text-sm text-gray-500">Busca r&aacute;pidamente una placa espec&iacute;fica.</p>
+        </div>
+        <div class="w-full sm:w-72">
+          <label class="sr-only" for="buscarPlaca">Buscar por placa</label>
+          <div class="relative">
+            <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
+              <i class="fas fa-search"></i>
+            </span>
+            <input
+              class="w-full rounded-lg border border-gray-300 bg-white px-10 py-2 text-sm text-gray-700 uppercase tracking-wide shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+              type="text"
+              id="buscarPlaca"
+              placeholder="Ej: ABC123"
+            />
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- TABLA -->
-    <section class="bg-white rounded-xl shadow-md border border-gray-100 p-6">
-      <div class="overflow-x-auto">
+      <!-- TABLA -->
+      <div class="w-full overflow-x-auto">
         <div class="max-h-[70vh] overflow-y-auto">
-          <table class="min-w-full text-gray-700 text-sm sm:text-base whitespace-nowrap">
-            <thead class="sticky top-0 z-10 bg-white shadow">
-              <tr class="bg-gray-100">
-                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[120px]">Fecha</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[120px]">Hora</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[100px] hidden sm:table-cell">Empresa</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[100px]">Placa</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[180px]">Chofer</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[130px] hidden sm:table-cell">Lugar</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[130px] hidden sm:table-cell">Incorrección</th>
-                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[130px] hidden sm:table-cell">Responsable</th>
-                <th class="px-4 py-3 text-center font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[80px]">Acciones</th>
+          <table class="w-full table-auto border-collapse text-gray-700 text-sm leading-relaxed">
+            <thead class="sticky top-0 z-10 bg-gray-100">
+              <tr>
+                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Fecha</th>
+                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Hora</th>
+                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Empresa</th>
+                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Placa</th>
+                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Chofer</th>
+                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Lugar</th>
+                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Incorrecci&oacute;n</th>
+                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Responsable</th>
+                <th class="px-3 py-3 text-center font-semibold text-sm border-b border-gray-200 uppercase">Acciones</th>
               </tr>
             </thead>
-            <tbody id="tabla-registros" class="divide-y divide-gray-100"></tbody>
+            <tbody id="tabla-registros" class="text-gray-700 text-sm"></tbody>
           </table>
         </div>
       </div>
@@ -53,15 +61,35 @@
 
 <!-- MODAL DETALLE -->
 <div id="detalleModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center px-4 z-50">
-  <div class="detalle-modal-content bg-white rounded-2xl shadow-2xl p-6 max-w-2xl w-full space-y-4 border border-gray-100">
+  <div class="detalle-modal-content bg-white rounded-2xl shadow-2xl p-6 max-w-3xl w-full space-y-4 border border-gray-100">
     <div class="flex items-center justify-between pb-2 border-b border-gray-200">
-      <h3 class="text-lg font-semibold text-gray-800">Detalle de la incorrección</h3>
+      <div>
+        <p class="text-xs uppercase tracking-[0.2em] text-indigo-500 font-semibold">Resumen</p>
+        <h3 class="text-lg font-semibold text-gray-800">Detalle de la incorrecci&oacute;n</h3>
+      </div>
       <button onclick="cerrarDetalle()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
     </div>
 
-    <table class="detalle-tabla w-full text-sm border-collapse">
-      <tbody id="detalleContenido"></tbody>
-    </table>
+    <div class="space-y-5 max-h-[75vh] overflow-y-auto pr-1">
+      <div>
+        <p class="text-xs uppercase tracking-[0.2em] text-gray-400 font-semibold mb-2">Datos generales</p>
+        <table class="detalle-tabla w-full text-sm border-collapse">
+          <tbody id="detalleGeneral"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <p class="text-xs uppercase tracking-[0.2em] text-gray-400 font-semibold mb-2">Detalle registrado</p>
+        <table class="detalle-tabla w-full text-sm border-collapse">
+          <tbody id="detalleContenido"></tbody>
+        </table>
+      </div>
+
+      <div>
+        <p class="text-xs uppercase tracking-[0.2em] text-gray-400 font-semibold mb-2">Evidencias</p>
+        <div id="detalleImagenes" class="flex flex-wrap gap-3"></div>
+      </div>
+    </div>
 
     <div class="flex justify-end">
       <button
@@ -77,7 +105,7 @@
 <!-- MODAL IMAGEN AMPLIADA -->
 <div id="imagenAmpliada" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 px-4">
   <div class="relative bg-white rounded-2xl shadow-2xl p-3 max-w-3xl w-full">
-    <img id="imagenAmpliadaSrc" src="" alt="Vista ampliada" class="w-full rounded-xl object-contain" />
+    <img id="imagenAmpliadaSrc" src="" alt="Vista ampliada" class="w-full rounded-xl object-contain max-h-[80vh]" />
     <button
       class="absolute top-2 right-2 bg-black/60 text-white px-3 py-1 rounded-lg text-sm hover:bg-black/80 transition"
       onclick="cerrarImagenAmpliada()"
@@ -91,7 +119,6 @@
 <script type="module" src="/js/mamparas/registros.js"></script>
 <script type="module" src="/js/mamparas/verRegistros.js"></script>
 <script>
-// ?Ys? NO BORRAR ??" Bloque restaurado/corregido del módulo Mamparas
-console.log("QA Mamparas: archivo corregido");
+// ðŸš« NO BORRAR â€” QA Mamparas
+console.log("QA Mamparas: archivo restaurado");
 </script>
-<!-- ?Ys? NO BORRAR ??" Fin archivo restaurado/corregido módulo Mamparas -->
