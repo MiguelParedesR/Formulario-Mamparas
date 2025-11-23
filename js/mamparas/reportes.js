@@ -43,19 +43,28 @@ async function cargarOperadores() {
   const select = document.getElementById("operador");
   if (!select) return;
 
-  select.innerHTML = '<option value="">Cargando operadores...</option>';
+  select.innerHTML = '<option value="Todos">Cargando operadores...</option>';
 
-  const { data, error } = await supabase.from("inspecciones").select("responsable");
   let operadores = [];
 
-  if (!error && data) {
-    operadores = [
-      ...new Set(
-        data
-          .map((r) => (r?.responsable || "").trim())
-          .filter((valor) => valor && valor.length > 0)
-      ),
-    ];
+  try {
+    const { data, error } = await supabase.from("inspecciones").select("responsable");
+
+    if (error) {
+      throw error;
+    }
+
+    if (Array.isArray(data)) {
+      operadores = [
+        ...new Set(
+          data
+            .map((r) => (r?.responsable || "").trim())
+            .filter((valor) => valor && valor.length > 0)
+        ),
+      ];
+    }
+  } catch (err) {
+    console.error("Error cargando operadores:", err.message || err);
   }
 
   if (!operadores.length) {
@@ -71,6 +80,11 @@ async function cargarOperadores() {
     <option value="Todos">Todos (sin filtro)</option>
     ${operadores.map((op) => `<option value="${op}">${op}</option>`).join("")}
   `;
+}
+
+function obtenerUltimoDiaMes(year, month) {
+  const ultimoDia = new Date(Number(year), Number(month), 0).getDate();
+  return String(ultimoDia).padStart(2, "0");
 }
 
 function initReportes() {
@@ -103,11 +117,13 @@ async function exportarExcel() {
 
   const [anio, numMes] = mes.split("-");
 
+  const ultimoDia = obtenerUltimoDiaMes(anio, numMes);
+
   let query = supabase
     .from("inspecciones")
     .select("*")
     .gte("fecha", `${anio}-${numMes}-01`)
-    .lte("fecha", `${anio}-${numMes}-31`);
+    .lte("fecha", `${anio}-${numMes}-${ultimoDia}`);
 
   if (operador && operador !== "Todos") {
     query = query.eq("responsable", operador);
@@ -121,7 +137,16 @@ async function exportarExcel() {
     return;
   }
 
-  const workbook = new ExcelJS.Workbook();
+  const ExcelLib = window.ExcelJS || ExcelJS;
+  const saveAsFn = window.saveAs || saveAs;
+
+  if (!ExcelLib || !saveAsFn) {
+    mostrarModal("error", "No se pudo cargar las librerías de exportación.");
+    setExportButtonState(false);
+    return;
+  }
+
+  const workbook = new ExcelLib.Workbook();
   const sheet = workbook.addWorksheet("Reporte");
 
   sheet.addRow([
@@ -151,7 +176,7 @@ async function exportarExcel() {
   });
 
   const buffer = await workbook.xlsx.writeBuffer();
-  saveAs(new Blob([buffer]), `reporte_${anio}_${numMes}.xlsx`);
+  saveAsFn(new Blob([buffer]), `reporte_${anio}_${numMes}.xlsx`);
 
   setExportButtonState(false);
   mostrarModal("success", "Reporte generado y descargado exitosamente.");

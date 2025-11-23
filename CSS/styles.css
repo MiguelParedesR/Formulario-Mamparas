@@ -55,6 +55,40 @@
   background: #fff;
 }
 
+.input-icon-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.input-icon-right {
+  position: absolute;
+  right: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.input-icon-wrapper input,
+.input-icon-wrapper select {
+  padding-left: 2.6rem;
+}
+
+.input-icon-wrapper select.has-right-icon {
+  padding-right: 2.6rem;
+}
+
 body {
   font-family: 'Segoe UI', sans-serif;
   background: var(--tpp-light);

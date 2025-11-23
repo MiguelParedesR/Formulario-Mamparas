@@ -1,24 +1,23 @@
-<!-- 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas -->
-<main class="mamparas-root p-6 space-y-6 text-gray-800">
-  <div class="space-y-1">
-    <h1 class="text-2xl font-bold flex items-center gap-3 text-slate-900">
-      <i class="fas fa-database text-indigo-600"></i>
-      Registros de Inspección
-    </h1>
-    <p class="text-sm text-gray-600">Consulta, filtra y revisa los registros almacenados desde cualquier dispositivo.</p>
-  </div>
-
-  <div class="mamparas-panel bg-white border border-gray-100 rounded-2xl shadow-xl p-6 sm:p-8 space-y-5">
+<!-- ?Ys? NO BORRAR ??" Bloque restaurado/corregido del m�dulo Mamparas -->
+<main class="mamparas-root min-h-screen bg-slate-50 py-8 text-gray-800">
+  <div class="max-w-7xl mx-auto px-6 space-y-8">
+    <div class="space-y-2">
+      <h1 class="text-2xl font-bold flex items-center gap-3 text-gray-900">
+        <i class="fas fa-database text-indigo-600"></i>
+        Registros de Inspecci�n
+      </h1>
+      <p class="text-sm text-gray-500">Consulta, filtra y revisa los registros almacenados desde cualquier dispositivo.</p>
+    </div>
 
     <!-- BUSCADOR -->
-    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-      <label class="text-sm font-semibold text-gray-700" for="buscarPlaca">Buscar por placa</label>
-      <div class="relative w-full sm:w-64">
-        <span class="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">
+    <div class="mt-4 mb-6">
+      <label class="block text-sm font-semibold text-gray-700" for="buscarPlaca">Buscar por placa</label>
+      <div class="relative mt-2 w-full sm:max-w-sm">
+        <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
           <i class="fas fa-search"></i>
         </span>
         <input
-          class="w-full rounded-xl border border-gray-200 bg-white pl-9 pr-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 uppercase tracking-wide"
+          class="w-full rounded-lg border border-gray-300 bg-white px-10 py-2 text-sm text-gray-700 uppercase tracking-wide shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
           type="text"
           id="buscarPlaca"
           placeholder="Ej: ABC123"
@@ -27,24 +26,28 @@
     </div>
 
     <!-- TABLA -->
-    <div class="table-wrapper overflow-x-auto rounded-2xl border border-gray-100 shadow-inner">
-      <table class="styled-table min-w-full text-sm text-gray-700">
-        <thead class="bg-orange-600 text-white text-xs uppercase tracking-wide">
-          <tr>
-            <th class="px-3 py-3 text-left">Fecha</th>
-            <th class="px-3 py-3 text-left">Hora</th>
-            <th class="px-3 py-3 text-left">Empresa</th>
-            <th class="px-3 py-3 text-left">Placa</th>
-            <th class="px-3 py-3 text-left">Chofer</th>
-            <th class="px-3 py-3 text-left">Lugar</th>
-            <th class="px-3 py-3 text-left">Incorrección</th>
-            <th class="px-3 py-3 text-left">Responsable</th>
-            <th class="px-3 py-3 text-left">Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tabla-registros" class="bg-white divide-y divide-gray-100 text-sm"></tbody>
-      </table>
-    </div>
+    <section class="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+      <div class="overflow-x-auto">
+        <div class="max-h-[70vh] overflow-y-auto">
+          <table class="min-w-full text-gray-700 text-sm sm:text-base whitespace-nowrap">
+            <thead class="sticky top-0 z-10 bg-white shadow">
+              <tr class="bg-gray-100">
+                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[120px]">Fecha</th>
+                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[120px]">Hora</th>
+                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[100px] hidden sm:table-cell">Empresa</th>
+                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[100px]">Placa</th>
+                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[180px]">Chofer</th>
+                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[130px] hidden sm:table-cell">Lugar</th>
+                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[130px] hidden sm:table-cell">Incorrecci�n</th>
+                <th class="px-4 py-3 text-left font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[130px] hidden sm:table-cell">Responsable</th>
+                <th class="px-4 py-3 text-center font-semibold text-gray-700 uppercase text-sm border-b border-gray-300 min-w-[80px]">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-registros" class="divide-y divide-gray-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   </div>
 </main>
 
@@ -52,7 +55,7 @@
 <div id="detalleModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center px-4 z-50">
   <div class="detalle-modal-content bg-white rounded-2xl shadow-2xl p-6 max-w-2xl w-full space-y-4 border border-gray-100">
     <div class="flex items-center justify-between pb-2 border-b border-gray-200">
-      <h3 class="text-lg font-semibold text-gray-800">Detalle de la incorrección</h3>
+      <h3 class="text-lg font-semibold text-gray-800">Detalle de la incorrecci�n</h3>
       <button onclick="cerrarDetalle()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
     </div>
 
@@ -88,7 +91,7 @@
 <script type="module" src="/js/mamparas/registros.js"></script>
 <script type="module" src="/js/mamparas/verRegistros.js"></script>
 <script>
-// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
+// ?Ys? NO BORRAR ??" Bloque restaurado/corregido del m�dulo Mamparas
 console.log("QA Mamparas: archivo corregido");
 </script>
-<!-- 🚫 NO BORRAR — Fin archivo restaurado/corregido módulo Mamparas -->
+<!-- ?Ys? NO BORRAR ??" Fin archivo restaurado/corregido m�dulo Mamparas -->

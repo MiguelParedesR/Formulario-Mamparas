@@ -21,5 +21,9 @@
   "description": "",
   "devDependencies": {
     "tailwindcss": "^3.4.14"
+  },
+  "dependencies": {
+    "docxtemplater": "^3.67.5",
+    "pizzip": "^3.2.0"
   }
 }

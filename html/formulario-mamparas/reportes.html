@@ -20,12 +20,12 @@
         <label class="block text-sm font-semibold text-gray-700" for="mes">
           Seleccionar mes
         </label>
-        <div class="relative">
-          <span class="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">
+        <div class="input-icon-wrapper">
+          <span class="input-icon">
             <i class="far fa-calendar-alt"></i>
           </span>
           <input
-            class="w-full rounded-xl border border-gray-200 bg-white pl-10 pr-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            class="w-full rounded-xl border border-gray-200 bg-white pr-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
             type="month"
             id="mes"
           />
@@ -37,17 +37,17 @@
         <label class="block text-sm font-semibold text-gray-700" for="operador">
           Seleccionar operador
         </label>
-        <div class="relative">
-          <span class="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">
+        <div class="input-icon-wrapper">
+          <span class="input-icon">
             <i class="fas fa-user-check"></i>
           </span>
           <select
-            class="w-full rounded-xl border border-gray-200 bg-white pl-10 pr-10 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 appearance-none"
+            class="w-full rounded-xl border border-gray-200 bg-white py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 appearance-none has-right-icon"
             id="operador"
           >
             <option value="Todos">Todos (sin filtro)</option>
           </select>
-          <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+          <span class="input-icon-right">
             <i class="fas fa-chevron-down text-xs"></i>
           </span>
         </div>

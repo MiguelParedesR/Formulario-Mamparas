@@ -6,19 +6,20 @@ function renderFila(reg) {
     typeof reg.detalle === "string" ? JSON.parse(reg.detalle || "{}") : reg.detalle || {};
 
   return `
-    <tr class="hover:bg-gray-100 transition">
-        <td>${reg.fecha || ""}</td>
-        <td>${reg.hora || ""}</td>
-        <td>${reg.empresa || ""}</td>
-        <td>${reg.placa || ""}</td>
-        <td>${reg.chofer || ""}</td>
-        <td>${reg.lugar || ""}</td>
-        <td>${reg.incorreccion || ""}</td>
-        <td>${reg.responsable || ""}</td>
+    <tr class="odd:bg-gray-50 even:bg-white text-gray-700 text-sm sm:text-base leading-relaxed transition">
+        <td class="px-4 py-2 min-w-[120px]">${reg.fecha || ""}</td>
+        <td class="px-4 py-2 min-w-[120px]">${reg.hora || ""}</td>
+        <td class="px-4 py-2 min-w-[100px] hidden sm:table-cell">${reg.empresa || ""}</td>
+        <td class="px-4 py-2 min-w-[100px] font-semibold text-gray-900">${reg.placa || ""}</td>
+        <td class="px-4 py-2 min-w-[180px]">${reg.chofer || ""}</td>
+        <td class="px-4 py-2 min-w-[130px] hidden sm:table-cell">${reg.lugar || ""}</td>
+        <td class="px-4 py-2 min-w-[130px] hidden sm:table-cell">${reg.incorreccion || ""}</td>
+        <td class="px-4 py-2 min-w-[130px] hidden sm:table-cell">${reg.responsable || ""}</td>
 
-        <td>
+        <td class="px-4 py-2 min-w-[80px] text-center">
             <button
-              class="px-3 py-1 bg-indigo-600 text-white rounded text-xs"
+              class="min-h-[36px] px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              aria-label="Ver registro"
               onclick='mostrarDetalle(${JSON.stringify(detalleObj)})'>
               Ver
             </button>
