@@ -243,3 +243,49 @@ html {
 .lightbox-close:hover {
     background: rgba(248, 113, 113, 0.9);
 }
+/* ======================================
+   FIX DEFINITIVO PARA FORMULARIO TPP
+   (Eliminar espacio blanco lateral)
+   ====================================== */
+
+/* Forzar que el contenedor SPA use TODO el ancho */
+#dashboardContent,
+#dashboardContent > div,
+main > div,
+main > div > section,
+main > div > section > form {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Forzar grid a ocupar 100% del espacio disponible */
+form #form-incidencia > div,
+form .grid {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Arreglar límite de Tailwind container */
+.container {
+    max-width: 100% !important;
+}
+/* =============================================================
+   FIX DEFINITIVO DE ANCHO — ELIMINA TODO BLOQUEO DE MAX-WIDTH
+   ============================================================= */
+
+html, body, main, #dashboardContent, main > div {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Forzar que nada use el límite container de Tailwind */
+.container, .\!container {
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Forzar que el formulario y sus grids usen TODO el ancho */
+form, form > div, #form-incidencia, #form-incidencia > div {
+    max-width: 100% !important;
+    width: 100% !important;
+}

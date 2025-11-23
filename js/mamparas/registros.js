@@ -3,8 +3,8 @@ import { supabase } from "./script.js";
 
 const TABLA_ID = "tabla-registros";
 const BTN_SELECTOR = ".btn-ver-detalle";
-
 const TEXTO_SIN_DETALLE = "Sin detalle registrado.";
+
 const MODAL_HTML = `
   <div id="modalVerDetalle" class="fixed inset-0 bg-black/50 hidden items-center justify-center px-4 z-50">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 space-y-4 border border-gray-100">
@@ -143,10 +143,10 @@ function manejarClickDetalle(evento) {
     const registro = JSON.parse(decodeURIComponent(data));
     console.log("QA Mamparas: click detectado en botón Ver", registro?.placa || registro);
     const modalPayload = prepararRegistroParaModal(registro);
+    ensureModalEstructura();
     if (typeof window.mostrarDetalleMamparaTabla === "function") {
       window.mostrarDetalleMamparaTabla(modalPayload);
     } else if (typeof window.mostrarDetalle === "function") {
-      // Compatibilidad con versiones anteriores
       window.mostrarDetalle(modalPayload);
     } else {
       console.warn("mostrarDetalleMamparaTabla no está disponible.");
@@ -168,7 +168,6 @@ function initListado() {
   if (!tabla) return;
 
   if (initListado.iniciado) {
-    // En SPA, si el DOM se reinstancia, reiniciamos el contenido y volvemos a cargar.
     tabla.innerHTML = "";
   }
 
@@ -190,18 +189,16 @@ function prepararRegistroParaModal(registro) {
         imagenes = Object.values(detalleObj.imagenes || {}).filter(Boolean);
       }
     } catch {
-      // Se mantiene textoDetalle original si no es JSON
+      // Mantener el texto original
     }
   }
 
-  const payload = {
+  return {
     ...registro,
     detalle: textoDetalle || TEXTO_SIN_DETALLE,
     foto1: imagenes[0] || registro.foto1 || null,
     foto2: imagenes[1] || registro.foto2 || null,
   };
-
-  return payload;
 }
 
 function generarTextoDetalle(detalleObj) {
@@ -226,6 +223,14 @@ function generarTextoDetalle(detalleObj) {
   return typeof detalleObj === "string" ? detalleObj : TEXTO_SIN_DETALLE;
 }
 
+function ensureModalEstructura() {
+  if (document.getElementById("modalVerDetalle")) return;
+  document.body.insertAdjacentHTML("beforeend", MODAL_HTML);
+  document.querySelectorAll("[data-close-modal='modalVerDetalle']").forEach((btn) => {
+    btn.addEventListener("click", () => cerrarModal("modalVerDetalle"));
+  });
+}
+
 function asegurarCierreModalGenerico() {
   if (typeof window.cerrarModal === "function") return;
   window.cerrarModal = function (id) {
@@ -238,6 +243,7 @@ function asegurarCierreModalGenerico() {
 
 if (!window.mostrarDetalleMamparaTabla) {
   window.mostrarDetalleMamparaTabla = function (registro) {
+    ensureModalEstructura();
     const modal = document.getElementById("modalVerDetalle");
     const textoDetalle = document.getElementById("detalleModalTexto");
     const fecha = document.getElementById("detalleModalFecha");
