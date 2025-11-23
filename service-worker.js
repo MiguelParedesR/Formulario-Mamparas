@@ -1,22 +1,10 @@
-// ============================================================================
-// SERVICE-WORKER — MODO SEGURO TPP (Sin fallos, producción estable)
-// ============================================================================
-//
-// ✔ No usa cache.addAll()
-// ✔ No falla si un archivo no existe
-// ✔ Cachea solo lo que se confirma que existe
-// ✔ Evita interferir con el SPA / router
-// ✔ No hace precache de HTML (para evitar vistas obsoletas)
-// ✔ Compatible con Supabase
-// ✔ Network-first para vistas dinámicas
-//
-// ============================================================================
+﻿
+const CACHE_NAME = "tpp-cache-v3";
 
-const CACHE_NAME = "tpp-cache-v2";
-
-// Archivos que intentará cachear si existen:
+// Archivos que intentaremos cachear si existen:
 const STATIC_ASSETS = [
   "/css/global.css",
+  "/css/tailwind.css",
   "/css/dashboard/dashboard.css",
   "/css/estilos-sidebar/sidebar.css",
   "/js/sidebar/sidebar-loader.js",
@@ -26,8 +14,10 @@ const STATIC_ASSETS = [
   "/favicon.ico",
 ];
 
+const STATIC_FILE_REGEX = /\.(css|js|png|jpg|jpeg|svg|webp|ico)$/i;
+
 // ============================================================================
-// INSTALL — Cachea solo los archivos que EXISTEN (modo seguro)
+// INSTALL - Cachea solo los archivos que EXISTEN (modo seguro)
 // ============================================================================
 self.addEventListener("install", (event) => {
   console.log("[SW] Instalando...");
@@ -56,7 +46,7 @@ self.addEventListener("install", (event) => {
 });
 
 // ============================================================================
-// ACTIVATE — Limpieza de caches antiguos
+// ACTIVATE - Limpieza de caches antiguos
 // ============================================================================
 self.addEventListener("activate", (event) => {
   console.log("[SW] Activado");
@@ -78,49 +68,48 @@ self.addEventListener("activate", (event) => {
 });
 
 // ============================================================================
-// FETCH — Estrategia combinada
+// FETCH - Estrategia combinada
 // ============================================================================
-// ✔ Network-first para HTML (SPA nunca se rompe)
-// ✔ Cache-first para CSS/JS/IMG
-// ✔ Ignoramos Supabase
+// - Network-first para HTML (SPA nunca se rompe)
+// - Cache-first para CSS/JS/IMG
+// - Ignoramos Supabase
 // ============================================================================
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
 
-  // No intervenir Supabase
-  if (req.url.includes("supabase.co")) return;
-
-  // Vista SPA: siempre desde red
-  if (req.headers.get("accept")?.includes("text/html")) {
-    event.respondWith(
-      fetch(req).catch(() => caches.match(req))
-    );
+  if (req.method !== "GET" || req.url.includes("supabase.co")) {
     return;
   }
 
-  // Cache-first para archivos estáticos
+  // Vista SPA: siempre desde red
+  if (req.headers.get("accept")?.includes("text/html")) {
+    event.respondWith(fetch(req).catch(() => caches.match(req)));
+    return;
+  }
+
   event.respondWith(
-    caches.match(req).then((cached) => {
-      return (
-        cached ||
-        fetch(req)
-          .then((networkRes) => {
-            // Cachear solo estáticos
-            if (req.url.match(/\.(css|js|png|jpg|jpeg|svg|webp|ico)$/)) {
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(req, networkRes.clone());
-              });
-            }
-            return networkRes;
-          })
-          .catch(() => cached)
-      );
-    })
+    (async () => {
+      const cached = await caches.match(req);
+      if (cached) return cached;
+
+      try {
+        const networkRes = await fetch(req);
+
+        if (networkRes.ok && STATIC_FILE_REGEX.test(new URL(req.url).pathname)) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(req, networkRes.clone());
+        }
+
+        return networkRes;
+      } catch (err) {
+        return cached;
+      }
+    })()
   );
 });
 
 // ============================================================================
 // LOG
 // ============================================================================
-console.log("✅ SW Modo Seguro TPP Activo");
+console.log("[SW] Modo Seguro TPP activo");

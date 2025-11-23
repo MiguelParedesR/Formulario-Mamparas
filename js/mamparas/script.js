@@ -184,7 +184,7 @@ function initListenersDetalle() {
   const btnDetalle = document.getElementById("btnAgregarDetalle");
   const detalleModal = document.getElementById("detalleModal");
 
-  if (!incorreccion || !btnDetalle) return;
+  if (!incorreccion || !btnDetalle || !detalleModal) return;
 
   incorreccion.addEventListener("change", () => {
     const tipo = incorreccion.value;
@@ -248,26 +248,41 @@ async function guardarDetalleJSON() {
 export function initMamparasForm() {
 
   const form = document.getElementById("form-inspeccion");
+  if (!form) {
+    console.warn("initMamparasForm: formulario no encontrado, se omite inicializaci\u00f3n.");
+    return;
+  }
+
   const fecha = document.getElementById("fecha");
   const hora = document.getElementById("hora");
   const empresa = document.getElementById("empresa");
   const nuevaEmpresa = document.getElementById("nueva_empresa");
   const cerrarModal = document.getElementById("cerrarDetalleModal");
+  const btnGuardarDetalle = document.getElementById("btnGuardarDetalle");
+  const detalleModal = document.getElementById("detalleModal");
 
   if (fecha) fecha.value = new Date().toISOString().split("T")[0];
   if (hora) hora.value = new Date().toTimeString().slice(0, 5);
 
   initListenersDetalle();
 
-  document.getElementById("btnGuardarDetalle").onclick = guardarDetalleJSON;
+  if (btnGuardarDetalle) {
+    btnGuardarDetalle.onclick = guardarDetalleJSON;
+  } else {
+    console.warn("initMamparasForm: no se encontr\u00f3 el bot\u00f3n para guardar el detalle.");
+  }
 
-  empresa.addEventListener("change", () => {
-    nuevaEmpresa.style.display = empresa.value === "otra" ? "block" : "none";
-  });
+  if (empresa && nuevaEmpresa) {
+    empresa.addEventListener("change", () => {
+      nuevaEmpresa.style.display = empresa.value === "otra" ? "block" : "none";
+    });
+  }
 
-  cerrarModal.addEventListener("click", () => {
-    document.getElementById("detalleModal").style.display = "none";
-  });
+  if (cerrarModal && detalleModal) {
+    cerrarModal.addEventListener("click", () => {
+      detalleModal.style.display = "none";
+    });
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();

@@ -10,46 +10,8 @@
   <link rel="manifest" href="./manifest.json" />
   <meta name="theme-color" content="#2f3b52" />
 
-  <!-- Tailwind Config -->
-  <script>
-    window.tailwind = window.tailwind || {};
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            tpp: {
-              dark: "#2f3b52",
-              mid: "#3e4b67",
-              light: "#f4f6f8",
-              orange: "#ffa500",
-            },
-          },
-          animation: {
-            fade: "fadeIn 0.4s ease-out",
-            slide: "slideUp 0.5s ease-out",
-            grow: "growIn 0.35s ease-out",
-          },
-          keyframes: {
-            fadeIn: {
-              "0%": { opacity: 0 },
-              "100%": { opacity: 1 },
-            },
-            slideUp: {
-              "0%": { opacity: 0, transform: "translateY(10px)" },
-              "100%": { opacity: 1, transform: "translateY(0)" },
-            },
-            growIn: {
-              "0%": { transform: "scale(0.96)", opacity: 0 },
-              "100%": { transform: "scale(1)", opacity: 1 },
-            },
-          },
-        },
-      },
-    };
-  </script>
-
   <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/tailwind.css" />
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
