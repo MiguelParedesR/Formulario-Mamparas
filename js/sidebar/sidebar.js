@@ -15,6 +15,11 @@ import { BASE_PATH } from "../config.js";
 
 const MAIN_SELECTOR = "#dashboardContent";
 const DESKTOP_BREAK = 1024;
+const PRELOADED_STYLES = new Set(
+  Array.from(document.querySelectorAll("link[rel='stylesheet']")).map((l) =>
+    new URL(l.href, window.location.href).href
+  )
+);
 
 /**
  * Inicializa el sidebar SPA
@@ -24,6 +29,7 @@ export async function initSidebar(
   options = {}
 ) {
   const basePath = options.basePath ?? BASE_PATH ?? "";
+  const loadedStyles = new Set(PRELOADED_STYLES);
 
   const withBasePath = (path = "") => {
     if (!path) return basePath || "";
@@ -87,6 +93,27 @@ export async function initSidebar(
   }
 
   normalizeMenuLinks(sidebar);
+
+  function ensureViewStyles(doc, baseHref) {
+    const links = doc?.querySelectorAll?.("link[rel='stylesheet']") || [];
+
+    links.forEach((link) => {
+      const href = link.getAttribute("href");
+      if (!href) return;
+
+      const fullHref = new URL(
+        href,
+        baseHref || window.location.href
+      ).href;
+      if (loadedStyles.has(fullHref)) return;
+
+      const style = document.createElement("link");
+      style.rel = "stylesheet";
+      style.href = fullHref;
+      document.head.appendChild(style);
+      loadedStyles.add(fullHref);
+    });
+  }
 
   let isNavigating = false;
 
@@ -308,7 +335,7 @@ export async function initSidebar(
   }
 
   // Ejecutar scripts de vistas SPA
-  async function executeScripts(scripts) {
+  async function executeScripts(scripts, baseHref) {
     for (const script of scripts) {
       const src = script.getAttribute("src");
       const type = script.getAttribute("type");
@@ -317,8 +344,12 @@ export async function initSidebar(
       if (type) s.type = type;
 
       if (src) {
-        const cacheBust = src.includes("?") ? "&" : "?";
-        s.src = `${src}${cacheBust}_=${Date.now()}`;
+        const normalizedSrc = new URL(
+          src,
+          baseHref || window.location.href
+        ).href;
+        const cacheBust = normalizedSrc.includes("?") ? "&" : "?";
+        s.src = `${normalizedSrc}${cacheBust}_=${Date.now()}`;
 
         await new Promise((resolve, reject) => {
           s.onload = resolve;
@@ -379,6 +410,8 @@ export async function initSidebar(
       const main = dom.querySelector("main");
       if (!main) throw new Error("No se encontro <main> en la vista cargada.");
 
+      ensureViewStyles(dom, target.fetchUrl);
+
       // Scripts de vista
       const scripts = [...dom.querySelectorAll("script")];
       scripts.forEach((s) => s.remove());
@@ -394,7 +427,7 @@ export async function initSidebar(
         );
       }
 
-      await executeScripts(scripts);
+      await executeScripts(scripts, target.fetchUrl);
 
       const title = dom.querySelector("title")?.textContent;
       if (title) document.title = title;
