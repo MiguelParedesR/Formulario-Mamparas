@@ -47,18 +47,39 @@ async function ensureCss(href) {
     if (window.BASE_PATH && filePath.startsWith(window.BASE_PATH)) {
       filePath = filePath.replace(window.BASE_PATH, "");
     }
-    return `https://raw.githubusercontent.com/${user}/${repo}/main${filePath}`;
+    return `https://raw.githubusercontent.com/${user}/${repo}/master${filePath}`;
+  };
+
+  const resolveCdnFallback = () => {
+    if (href.includes("tailwind.css")) {
+      return "https://cdn.jsdelivr.net/npm/tailwindcss@3.4.15/dist/tailwind.min.css";
+    }
+    return null;
   };
 
   let finalHref = href;
 
   try {
-    const res = await fetch(normalizedHref, { method: "GET", cache: "no-store" });
+    const res = await fetch(normalizedHref, { method: "HEAD", cache: "no-store" });
     if (!res.ok) {
-      finalHref = resolveRawFallback();
+      finalHref = resolveRawFallback() || resolveCdnFallback() || href;
     }
   } catch {
-    finalHref = resolveRawFallback();
+    finalHref = resolveRawFallback() || resolveCdnFallback() || href;
+  }
+
+  // Si el fallback crudo también falla, último intento con CDN (solo tailwind)
+  if (finalHref && finalHref !== href) {
+    try {
+      const check = await fetch(finalHref, { method: "HEAD", cache: "no-store" });
+      if (!check.ok) {
+        const cdn = resolveCdnFallback();
+        if (cdn) finalHref = cdn;
+      }
+    } catch {
+      const cdn = resolveCdnFallback();
+      if (cdn) finalHref = cdn;
+    }
   }
 
   const link = document.createElement("link");
