@@ -156,8 +156,7 @@ async function renderWord(context) {
   });
 
   triggerDownload(output, `Informe_${Date.now()}.docx`);
-
-/* ----------------------------------------------------------
+/* --------------------------------------------------------
    8) Descargar archivo final
 ---------------------------------------------------------- */
 function triggerDownload(blob, filename) {
