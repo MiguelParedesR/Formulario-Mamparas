@@ -2,7 +2,7 @@
 // supabase.js - Cliente central del nuevo sistema de Incidencias
 // ============================================================
 
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4?bundle&target=es2020";
 
 // ----------------------------------------------
 // CREDENCIALES DE TU PROYECTO TPP (seguras)

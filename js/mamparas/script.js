@@ -1,5 +1,5 @@
 // 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4?bundle&target=es2020";
 
 const STORAGE_BUCKET = "mamparas";
 const VALIDACION_PLACA_DELAY = 450;
