@@ -20,7 +20,7 @@ const withBase = (path = "") => {
   return `${BASE_PATH}${normalized}`;
 };
 
-const CACHE_NAME = `tpp-v58${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
+const CACHE_NAME = `tpp-v59${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
 // Archivos que intentaremos cachear si existen:
 const STATIC_ASSETS = [

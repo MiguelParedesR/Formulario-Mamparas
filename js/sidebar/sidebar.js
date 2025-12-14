@@ -126,9 +126,8 @@ export async function initSidebar(
     if (isDesktop()) {
       document.body.classList.remove("sidebar-hidden");
       sidebar.classList.add("show");
-      const sideWidth = sidebar.getBoundingClientRect().width || 260;
-      mainContainer.style.marginLeft = `${sideWidth}px`;
-      mainContainer.style.width = `calc(100% - ${sideWidth}px)`;
+      mainContainer.style.removeProperty("margin-left");
+      mainContainer.style.removeProperty("width");
     } else {
       mainContainer.style.marginLeft = "0px";
       mainContainer.style.width = "100%";
