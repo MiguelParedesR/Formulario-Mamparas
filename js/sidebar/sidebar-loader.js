@@ -10,9 +10,11 @@
 // ✔ No rompe otras vistas ni el flujo del proyecto
 // ============================================================================
 
-const SIDEBAR_HTML = "/html/base/sidebar.html";
-const SIDEBAR_JS = "/js/sidebar/sidebar.js";
-const SIDEBAR_CSS = "/css/estilos-sidebar/sidebar.css";
+import { BASE_PATH, withBase } from "../config.js";
+
+const SIDEBAR_HTML = withBase("/html/base/sidebar.html");
+const SIDEBAR_JS = withBase("/js/sidebar/sidebar.js");
+const SIDEBAR_CSS = withBase("/css/estilos-sidebar/sidebar.css");
 
 const FONT_AWESOME =
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css";
@@ -23,7 +25,12 @@ let sidebarBootstrapPromise = null;
 //  Inyección de CSS sin duplicar
 // ============================================================================
 function ensureCss(href) {
-  if (document.querySelector(`link[href='${href}']`)) return;
+  const normalizedHref = new URL(href, window.location.href).href;
+  const alreadyLoaded = Array.from(
+    document.querySelectorAll("link[rel='stylesheet']")
+  ).some((link) => link.href === normalizedHref || link.getAttribute("href") === href);
+
+  if (alreadyLoaded) return;
 
   const link = document.createElement("link");
   link.rel = "stylesheet";
@@ -76,6 +83,7 @@ async function initSidebarJS() {
     await initSidebar("#sidebar-container", {
       htmlPath: SIDEBAR_HTML,
       enableRouting: true,
+      basePath: BASE_PATH,
     });
   } catch (err) {
     console.error("❌ Error cargando sidebar.js", err);

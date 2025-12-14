@@ -7,6 +7,7 @@
 import { supabase } from "../utils/supabase.js";
 import { uploadFiles } from "../utils/storage.js";
 import { generateWordFinal } from "./generador-docx.js";
+import { withBase } from "../config.js";
 
 /* ---------------------------------------------------------------------------
    CONSTANTES DE PLANTILLA / TIPOS DE INCIDENCIA
@@ -611,7 +612,7 @@ document.getElementById("btnGuardarCompleto")
 document.getElementById("btnVolverDashboard")
   ?.addEventListener("click", () => {
     window.dispatchEvent(
-      new CustomEvent("sidebar:navigate", { detail: "./index.html" })
+      new CustomEvent("sidebar:navigate", { detail: withBase("/index.html") })
     );
   });
 
@@ -865,4 +866,3 @@ window.resetFormularioParcial = resetFormularioParcial;
 /* ============================================================================
    🎉 FIN DEL ARCHIVO — FORMULARIO COMPLETO, LIMPIO Y FUNCIONAL
 ============================================================================ */
-

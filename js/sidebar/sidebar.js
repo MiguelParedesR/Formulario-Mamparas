@@ -11,6 +11,8 @@
 // ✔ Seguro, limpio y compatible con producción
 // ============================================================================
 
+import { BASE_PATH } from "../config.js";
+
 const MAIN_SELECTOR = "#dashboardContent";
 const DESKTOP_BREAK = 1024;
 
@@ -21,7 +23,22 @@ export async function initSidebar(
   containerSelector = "#sidebar-container",
   options = {}
 ) {
-  const htmlPath = options.htmlPath ?? "/html/base/sidebar.html";
+  const basePath = options.basePath ?? BASE_PATH ?? "";
+
+  const withBasePath = (path = "") => {
+    if (!path) return basePath || "";
+    if (/^(https?:)?\/\//i.test(path) || path.startsWith("data:") || path.startsWith("mailto:")) return path;
+
+    const normalized = path.startsWith("/") ? path : `/${path}`;
+    if (basePath && (normalized === basePath || normalized.startsWith(`${basePath}/`))) {
+      return normalized;
+    }
+
+    const prefix = basePath || "";
+    return `${prefix}${normalized}`;
+  };
+
+  const htmlPath = withBasePath(options.htmlPath ?? "/html/base/sidebar.html");
   const enableRouting = options.enableRouting !== false;
 
   const container = document.querySelector(containerSelector);
@@ -58,6 +75,18 @@ export async function initSidebar(
     console.error("⚠️ initSidebar: Faltan elementos del sidebar.");
     return;
   }
+
+  function normalizeMenuLinks(root) {
+    if (!root) return;
+
+    root.querySelectorAll("a[href]").forEach((link) => {
+      const href = link.getAttribute("href");
+      if (!href || href.startsWith("#") || /^(https?:)?\/\//i.test(href)) return;
+      link.setAttribute("href", withBasePath(href));
+    });
+  }
+
+  normalizeMenuLinks(sidebar);
 
   let isNavigating = false;
 
@@ -201,19 +230,34 @@ export async function initSidebar(
   }
 
   // Marcar enlace activo
+  const normalizeForMatch = (value) => {
+    if (!value) return null;
+    try {
+      const parsed = new URL(withBasePath(value), window.location.origin);
+      return parsed.pathname + parsed.search;
+    } catch {
+      return value;
+    }
+  };
+
   function highlightActive(href) {
     sidebar
       .querySelectorAll(".menu-link, .submenu-link")
       .forEach((a) => a.classList.remove("active-link"));
 
-    if (!href) return;
+    const targetHref = normalizeForMatch(href);
+    if (!targetHref) return;
 
-    let target = sidebar.querySelector(`a[href="${href}"]`);
-
-    if (!target) {
-      const base = href.split("?")[0];
-      target = sidebar.querySelector(`a[href="${base}"]`);
-    }
+    const target = Array.from(
+      sidebar.querySelectorAll(".menu-link, .submenu-link")
+    ).find((link) => {
+      const linkHref = normalizeForMatch(link.getAttribute("href"));
+      if (!linkHref) return false;
+      return (
+        linkHref === targetHref ||
+        linkHref.split("?")[0] === targetHref.split("?")[0]
+      );
+    });
 
     if (!target) return;
 
@@ -229,11 +273,11 @@ export async function initSidebar(
     }
   }
 
-  // Expande submenú según ruta
+  // Expande submenus segun ruta
   function expandSubmenuByHref(href) {
     if (!href) return;
 
-    const url = new URL(href, window.location.origin);
+    const url = new URL(withBasePath(href), window.location.origin);
     const tipo = url.searchParams.get("tipo");
 
     const mapTipo = {
@@ -293,14 +337,14 @@ export async function initSidebar(
 
   // Normaliza ruta
   function normalizeHref(href) {
-    const parsed = new URL(
-      href,
-      window.location.origin + window.location.pathname
-    );
+    const hrefWithBase = withBasePath(href);
+    const parsed = new URL(hrefWithBase, window.location.origin);
 
-    const relativePath = parsed.pathname + parsed.search;
     const stateUrl = new URL(window.location.href);
-    stateUrl.searchParams.set("view", parsed.pathname);
+    const viewValue =
+      parsed.pathname.replace(basePath || "", "") || "/";
+
+    stateUrl.searchParams.set("view", viewValue);
 
     parsed.searchParams.forEach((v, k) => stateUrl.searchParams.set(k, v));
 
@@ -308,7 +352,7 @@ export async function initSidebar(
       href: parsed.href,
       fetchUrl: parsed.href,
       stateUrl,
-      menuHref: relativePath,
+      menuHref: parsed.pathname + parsed.search,
       sameOrigin: parsed.origin === window.location.origin,
     };
   }
@@ -413,8 +457,9 @@ export async function initSidebar(
   if (initialHref) {
     loadPartial(initialHref, { push: false });
   } else {
-    highlightActive("/index.html");
-    expandSubmenuByHref("/index.html");
+    const homeHref = withBasePath("/index.html");
+    highlightActive(homeHref);
+    expandSubmenuByHref(homeHref);
   }
 
   if (isDesktop()) {

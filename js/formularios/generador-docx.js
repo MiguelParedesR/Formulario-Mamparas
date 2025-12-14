@@ -11,12 +11,13 @@ import PizZip from "https://cdn.jsdelivr.net/npm/pizzip@3.1.4/+esm";
 import Docxtemplater from "https://esm.sh/docxtemplater@3.67.5";
 import ImageModule from "https://esm.sh/docxtemplater-image-module@3.1.0";
 import { getFileBase64 } from "../utils/storage.js";
+import { withBase } from "../config.js";
 
 /* ----------------------------------------------------------
    1) Cargar plantilla Word como ArrayBuffer
 ---------------------------------------------------------- */
 async function loadTemplate() {
-  const url = "/assets/templates/informe-base.docx";
+  const url = withBase("/assets/templates/informe-base.docx");
 
   const res = await fetch(url);
   if (!res.ok) {
@@ -234,5 +235,4 @@ async function generarDocxIncidencia(incidencia = {}) {
 export { generateWordFinal, generarDocxIncidencia };
 
 console.log("QA DOCX: generador-docx.js cargado correctamente");
-
 

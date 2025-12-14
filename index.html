@@ -11,18 +11,18 @@
   <meta name="theme-color" content="#2f3b52" />
 
   <!-- Tailwind -->
-  <link rel="stylesheet" href="/css/tailwind.css" />
+  <link rel="stylesheet" href="./css/tailwind.css" />
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- Sidebar + Global -->
-  <link rel="stylesheet" href="/css/estilos-sidebar/sidebar.css" />
-  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="./css/estilos-sidebar/sidebar.css" />
+  <link rel="stylesheet" href="./css/global.css" />
 
   <!-- Dashboard CSS -->
-  <link rel="stylesheet" href="/css/dashboard/dashboard.css" />
+  <link rel="stylesheet" href="./css/dashboard/dashboard.css" />
 
   <style>
     body {
@@ -137,31 +137,35 @@
   </main>
 
   <!-- Navegación SPA -->
-  <script>
-    function navigateToFormulario(tipo) {
+  <script type="module">
+    import { BASE_PATH, withBase } from "./js/config.js";
+
+    window.navigateToFormulario = (tipo) => {
+      if (!tipo) return;
       window.dispatchEvent(
         new CustomEvent("sidebar:navigate", {
-          detail: `./html/formulario.html?tipo=${tipo}`
+          detail: withBase(`/html/formulario.html?tipo=${tipo}`),
         })
       );
-    }
+    };
 
-    function navigateToMamparas() {
+    window.navigateToMamparas = () => {
       window.dispatchEvent(
         new CustomEvent("sidebar:navigate", {
-          detail: "./html/formulario-mamparas/registro.html"
+          detail: withBase("/html/formulario-mamparas/registro.html"),
         })
       );
+    };
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register(withBase("/service-worker.js"), {
+        scope: withBase("/") || "/",
+      });
     }
 
-    // Registrar SW
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js');
-    }
+    import(withBase("/js/sidebar/sidebar-loader.js"));
+    console.log("BASE_PATH activo:", BASE_PATH || "(raiz)");
   </script>
-
-  <!-- Loader del Sidebar -->
-  <script type="module" src="/js/sidebar/sidebar-loader.js"></script>
 
 </body>
 
