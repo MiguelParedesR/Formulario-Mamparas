@@ -15,6 +15,11 @@ import { BASE_PATH, withBase } from "../config.js";
 const SIDEBAR_HTML = withBase("/html/base/sidebar.html");
 const SIDEBAR_JS = withBase("/js/sidebar/sidebar.js");
 const SIDEBAR_CSS = withBase("/css/estilos-sidebar/sidebar.css");
+const CORE_STYLES = [
+  withBase("/css/tailwind.css"),
+  withBase("/css/global.css"),
+  withBase("/css/dashboard/dashboard.css"),
+];
 
 const FONT_AWESOME =
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css";
@@ -99,6 +104,7 @@ async function initSidebarJS() {
 
   if (!sidebarBootstrapPromise) {
     sidebarBootstrapPromise = (async () => {
+      CORE_STYLES.forEach(ensureCss);
       ensureCss(FONT_AWESOME);
       ensureCss(SIDEBAR_CSS);
 
