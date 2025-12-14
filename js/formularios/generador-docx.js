@@ -144,7 +144,7 @@ async function renderWord(context) {
     doc.render();
   } catch (err) {
     if (err?.properties?.errors) { console.error("Template errors:", err.properties.errors); }
-    console.error("ƒ?O Error renderizando DOCX:", err);
+    console.error("ï¿½?O Error renderizando DOCX:", err);
     throw err;
   }
   }
@@ -156,7 +156,6 @@ async function renderWord(context) {
   });
 
   triggerDownload(output, `Informe_${Date.now()}.docx`);
-}
 
 /* ----------------------------------------------------------
    8) Descargar archivo final
