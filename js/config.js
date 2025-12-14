@@ -14,7 +14,10 @@ const detectBasePath = () => {
   const override = window.BASE_PATH_OVERRIDE || window.__BASE_PATH_OVERRIDE__;
   if (override) return normalizeBase(override);
 
-  const segments = window.location.pathname.split("/").filter(Boolean);
+  const { protocol, pathname } = window.location;
+  if (protocol === "file:") return "";
+
+  const segments = pathname.split("/").filter(Boolean);
   if (!segments.length) return "";
 
   const last = segments[segments.length - 1];
