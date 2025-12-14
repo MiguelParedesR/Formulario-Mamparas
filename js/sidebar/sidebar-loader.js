@@ -29,7 +29,7 @@ let sidebarBootstrapPromise = null;
 // ============================================================================
 //  Inyección de CSS sin duplicar
 // ============================================================================
-function ensureCss(href) {
+async function ensureCss(href) {
   const normalizedHref = new URL(href, window.location.href).href;
   const alreadyLoaded = Array.from(
     document.querySelectorAll("link[rel='stylesheet']")
@@ -37,13 +37,7 @@ function ensureCss(href) {
 
   if (alreadyLoaded) return;
 
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.href = href;
-  link.crossOrigin = "anonymous";
-
-  link.addEventListener("error", () => {
-    // Fallback a raw.githubusercontent en caso de 404 en Pages
+  const resolveRawFallback = () => {
     const user = window.location.hostname.split(".")[0];
     const repo = (window.BASE_PATH || "").replace(/^\//, "") || "Formulario-Mamparas";
     let filePath = href;
@@ -53,12 +47,24 @@ function ensureCss(href) {
     if (window.BASE_PATH && filePath.startsWith(window.BASE_PATH)) {
       filePath = filePath.replace(window.BASE_PATH, "");
     }
-    const rawUrl = `https://raw.githubusercontent.com/${user}/${repo}/main${filePath}`;
+    return `https://raw.githubusercontent.com/${user}/${repo}/main${filePath}`;
+  };
 
-    if (link.dataset.rawFallback) return;
-    link.dataset.rawFallback = "1";
-    link.href = rawUrl;
-  });
+  let finalHref = href;
+
+  try {
+    const res = await fetch(normalizedHref, { method: "GET", cache: "no-store" });
+    if (!res.ok) {
+      finalHref = resolveRawFallback();
+    }
+  } catch {
+    finalHref = resolveRawFallback();
+  }
+
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = finalHref;
+  link.crossOrigin = "anonymous";
 
   document.head.appendChild(link);
 }
@@ -122,9 +128,11 @@ async function initSidebarJS() {
 
   if (!sidebarBootstrapPromise) {
     sidebarBootstrapPromise = (async () => {
-      CORE_STYLES.forEach(ensureCss);
-      ensureCss(FONT_AWESOME);
-      ensureCss(SIDEBAR_CSS);
+      await Promise.all([
+        ...CORE_STYLES.map((href) => ensureCss(href)),
+        ensureCss(FONT_AWESOME),
+        ensureCss(SIDEBAR_CSS),
+      ]);
 
       await injectSidebarHTML();
       await initSidebarJS();
