@@ -20,7 +20,7 @@ const withBase = (path = "") => {
   return `${BASE_PATH}${normalized}`;
 };
 
-const CACHE_NAME = `CCTV-V61${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
+const CACHE_NAME = `CCTV-V63${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
 // Archivos que intentaremos cachear si existen:
 const STATIC_ASSETS = [

@@ -126,8 +126,18 @@ export async function initSidebar(
     if (isDesktop()) {
       document.body.classList.remove("sidebar-hidden");
       sidebar.classList.add("show");
-      mainContainer.style.removeProperty("margin-left");
-      mainContainer.style.removeProperty("width");
+      const rootStyles = getComputedStyle(document.documentElement);
+      const defaultWidth =
+        rootStyles.getPropertyValue("--sidebar-width")?.trim() || "250px";
+      const collapsedWidth =
+        rootStyles.getPropertyValue("--sidebar-width-collapsed")?.trim() ||
+        "70px";
+
+      const isCollapsed = sidebar.classList.contains("collapsed");
+      const sideWidth = isCollapsed ? collapsedWidth : defaultWidth;
+
+      mainContainer.style.marginLeft = sideWidth;
+      mainContainer.style.width = `calc(100% - ${sideWidth})`;
     } else {
       mainContainer.style.marginLeft = "0px";
       mainContainer.style.width = "100%";
