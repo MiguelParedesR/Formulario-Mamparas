@@ -19,6 +19,7 @@ const CORE_STYLES = [
   withBase("/CSS/tailwind.css"),
   withBase("/CSS/global.css"),
   withBase("/CSS/dashboard/dashboard.css"),
+  withBase("/CSS/styles.css"),
 ];
 
 const FONT_AWESOME =

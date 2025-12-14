@@ -28,6 +28,7 @@ const STATIC_ASSETS = [
   "/CSS/tailwind.css",
   "/CSS/dashboard/dashboard.css",
   "/CSS/estilos-sidebar/sidebar.css",
+  "/CSS/styles.css",
   "/js/sidebar/sidebar-loader.js",
   "/js/sidebar/sidebar.js",
   "/js/libs/docxtemplater-image-module.js",
