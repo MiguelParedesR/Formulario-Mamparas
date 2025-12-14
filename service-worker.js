@@ -20,14 +20,14 @@ const withBase = (path = "") => {
   return `${BASE_PATH}${normalized}`;
 };
 
-const CACHE_NAME = `tpp-v51${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
+const CACHE_NAME = `tpp-v53${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
 // Archivos que intentaremos cachear si existen:
 const STATIC_ASSETS = [
-  "/css/global.css",
-  "/css/tailwind.css",
-  "/css/dashboard/dashboard.css",
-  "/css/estilos-sidebar/sidebar.css",
+  "/CSS/global.css",
+  "/CSS/tailwind.css",
+  "/CSS/dashboard/dashboard.css",
+  "/CSS/estilos-sidebar/sidebar.css",
   "/js/sidebar/sidebar-loader.js",
   "/js/sidebar/sidebar.js",
   "/js/libs/docxtemplater-image-module.js",
