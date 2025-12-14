@@ -136,15 +136,17 @@ async function renderWord(context) {
     paragraphLoop: true,
     linebreaks: true,
     modules: [imageModule],
+    nullGetter: () => "",
   });
-
   doc.setData(context);
 
   try {
     doc.render();
   } catch (err) {
-    console.error("‚ùå Error renderizando DOCX:", err);
+    if (err?.properties?.errors) { console.error("Template errors:", err.properties.errors); }
+    console.error("É?O Error renderizando DOCX:", err);
     throw err;
+  }
   }
 
   const output = doc.getZip().generate({
