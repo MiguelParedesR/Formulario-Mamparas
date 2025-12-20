@@ -1,281 +1,287 @@
 /* ==========================================================================
-   SIDEBAR TPP – VERSION FINAL PRODUCCIÓN
-   Integración completa con sidebar.html y sidebar.js v3
+   SIDEBAR TPP - DISEÑO BASE LIMPIO (RESPONSIVO, NO SOLAPA)
    ========================================================================== */
 
+:root {
+  --sidebar-width: 250px;
+  --sidebar-width-collapsed: 72px;
+  --sidebar-bg: #2f3b52;
+  --sidebar-bg-dark: #233047;
+  --sidebar-hover: rgba(255, 255, 255, 0.06);
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-text: #fff;
+  --sidebar-muted: #cbd5e1;
+  --sidebar-accent: #ffa500;
+  --sidebar-shadow: 2px 0 12px rgba(0, 0, 0, 0.12);
+}
+
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
 }
 
 body {
-    background: #f4f6f8;
-    transition: background 0.25s ease;
+  background: #f4f6f8;
+  transition: background 0.25s ease;
 }
 
-/* ==========================================================================
-   SIDEBAR
-   ========================================================================== */
-
+/* ========================================================================== */
+/* SIDEBAR                                                                    */
+/* ========================================================================== */
 .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 250px;
-    height: 100vh;
-    background: #2f3b52;
-    color: #fff;
-    overflow-y: auto;
-    z-index: 2000;
-    transform: translateX(0);
-    transition: transform 0.3s ease, width 0.25s ease;
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  overflow-y: auto;
+  z-index: 2000;
+  transform: translateX(0);
+  transition: transform 0.3s ease, width 0.25s ease;
+  box-shadow: var(--sidebar-shadow);
 }
 
 .sidebar::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
-
 .sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255, 165, 0, 0.45);
-    border-radius: 3px;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 3px;
 }
 
-/* ==========================================================================
-   LOGO + TOGGLES
-   ========================================================================== */
+.sidebar.collapsed {
+  width: var(--sidebar-width-collapsed);
+}
+.sidebar.collapsed .logo-text,
+.sidebar.collapsed .arrow,
+.sidebar.collapsed .menu-link span,
+.sidebar.collapsed .submenu {
+  display: none !important;
+}
+.sidebar.collapsed .menu-link,
+.sidebar.collapsed .submenu-link {
+  justify-content: center;
+  padding: 12px 10px;
+}
 
+/* Oculto en mobile */
+.sidebar-hidden .sidebar {
+  transform: translateX(-260px);
+}
+
+body.sidebar-hidden .sidebar {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Toggle flotante visible cuando está oculto en mobile */
+.sidebar-hidden .sidebar-toggle-floating {
+  display: inline-flex !important;
+}
+
+/* ========================================================================== */
+/* LOGO + TOGGLES                                                             */
+/* ========================================================================== */
 .logo {
-    position: relative;
-    padding: 18px 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  padding: 18px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--sidebar-border);
 }
 
 .logo-text {
-    font-size: 1.1rem;
-    font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
-/* Collapse desktop */
-.collapse-btn {
-    background: transparent;
-    border: none;
-    color: #fff;
-    padding: 6px;
-    cursor: pointer;
+.collapse-btn,
+.sidebar-toggle-internal,
+.sidebar-toggle-floating {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 8px;
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-/* Toggle interno móvil */
-.sidebar-toggle-internal {
-    background: transparent;
-    border: none;
-    color: #fff;
-    padding: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    display: none;
+.collapse-btn:hover,
+.sidebar-toggle-internal:hover,
+.sidebar-toggle-floating:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
-
-/* ==========================================================================
-   TOGGLE UNIVERSAL FLOTANTE
-   ========================================================================== */
 
 .sidebar-toggle-floating {
-    position: fixed;
-    top: 14px;
-    left: 14px;
-    background: #2f3b52;
-    color: #fff;
-    border: none;
-    padding: 10px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    z-index: 3500;
-    display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2100;
+  display: inline-flex;
+}
+.sidebar-respawn {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 3600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.65);
+  background: rgba(255, 255, 255, 0.92);
+  color: #1f2937;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-/* Mostrar toggle flotante cuando sidebar está oculto */
-.sidebar-hidden .sidebar-toggle-floating {
-    display: inline-flex !important;
+.sidebar-respawn:hover {
+  background: #fff;
+  transform: translateY(-1px);
 }
 
-/* ==========================================================================
-   MENU
-   ========================================================================== */
+#sidebarRespawn {
+  display: none;
+}
 
+body.sidebar-hidden #sidebarRespawn {
+  display: inline-flex;
+}
+
+.sidebar-desktop-toggle {
+  position: fixed;
+  top: 18px;
+  left: calc(var(--sidebar-width-collapsed) + 10px);
+  z-index: 3200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: rgba(255, 255, 255, 0.95);
+  color: #1f2937;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.sidebar-desktop-toggle:hover {
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+@media (min-width: 1024px) {
+  .sidebar-toggle-floating {
+    display: none !important;
+  }
+}
+
+/* ========================================================================== */
+/* MENÚ                                                                       */
+/* ========================================================================== */
 .menu {
-    list-style: none;
-    padding: 10px 0;
+  list-style: none;
+  padding: 10px 0;
+}
+
+.menu li {
+  position: relative;
 }
 
 .menu-link,
 .submenu-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    font-size: 0.96rem;
-    color: #e1e1e1;
-    text-decoration: none;
-    border-left: 4px solid transparent;
-    transition: background 0.25s ease, color 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  color: var(--sidebar-muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .menu-link i,
 .submenu-link i {
-    width: 22px;
-    text-align: center;
+  min-width: 18px;
+  text-align: center;
 }
 
 .menu-link:hover,
 .submenu-link:hover {
-    background: #3e4b67;
-    color: #fff;
-    border-left-color: #ffa500;
+  background: var(--sidebar-hover);
+  color: #fff;
 }
 
-.menu-link.active-link {
-    background: #3e4b67;
-    border-left-color: #ffa500;
+.menu .active-link {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
 }
 
-/* Arrow rotation */
-.menu-link .arrow::after {
-    content: "▶";
-    font-size: 0.8rem;
-    margin-left: auto;
-    transition: transform 0.25s ease;
+.menu .active-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  background: var(--sidebar-accent);
+  border-radius: 2px;
 }
 
-.menu li.active>.menu-link .arrow::after {
-    transform: rotate(90deg);
+.has-submenu > .menu-link .arrow {
+  margin-left: auto;
+  transition: transform 0.2s ease;
 }
 
-/* ==========================================================================
-   SUBMENUS
-   ========================================================================== */
+.has-submenu.active > .menu-link .arrow {
+  transform: rotate(90deg);
+}
 
 .submenu {
-    list-style: none;
-    background: #394862;
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    transition: max-height .3s ease, opacity .25s ease;
-}
-
-.menu li.active>.submenu {
-    opacity: 1;
-    max-height: 500px;
+  list-style: none;
+  padding-left: 14px;
+  margin: 0;
+  display: none;
 }
 
 .submenu .submenu-link {
-    padding-left: 48px;
-    font-size: .90rem;
+  font-size: 0.9rem;
+  padding: 10px 12px 10px 26px;
 }
 
-/* ==========================================================================
-   COLLAPSED DESKTOP
-   ========================================================================== */
+/* ========================================================================== */
+/* ESTADOS RESPONSIVE                                                         */
+/* ========================================================================== */
+@media (max-width: 1023px) {
+  .sidebar {
+    transform: translateX(-260px);
+  }
 
-.sidebar.collapsed {
-    width: 70px;
+  .sidebar.show {
+    transform: translateX(0);
+  }
 }
 
-.sidebar.collapsed .logo-text {
-    display: none;
-}
+@media (max-width: 640px) {
+  .logo-text {
+    font-size: 0.98rem;
+  }
 
-.sidebar.collapsed .collapse-btn i {
-    transform: rotate(180deg);
-}
-
-.sidebar.collapsed .menu-link span,
-.sidebar.collapsed .submenu-link,
-.sidebar.collapsed .arrow {
-    display: none;
-}
-
-/* Flyout */
-.sidebar-flyout {
-    background: #394862;
-    border-radius: 6px;
-    padding: 4px 0;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-    z-index: 5000;
-}
-
-/* ==========================================================================
-   MOBILE SLIDE
-   ========================================================================== */
-
-@media (max-width: 1024px) {
-
-    /* Sidebar oculto al inicio */
-    .sidebar {
-        transform: translateX(-260px);
-    }
-
-    /* Sidebar visible */
-    .sidebar.show {
-        transform: translateX(0);
-    }
-
-    /* Ocultar collapse desktop */
-    .collapse-btn {
-        display: none !important;
-    }
-
-    /* Toggle interno visible */
-    .sidebar-toggle-internal {
-        display: flex !important;
-        position: absolute;
-        right: 14px;
-        top: 14px;
-    }
-}
-
-/* ==========================================================================
-   CONTENT SHIFT
-   ========================================================================== */
-
-body.sidebar-collapsed #dashboardContent {
-    margin-left: 70px !important;
-}
-
-@media (max-width: 1024px) {
-    #dashboardContent {
-        margin-left: 0 !important;
-    }
-}
-
-/* ==========================================================================
-   CONTROL DE VISIBILIDAD DE TOGGLES
-   ========================================================================== */
-
-/* Escritorio: oculta ambos toggles */
-@media (min-width: 1024px) {
-    #sidebarUniversalToggle {
-        display: none !important;
-    }
-
-    #sidebarInternalToggle {
-        display: none !important;
-    }
-}
-
-/* Móvil: mostrar ambos */
-@media (max-width: 1024px) {
-    #sidebarUniversalToggle {
-        display: flex !important;
-    }
-
-    #sidebarInternalToggle {
-        display: flex !important;
-    }
+  .menu-link,
+  .submenu-link {
+    font-size: 0.9rem;
+  }
 }

@@ -1,4 +1,4 @@
-// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
+﻿// ðŸš« NO BORRAR â€” Bloque restaurado/corregido del mÃ³dulo Mamparas
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4?bundle&target=es2020";
 
 const STORAGE_BUCKET = "mamparas";
@@ -13,27 +13,73 @@ export const supabase = createClient(
 let actualizarEmpresaPersonalizadaFn = null;
 let actualizarBotonDetalleFn = null;
 
+const toggleHidden = (el, hidden) => {
+  if (!el) return;
+  el.classList.toggle("hidden", hidden);
+};
+
+const showModalOverlay = (el) => {
+  if (!el) return;
+  el.classList.remove("hidden");
+  el.classList.add("flex");
+};
+
+const hideModalOverlay = (el) => {
+  if (!el) return;
+  el.classList.add("hidden");
+  el.classList.remove("flex");
+};
+
+const bindEscClose = (modal, handler) => {
+  if (!modal || typeof handler !== "function") return;
+  const listener = (ev) => {
+    if (ev.key === "Escape" && !modal.classList.contains("hidden")) handler();
+  };
+  document.addEventListener("keydown", listener);
+  return listener;
+};
+
+const feedbackCloseBtn = document.querySelector("[data-close-feedback]");
+if (feedbackCloseBtn) {
+  feedbackCloseBtn.addEventListener("click", () =>
+    hideModalOverlay(document.getElementById("feedbackModal"))
+  );
+}
+
 export function mostrarModal(tipo, mensaje) {
   const feedbackModal = document.getElementById("feedbackModal");
   const loader = document.getElementById("loadingAnimation");
   const msg = document.getElementById("feedbackMessage");
   if (!feedbackModal || !loader || !msg) return;
 
-  feedbackModal.style.display = "flex";
-  loader.style.display = "block";
-  msg.style.display = "none";
+  showModalOverlay(feedbackModal);
+  toggleHidden(loader, false);
+  toggleHidden(msg, true);
 
   setTimeout(() => {
-    loader.style.display = "none";
-    msg.style.display = "block";
+    toggleHidden(loader, true);
+    toggleHidden(msg, false);
     msg.textContent = mensaje;
     const colorClass = tipo === "error" ? "text-red-600" : "text-green-600";
     msg.className = `message text-sm font-medium ${colorClass}`;
   }, 500);
 
   setTimeout(() => {
-    feedbackModal.style.display = "none";
+    hideModalOverlay(feedbackModal);
   }, 4500);
+}
+
+const feedbackModalEl = document.getElementById("feedbackModal");
+if (feedbackModalEl) {
+  feedbackModalEl.addEventListener("click", (ev) => {
+    if (ev.target === feedbackModalEl) hideModalOverlay(feedbackModalEl);
+  });
+}
+
+function cerrarTodosLosModales() {
+  document
+    .querySelectorAll(".modal-overlay, #modalPreview, #feedbackModal, #modalPlacaExistente, #detalleModal")
+    .forEach((modal) => modal.classList.add("hidden"));
 }
 
 function sanitizeFileName(fileName) {
@@ -273,29 +319,40 @@ function actualizarPreviewInput(input) {
 }
 
 function abrirPreviewImagenModal(src) {
-  const modal = document.getElementById("previewImagenModal");
-  const img = document.getElementById("previewImagenSrc");
-  if (!modal || !img) return;
+  const modal = document.getElementById("modalPreview");
+  const img = document.getElementById("previewImagen");
+  if (!modal || !img || !src) return;
+
   img.src = src;
-  modal.style.display = "flex";
+  modal.classList.add("flex");
+  modal.classList.remove("hidden");
+  document.addEventListener("keydown", escCloseHandler);
+  modal.addEventListener("click", outsideClickHandler);
 }
 
-function cerrarPreviewImagenModal() {
-  const modal = document.getElementById("previewImagenModal");
-  if (modal) {
-    modal.style.display = "none";
-  }
+function cerrarModalPreview() {
+  const modal = document.getElementById("modalPreview");
+  if (!modal) return;
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  document.removeEventListener("keydown", escCloseHandler);
+  modal.removeEventListener("click", outsideClickHandler);
+}
+
+function escCloseHandler(e) {
+  if (e.key === "Escape") cerrarModalPreview();
+}
+
+function outsideClickHandler(e) {
+  if (e.target?.id === "modalPreview") cerrarModalPreview();
 }
 
 function initPreviewModal() {
-  const modal = document.getElementById("previewImagenModal");
-  const cerrar = document.getElementById("cerrarPreviewImagen");
-  if (!modal || !cerrar) return;
+  const modal = document.getElementById("modalPreview");
+  const btnClose = modal?.querySelector("button[onclick='cerrarModalPreview()']");
+  if (!modal || !btnClose) return;
 
-  cerrar.addEventListener("click", cerrarPreviewImagenModal);
-  modal.addEventListener("click", (event) => {
-    if (event.target === modal) cerrarPreviewImagenModal();
-  });
+  btnClose.addEventListener("click", cerrarModalPreview);
 }
 
 function toggleDetalleAlert(show, message) {
@@ -336,6 +393,45 @@ function mostrarDetalleGuardadoAviso(visible) {
   const aviso = document.getElementById("detalleGuardadoAviso");
   if (!aviso) return;
   aviso.classList.toggle("hidden", !visible);
+}
+
+function renderGaleriaMamparas(detalle) {
+  const cont = document.getElementById("galeriaMamparas");
+  if (!cont) return;
+
+  cont.innerHTML = "";
+
+  const imagenes = detalle?.imagenes;
+  if (!imagenes || !Object.keys(imagenes).length) {
+    const empty = document.createElement("p");
+    empty.className = "text-sm text-gray-500";
+    empty.textContent = "Sin evidencias registradas aun.";
+    cont.appendChild(empty);
+    return;
+  }
+
+  const grid = document.createElement("div");
+  grid.className = "grid grid-cols-2 gap-3";
+
+  Object.values(imagenes).forEach((url) => {
+    if (!url) return;
+    const item = document.createElement("div");
+    item.className =
+      "rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition cursor-pointer";
+    item.innerHTML = `<img src="${url}" alt="Evidencia" class="w-full h-24 object-cover" />`;
+    item.addEventListener("click", () => abrirPreviewImagenModal(url));
+    grid.appendChild(item);
+  });
+
+  if (!grid.childElementCount) {
+    const empty = document.createElement("p");
+    empty.className = "text-sm text-gray-500";
+    empty.textContent = "Sin evidencias registradas aun.";
+    cont.appendChild(empty);
+    return;
+  }
+
+  cont.appendChild(grid);
 }
 
 async function guardarDetalleJSON() {
@@ -430,7 +526,8 @@ async function guardarDetalleJSON() {
 
   campoDetalle.value = JSON.stringify(detalle);
   mostrarDetalleGuardadoAviso(true);
-  detalleModal.style.display = "none";
+  renderGaleriaMamparas(detalle);
+  hideModalOverlay(detalleModal);
   mostrarModal("success", "Detalle guardado correctamente.");
 }
 
@@ -446,14 +543,13 @@ function initDetalleModal() {
   btnDetalle.addEventListener("click", () => {
     if (!incorreccion.value) return;
     generarContenidoModal(incorreccion.value);
-    detalleModal.style.display = "flex";
+    showModalOverlay(detalleModal);
   });
 
   if (cerrarModal) {
-    cerrarModal.addEventListener("click", () => {
-      detalleModal.style.display = "none";
-    });
+    cerrarModal.addEventListener("click", () => hideModalOverlay(detalleModal));
   }
+  bindEscClose(detalleModal, () => hideModalOverlay(detalleModal));
 
   if (btnGuardarDetalle) {
     btnGuardarDetalle.addEventListener("click", guardarDetalleJSON);
@@ -468,7 +564,7 @@ function initDetalleModal() {
 
   detalleModal.addEventListener("click", (event) => {
     if (event.target === detalleModal) {
-      detalleModal.style.display = "none";
+      hideModalOverlay(detalleModal);
     }
   });
 }
@@ -481,10 +577,11 @@ function initDetalleTrigger() {
 
   actualizarBotonDetalleFn = () => {
     const tieneValor = Boolean(incorreccion.value);
-    btnDetalle.style.display = tieneValor ? "inline-flex" : "none";
+    toggleHidden(btnDetalle, !tieneValor);
     if (!tieneValor) {
       detalleInput.value = "";
       mostrarDetalleGuardadoAviso(false);
+      renderGaleriaMamparas(null);
     }
   };
 
@@ -511,7 +608,7 @@ function initEmpresaPersonalizada() {
 
   actualizarEmpresaPersonalizadaFn = () => {
     const usarCampo = empresa.value === "otra";
-    nuevaEmpresa.style.display = usarCampo ? "block" : "none";
+    toggleHidden(nuevaEmpresa, !usarCampo);
     nuevaEmpresa.required = usarCampo;
     if (!usarCampo) {
       nuevaEmpresa.value = "";
@@ -584,14 +681,12 @@ function mostrarModalPlaca(registro, placa) {
   ];
 
   contenido.innerHTML = filas.join("");
-  modal.style.display = "flex";
+  showModalOverlay(modal);
 }
 
 function ocultarModalPlaca() {
   const modal = document.getElementById("modalPlacaExistente");
-  if (modal) {
-    modal.style.display = "none";
-  }
+  hideModalOverlay(modal);
 }
 
 function initModalPlacaListeners() {
@@ -603,7 +698,7 @@ function initModalPlacaListeners() {
   if (!modal) return;
 
   const cerrar = (limpiar) => {
-    modal.style.display = "none";
+    hideModalOverlay(modal);
     if (limpiar && placaInput) {
       placaInput.value = "";
       placaInput.focus();
@@ -619,6 +714,7 @@ function initModalPlacaListeners() {
   modal.addEventListener("click", (event) => {
     if (event.target === modal) cerrar(false);
   });
+  bindEscClose(modal, () => cerrar(false));
 }
 
 function initValidacionPlaca() {
@@ -655,6 +751,7 @@ function initFormulario() {
     return;
   }
 
+  cerrarTodosLosModales();
   autocompletarFechaHora();
   initEmpresaPersonalizada();
   initDetalleTrigger();
@@ -710,9 +807,11 @@ function initFormulario() {
       form.reset();
       detalleCampo.value = "";
       mostrarDetalleGuardadoAviso(false);
+      cerrarTodosLosModales();
       autocompletarFechaHora();
       actualizarEmpresaPersonalizadaFn?.();
       actualizarBotonDetalleFn?.();
+      renderGaleriaMamparas(null);
     }
   });
 }
@@ -723,5 +822,6 @@ if (document.readyState === "loading") {
   initFormulario();
 }
 
-// 🚫 NO BORRAR — QA Mamparas
+// ðŸš« NO BORRAR â€” QA Mamparas
 console.log("QA Mamparas: archivo restaurado");
+

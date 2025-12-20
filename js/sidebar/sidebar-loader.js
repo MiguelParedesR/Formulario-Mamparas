@@ -14,12 +14,12 @@ import { BASE_PATH, withBase } from "../config.js";
 
 const SIDEBAR_HTML = withBase("/html/base/sidebar.html");
 const SIDEBAR_JS = withBase("/js/sidebar/sidebar.js");
-const SIDEBAR_CSS = withBase("/CSS/estilos-sidebar/sidebar.css");
+const SIDEBAR_CSS = withBase("/css/estilos-sidebar/sidebar.css");
 const CORE_STYLES = [
-  withBase("/CSS/tailwind.css"),
-  withBase("/CSS/global.css"),
-  withBase("/CSS/dashboard/dashboard.css"),
-  withBase("/CSS/styles.css"),
+  withBase("/css/tailwind.css"),
+  withBase("/css/global.css"),
+  withBase("/css/dashboard/dashboard.css"),
+  withBase("/css/styles.css"),
 ];
 
 const FONT_AWESOME =

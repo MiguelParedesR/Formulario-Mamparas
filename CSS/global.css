@@ -44,6 +44,19 @@ body.sidebar-collapsed #dashboardContent {
     width: calc(100% - var(--sidebar-width-collapsed));
 }
 
+/* Forzar layout en desktop para evitar solapamiento por estilos inline */
+@media (min-width: 1024px) {
+    body:not(.sidebar-hidden) #dashboardContent {
+        margin-left: var(--sidebar-width) !important;
+        width: calc(100% - var(--sidebar-width)) !important;
+    }
+
+    body.sidebar-collapsed #dashboardContent {
+        margin-left: var(--sidebar-width-collapsed) !important;
+        width: calc(100% - var(--sidebar-width-collapsed)) !important;
+    }
+}
+
 /* Estado cuando el sidebar está oculto en mobile */
 @media (max-width: 1023px) {
     #dashboardContent,
@@ -383,4 +396,189 @@ body>* {
 
 body>*:not(#dashboardContent) {
     padding: 0 !important;
+}
+
+/* ============================================================================
+   LAYOUT REDISENADO (VISTAS FORMULARIOS / DASHBOARD)
+   ============================================================================ */
+main.app-layout {
+    padding: 32px !important;
+    margin: 0 auto !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    background: #f4f6f8;
+}
+
+main.app-layout .app-layout-inner {
+    max-width: 1400px;
+    margin: 0 auto !important;
+    width: 100%;
+    padding: 0 !important;
+}
+
+.app-3col-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (min-width: 1024px) {
+    .app-3col-grid {
+        grid-template-columns: 2fr 2fr 1.2fr;
+    }
+}
+
+body.sidebar-hidden #dashboardContent {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+/* ============================
+   ANIMACIONES MODALES / LIGHTBOX
+============================ */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes scaleIn {
+    from { opacity: 0; transform: translateY(4px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-fade { animation: fadeIn 180ms ease-out forwards; }
+.animate-scale { animation: scaleIn 200ms ease-out forwards; }
+
+/* ============================
+   GALERÍA / LIGHTBOX
+============================ */
+.gallery-scroll {
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+.gallery-scroll::-webkit-scrollbar { width: 8px; }
+.gallery-scroll::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.25);
+    border-radius: 999px;
+}
+
+#anexosPreview,
+#galeriaMamparas {
+    max-height: 580px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+}
+
+#anexosPreview::-webkit-scrollbar,
+#galeriaMamparas::-webkit-scrollbar {
+    width: 8px;
+}
+
+#anexosPreview::-webkit-scrollbar-thumb,
+#galeriaMamparas::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+}
+
+.lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+    z-index: 5000;
+}
+.lightbox-overlay.active { display: flex; }
+.lightbox-content {
+    position: relative;
+    background: #fff;
+    border-radius: 18px;
+    padding: 14px;
+    max-width: 960px;
+    width: 100%;
+    box-shadow: 0 22px 60px rgba(0,0,0,0.24);
+    animation: fadeIn 150ms ease, scaleIn 220ms ease;
+}
+.lightbox-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    border: none;
+    font-size: 1rem;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+}
+
+/* ============================
+   BOTÓN FLECHA DESKTOP
+============================ */
+.sidebar-desktop-toggle { display: none; }
+.sidebar-collapsed .sidebar-desktop-toggle { display: inline-flex; }
+@media (max-width: 1023px) {
+    .sidebar-desktop-toggle { display: none !important; }
+}
+
+/* Galeria de evidencias */
+.gallery-scroll {
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.gallery-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.gallery-scroll::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.25);
+    border-radius: 999px;
+}
+
+.gallery-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Modales */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    max-width: 600px;
+    width: 90%;
+    animation: popIn 0.3s ease-out;
+}
+
+.modal-card {
+    animation: popIn 0.3s ease-out;
 }

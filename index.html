@@ -11,19 +11,19 @@
   <meta name="theme-color" content="#2f3b52" />
 
   <!-- Tailwind -->
-  <link rel="stylesheet" href="./CSS/tailwind.css" />
+  <link rel="stylesheet" href="./css/tailwind.css" />
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- Sidebar + Global -->
-  <link rel="stylesheet" href="./CSS/estilos-sidebar/sidebar.css" />
-  <link rel="stylesheet" href="./CSS/global.css" />
-  <link rel="stylesheet" href="./CSS/styles.css" />
+  <link rel="stylesheet" href="./css/estilos-sidebar/sidebar.css" />
+  <link rel="stylesheet" href="./css/global.css" />
+  <link rel="stylesheet" href="./css/styles.css" />
 
   <!-- Dashboard CSS -->
-  <link rel="stylesheet" href="./CSS/dashboard/dashboard.css" />
+  <link rel="stylesheet" href="./css/dashboard/dashboard.css" />
 
   <style>
     body {
@@ -33,6 +33,10 @@
 </head>
 
 <body>
+
+  <button id="sidebarRespawn" type="button" aria-label="Mostrar menú lateral" class="sidebar-respawn">
+    ☰
+  </button>
 
   <!-- SIDEBAR -->
   <div id="sidebar-container"></div>
@@ -140,6 +144,11 @@
   <!-- Navegación SPA -->
   <script type="module">
     import { BASE_PATH, withBase } from "./js/config.js";
+    import { toggleSidebar, initializeSidebarState } from "./js/sidebar/sidebar-state.js";
+
+    const respawnBtn = document.getElementById("sidebarRespawn");
+    initializeSidebarState();
+    respawnBtn?.addEventListener("click", () => toggleSidebar());
 
     window.navigateToFormulario = (tipo) => {
       if (!tipo) return;
@@ -159,9 +168,12 @@
     };
 
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register(withBase("/service-worker.js"), {
-        scope: withBase("/") || "/",
-      });
+      navigator.serviceWorker
+        .register(withBase("/service-worker.js"), {
+          scope: withBase("/") || "/",
+        })
+        .then((reg) => console.log("SW registrado", reg.scope))
+        .catch((err) => console.error("Error registrando SW", err));
     }
 
     import(withBase("/js/sidebar/sidebar-loader.js"));

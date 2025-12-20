@@ -1,0 +1,281 @@
+/* ==========================================================================
+   SIDEBAR TPP – VERSION FINAL PRODUCCIÓN
+   Integración completa con sidebar.html y sidebar.js v3
+   ========================================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #f4f6f8;
+    transition: background 0.25s ease;
+}
+
+/* ==========================================================================
+   SIDEBAR
+   ========================================================================== */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    background: #2f3b52;
+    color: #fff;
+    overflow-y: auto;
+    z-index: 2000;
+    transform: translateX(0);
+    transition: transform 0.3s ease, width 0.25s ease;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 165, 0, 0.45);
+    border-radius: 3px;
+}
+
+/* ==========================================================================
+   LOGO + TOGGLES
+   ========================================================================== */
+
+.logo {
+    position: relative;
+    padding: 18px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.logo-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/* Collapse desktop */
+.collapse-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 6px;
+    cursor: pointer;
+}
+
+/* Toggle interno móvil */
+.sidebar-toggle-internal {
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: none;
+}
+
+/* ==========================================================================
+   TOGGLE UNIVERSAL FLOTANTE
+   ========================================================================== */
+
+.sidebar-toggle-floating {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    background: #2f3b52;
+    color: #fff;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 3500;
+    display: none;
+}
+
+/* Mostrar toggle flotante cuando sidebar está oculto */
+.sidebar-hidden .sidebar-toggle-floating {
+    display: inline-flex !important;
+}
+
+/* ==========================================================================
+   MENU
+   ========================================================================== */
+
+.menu {
+    list-style: none;
+    padding: 10px 0;
+}
+
+.menu-link,
+.submenu-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    font-size: 0.96rem;
+    color: #e1e1e1;
+    text-decoration: none;
+    border-left: 4px solid transparent;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+.menu-link i,
+.submenu-link i {
+    width: 22px;
+    text-align: center;
+}
+
+.menu-link:hover,
+.submenu-link:hover {
+    background: #3e4b67;
+    color: #fff;
+    border-left-color: #ffa500;
+}
+
+.menu-link.active-link {
+    background: #3e4b67;
+    border-left-color: #ffa500;
+}
+
+/* Arrow rotation */
+.menu-link .arrow::after {
+    content: "▶";
+    font-size: 0.8rem;
+    margin-left: auto;
+    transition: transform 0.25s ease;
+}
+
+.menu li.active>.menu-link .arrow::after {
+    transform: rotate(90deg);
+}
+
+/* ==========================================================================
+   SUBMENUS
+   ========================================================================== */
+
+.submenu {
+    list-style: none;
+    background: #394862;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height .3s ease, opacity .25s ease;
+}
+
+.menu li.active>.submenu {
+    opacity: 1;
+    max-height: 500px;
+}
+
+.submenu .submenu-link {
+    padding-left: 48px;
+    font-size: .90rem;
+}
+
+/* ==========================================================================
+   COLLAPSED DESKTOP
+   ========================================================================== */
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+.sidebar.collapsed .logo-text {
+    display: none;
+}
+
+.sidebar.collapsed .collapse-btn i {
+    transform: rotate(180deg);
+}
+
+.sidebar.collapsed .menu-link span,
+.sidebar.collapsed .submenu-link,
+.sidebar.collapsed .arrow {
+    display: none;
+}
+
+/* Flyout */
+.sidebar-flyout {
+    background: #394862;
+    border-radius: 6px;
+    padding: 4px 0;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    z-index: 5000;
+}
+
+/* ==========================================================================
+   MOBILE SLIDE
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+
+    /* Sidebar oculto al inicio */
+    .sidebar {
+        transform: translateX(-260px);
+    }
+
+    /* Sidebar visible */
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    /* Ocultar collapse desktop */
+    .collapse-btn {
+        display: none !important;
+    }
+
+    /* Toggle interno visible */
+    .sidebar-toggle-internal {
+        display: flex !important;
+        position: absolute;
+        right: 14px;
+        top: 14px;
+    }
+}
+
+/* ==========================================================================
+   CONTENT SHIFT
+   ========================================================================== */
+
+body.sidebar-collapsed #dashboardContent {
+    margin-left: 70px !important;
+}
+
+@media (max-width: 1024px) {
+    #dashboardContent {
+        margin-left: 0 !important;
+    }
+}
+
+/* ==========================================================================
+   CONTROL DE VISIBILIDAD DE TOGGLES
+   ========================================================================== */
+
+/* Escritorio: oculta ambos toggles */
+@media (min-width: 1024px) {
+    #sidebarUniversalToggle {
+        display: none !important;
+    }
+
+    #sidebarInternalToggle {
+        display: none !important;
+    }
+}
+
+/* Móvil: mostrar ambos */
+@media (max-width: 1024px) {
+    #sidebarUniversalToggle {
+        display: flex !important;
+    }
+
+    #sidebarInternalToggle {
+        display: flex !important;
+    }
+}

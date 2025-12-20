@@ -20,15 +20,16 @@ const withBase = (path = "") => {
   return `${BASE_PATH}${normalized}`;
 };
 
-const CACHE_NAME = `CCTV-V63${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
+const VERSION = "v7.14";
+const CACHE_NAME = `CCTV-V75${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
 // Archivos que intentaremos cachear si existen:
 const STATIC_ASSETS = [
-  "/CSS/global.css",
-  "/CSS/tailwind.css",
-  "/CSS/dashboard/dashboard.css",
-  "/CSS/estilos-sidebar/sidebar.css",
-  "/CSS/styles.css",
+  "/css/global.css",
+  "/css/tailwind.css",
+  "/css/dashboard/dashboard.css",
+  "/css/estilos-sidebar/sidebar.css",
+  "/css/styles.css",
   "/js/sidebar/sidebar-loader.js",
   "/js/sidebar/sidebar.js",
   "/js/libs/docxtemplater-image-module.js",
@@ -62,10 +63,10 @@ self.addEventListener("install", (event) => {
           console.warn("[SW] Error cacheando (omitido):", url);
         }
       }
+
+      await self.skipWaiting();
     })()
   );
-
-  self.skipWaiting();
 });
 
 // ============================================================================
@@ -75,19 +76,20 @@ self.addEventListener("activate", (event) => {
   console.log("[SW] Activado");
 
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
         keys
           .filter((key) => key !== CACHE_NAME)
           .map((key) => {
             console.log("[SW] Eliminando cache viejo:", key);
             return caches.delete(key);
           })
-      )
-    )
-  );
+      );
 
-  self.clients.claim();
+      await self.clients.claim();
+    })()
+  );
 });
 
 // ============================================================================

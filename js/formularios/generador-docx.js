@@ -114,10 +114,7 @@ async function pdfIconBase64() {
    6) Normalización de saltos de línea
 ---------------------------------------------------------- */
 function normalizeMultiline(text = "") {
-  return text
-    .replace(/\r\n/g, "\n")
-    .replace(/\r/g, "\n")
-    .replace(/\n/g, "\n");
+  return text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/\n/g, "\n");
 }
 
 /* ----------------------------------------------------------
@@ -143,19 +140,21 @@ async function renderWord(context) {
   try {
     doc.render();
   } catch (err) {
-    if (err?.properties?.errors) { console.error("Template errors:", err.properties.errors); }
+    if (err?.properties?.errors) {
+      console.error("Template errors:", err.properties.errors);
+    }
     console.error("�?O Error renderizando DOCX:", err);
     throw err;
   }
-  }
+}
 
-  const output = doc.getZip().generate({
-    type: "blob",
-    mimeType:
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  });
+const output = doc.getZip().generate({
+  type: "blob",
+  mimeType:
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+});
 
-  triggerDownload(output, `Informe_${Date.now()}.docx`);
+triggerDownload(output, `Informe_${Date.now()}.docx`);
 /* ----------------------------------------------------------
    8) Descargar archivo final
 ---------------------------------------------------------- */
@@ -202,7 +201,7 @@ async function generateWordFinal(payload) {
     RECOMENDACIONES: normalizeMultiline(recomendaciones || ""),
     TABLA_ANEXOS: anexosProcesados,
   };
-  
+
   await renderWord(context);
 }
 
@@ -210,11 +209,10 @@ console.log("QA DOCX: generador-docx.js cargado correctamente");
 
 async function generarDocxIncidencia(incidencia = {}) {
   const campos = incidencia.campos || {};
-  const valorExtra =
-    campos.valorExtra || {
-      contenedor: campos.contenedor || "",
-      placa: campos.placa || "",
-    };
+  const valorExtra = campos.valorExtra || {
+    contenedor: campos.contenedor || "",
+    placa: campos.placa || "",
+  };
 
   const payload = {
     asunto: incidencia.asunto || "",
@@ -235,4 +233,3 @@ async function generarDocxIncidencia(incidencia = {}) {
 export { generateWordFinal, generarDocxIncidencia };
 
 console.log("QA DOCX: generador-docx.js cargado correctamente");
-

@@ -1,226 +1,256 @@
-<!-- ?? NO BORRAR � Bloque restaurado/corregido del m&oacute;dulo Mamparas -->
-<main class="mamparas-root p-6 space-y-6 text-gray-800">
-  <div class="space-y-1">
-    <h1 class="text-2xl font-bold flex items-center gap-3 text-slate-900">
-      <i class="fas fa-clipboard-list text-indigo-600"></i>
-      Registro de Inspecci&oacute;n
-    </h1>
-    <p class="text-sm text-gray-600">
-      Completa los datos y adjunta el detalle obligatorio para asegurar la trazabilidad de cada inspecci&oacute;n.
-    </p>
-  </div>
-
-  <section class="mamparas-panel bg-white border border-gray-100 rounded-2xl shadow-xl p-6 sm:p-8 space-y-6">
-    <form id="form-inspeccion" class="space-y-6">
-      <!-- FECHA + HORA -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-slate-700" for="fecha">Fecha</label>
-          <div class="input-icon-wrapper">
-            <input
-              class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-              type="date"
-              id="fecha"
-              name="fecha"
-              required
-              readonly
-            />
-            <span class="input-icon">
-              <i class="far fa-calendar"></i>
-            </span>
-          </div>
-          <p class="text-xs text-gray-500">Se autocompleta para evitar errores.</p>
-        </div>
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-slate-700" for="hora">Hora</label>
-          <div class="input-icon-wrapper">
-            <input
-              class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-              type="time"
-              id="hora"
-              name="hora"
-              required
-              readonly
-            />
-            <span class="input-icon">
-              <i class="far fa-clock"></i>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- EMPRESA + PLACA -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-slate-700" for="empresa">Empresa</label>
-          <select
-            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-            id="empresa"
-            name="empresa"
-            required
-          >
-            <option value="">Seleccione</option>
-            <option value="otra">Agregar otra empresa</option>
-            <option value="RYM">RYM</option>
-            <option value="TURICAR">TURICAR</option>
-            <option value="BUEN DIA">BUEN DIA</option>
-            <option value="HUARIJIRCA">HUARIJIRCA</option>
-            <option value="TEAL">TEAL</option>
-            <option value="BRANDOM">BRANDOM</option>
-            <option value="DIOS DA">DIOS DA</option>
-            <option value="KAREL">KAREL</option>
-            <option value="MALEJA">MALEJA</option>
-            <option value="MOTRIL">MOTRIL</option>
-            <option value="JK SALAS">JK SALAS</option>
-            <option value="TATTUS TRUCK">TATTUS TRUCK</option>
-            <option value="PR HERMANOS">PR HERMANOS</option>
-            <option value="SCARAMUTTI">SCARAMUTTI</option>
-            <option value="GM">GM</option>
-            <option value="TILOPSAC">TILOPSAC</option>
-            <option value="CHUCAS CARGO">CHUCAS CARGO</option>
-            <option value="V&amp;B">V&amp;B</option>
-            <option value="GAMARRA BERRENECHEA">GAMARRA BERRENECHEA</option>
-          </select>
-          <input
-            class="w-full rounded-xl border border-dashed border-indigo-200 bg-indigo-50 px-4 py-2 text-sm text-indigo-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-            type="text"
-            id="nueva_empresa"
-            name="nueva_empresa"
-            placeholder="Ingresa el nombre de la empresa"
-            style="display:none;"
-          />
-        </div>
-
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-slate-700" for="placa">Placa</label>
-          <input
-            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm uppercase tracking-wide text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-            type="text"
-            id="placa"
-            name="placa"
-            placeholder="ABC-123"
-            required
-            maxlength="10"
-          />
-          <p class="text-xs text-gray-500">
-            La validaci&oacute;n es en tiempo real. Si la placa ya fue registrada hoy se mostrar&aacute; un aviso con
-            los detalles.
-          </p>
-        </div>
-      </div>
-
-      <!-- CHOFER + LUGAR -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-slate-700" for="chofer">Chofer</label>
-          <input
-            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-            type="text"
-            id="chofer"
-            name="chofer"
-            placeholder="Nombre completo"
-            required
-          />
-        </div>
-
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-slate-700" for="lugar">Lugar</label>
-          <select
-            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-            id="lugar"
-            name="lugar"
-            required
-          >
-            <option value="">Seleccione</option>
-            <option value="Tracciones">Tracciones</option>
-            <option value="Calle">Calle</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- INCORRECCION + RESPONSABLE -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-slate-700" for="incorreccion">
-            Tipo de incorrecci&oacute;n
-          </label>
-          <select
-            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-            id="incorreccion"
-            name="incorreccion"
-            required
-          >
-            <option value="">Seleccione</option>
-            <option value="Mampara">Mampara</option>
-            <option value="Cola de Pato">Cola de Pato</option>
-            <option value="Pernos">Pernos</option>
-            <option value="Otros">Otros</option>
-          </select>
-          <p class="text-xs text-gray-500">Activa el bot&oacute;n de detalle seg&uacute;n el tipo elegido.</p>
-        </div>
-
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-slate-700" for="responsable">Responsable</label>
-          <select
-            class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-            id="responsable"
-            name="responsable"
-            required
-          >
-            <option value="">Seleccione</option>
-            <option value="Carlos Sanchez">Carlos Sanchez</option>
-            <option value="Francisco Elescano">Francisco Elescano</option>
-            <option value="Hernan Luna">Hernan Luna</option>
-            <option value="Roger Castro">Roger Castro</option>
-            <option value="Oscar Fernandez">Oscar Fernandez</option>
-            <option value="Miguel Paredes">Miguel Paredes</option>
-            <option value="David Echaccaya">David Echaccaya</option>
-            <option value="Juan Quelopana">Juan Quelopana</option>
-            <option value="Grover Munguia">Grover Munguia</option>
-            <option value="Ernesto Alfaro">Ernesto Alfaro</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- OBSERVACIONES -->
-      <div class="space-y-2">
-        <label class="block text-sm font-semibold text-slate-700" for="observaciones">
-          Observaciones
-        </label>
-        <select
-          class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-          id="observaciones"
-          name="observaciones"
-          required
-        >
-          <option value="">Seleccione</option>
-          <option value="Descarga">Descarga</option>
-          <option value="Embarque">Embarque</option>
-          <option value="Otros">Otros</option>
-        </select>
-      </div>
-
-      <!-- HIDDEN DETALLE -->
-      <input type="hidden" id="detalle" name="detalle" />
-      <p
-        id="detalleGuardadoAviso"
-        class="text-sm text-green-600 bg-green-50 border border-green-200 rounded-xl px-4 py-2 hidden"
-      >
-        Detalle guardado y listo para enviarse junto con la inspecci&oacute;n.
+﻿<!-- ?? NO BORRAR — Bloque restaurado/corregido del m&oacute;dulo Mamparas -->
+<main class="mamparas-root app-layout text-gray-800">
+  <div class="app-layout-inner space-y-6">
+    <div class="space-y-1">
+      <h1 class="text-2xl font-bold flex items-center gap-3 text-slate-900">
+        <i class="fas fa-clipboard-list text-indigo-600"></i>
+        Registro de Inspecci&oacute;n
+      </h1>
+      <p class="text-sm text-gray-600">
+        Completa los datos y adjunta el detalle obligatorio para asegurar la trazabilidad de cada inspecci&oacute;n.
       </p>
+    </div>
 
-      <!-- BOTONES -->
-      <div class="flex flex-wrap gap-3 items-center">
-        <button
-          type="button"
-          id="btnAgregarDetalle"
-          class="px-4 py-2 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-700 text-sm font-semibold shadow-sm hover:bg-indigo-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
-          style="display:none;"
-        >
-          <i class="fas fa-list-ul mr-2 text-xs"></i>
-          Agregar detalle
-        </button>
+    <section class="mamparas-panel bg-white border border-gray-100 rounded-2xl shadow-xl p-6 sm:p-8 space-y-6">
+      <form id="form-inspeccion" class="space-y-6">
+        <div class="app-3col-grid items-start">
+          <section class="col-span-1 xl:col-span-2 space-y-6">
+          <!-- FECHA + HORA -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-700" for="fecha">Fecha</label>
+              <div class="input-icon-wrapper">
+                <input
+                  class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                  type="date"
+                  id="fecha"
+                  name="fecha"
+                  required
+                  readonly
+                />
+                <span class="input-icon">
+                  <i class="far fa-calendar"></i>
+                </span>
+              </div>
+              <p class="text-xs text-gray-500">Se autocompleta para evitar errores.</p>
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-700" for="hora">Hora</label>
+              <div class="input-icon-wrapper">
+                <input
+                  class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                  type="time"
+                  id="hora"
+                  name="hora"
+                  required
+                  readonly
+                />
+                <span class="input-icon">
+                  <i class="far fa-clock"></i>
+                </span>
+              </div>
+            </div>
+          </div>
 
+          <!-- EMPRESA + PLACA -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-700" for="empresa">Empresa</label>
+              <select
+                class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                id="empresa"
+                name="empresa"
+                required
+              >
+                <option value="">Seleccione</option>
+                <option value="otra">Agregar otra empresa</option>
+                <option value="RYM">RYM</option>
+                <option value="TURICAR">TURICAR</option>
+                <option value="BUEN DIA">BUEN DIA</option>
+                <option value="HUARIJIRCA">HUARIJIRCA</option>
+                <option value="TEAL">TEAL</option>
+                <option value="BRANDOM">BRANDOM</option>
+                <option value="DIOS DA">DIOS DA</option>
+                <option value="KAREL">KAREL</option>
+                <option value="MALEJA">MALEJA</option>
+                <option value="MOTRIL">MOTRIL</option>
+                <option value="JK SALAS">JK SALAS</option>
+                <option value="TATTUS TRUCK">TATTUS TRUCK</option>
+                <option value="PR HERMANOS">PR HERMANOS</option>
+                <option value="SCARAMUTTI">SCARAMUTTI</option>
+                <option value="GM">GM</option>
+                <option value="TILOPSAC">TILOPSAC</option>
+                <option value="CHUCAS CARGO">CHUCAS CARGO</option>
+                <option value="V&B">V&B</option>
+                <option value="GAMARRA BERRENECHEA">GAMARRA BERRENECHEA</option>
+              </select>
+              <input
+                class="w-full rounded-xl border border-dashed border-indigo-200 bg-indigo-50 px-4 py-2 text-sm text-indigo-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 hidden"
+                type="text"
+                id="nueva_empresa"
+                name="nueva_empresa"
+                placeholder="Ingresa el nombre de la empresa"
+              />
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-700" for="placa">Placa</label>
+              <input
+                class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm uppercase tracking-wide text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                type="text"
+                id="placa"
+                name="placa"
+                placeholder="ABC-123"
+                required
+                maxlength="10"
+              />
+              <p class="text-xs text-gray-500">
+                La validaci&oacute;n es en tiempo real. Si la placa ya fue registrada hoy se mostrar&aacute; un aviso con
+                los detalles.
+              </p>
+            </div>
+          </div>
+
+          <!-- CHOFER + LUGAR -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-700" for="chofer">Chofer</label>
+              <input
+                class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                type="text"
+                id="chofer"
+                name="chofer"
+                placeholder="Nombre completo"
+                required
+              />
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-700" for="lugar">Lugar</label>
+              <select
+                class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                id="lugar"
+                name="lugar"
+                required
+              >
+                <option value="">Seleccione</option>
+                <option value="Tracciones">Tracciones</option>
+                <option value="Calle">Calle</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- INCORRECCION + RESPONSABLE -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-700" for="incorreccion">
+                Tipo de incorrecci&oacute;n
+              </label>
+              <select
+                class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                id="incorreccion"
+                name="incorreccion"
+                required
+              >
+                <option value="">Seleccione</option>
+                <option value="Mampara">Mampara</option>
+                <option value="Cola de Pato">Cola de Pato</option>
+                <option value="Pernos">Pernos</option>
+                <option value="Otros">Otros</option>
+              </select>
+              <p class="text-xs text-gray-500">Activa el bot&oacute;n de detalle seg&uacute;n el tipo elegido.</p>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-slate-700" for="responsable">Responsable</label>
+              <select
+                class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                id="responsable"
+                name="responsable"
+                required
+              >
+                <option value="">Seleccione</option>
+                <option value="Carlos Sanchez">Carlos Sanchez</option>
+                <option value="Francisco Elescano">Francisco Elescano</option>
+                <option value="Hernan Luna">Hernan Luna</option>
+                <option value="Roger Castro">Roger Castro</option>
+                <option value="Oscar Fernandez">Oscar Fernandez</option>
+                <option value="Miguel Paredes">Miguel Paredes</option>
+                <option value="David Echaccaya">David Echaccaya</option>
+                <option value="Juan Quelopana">Juan Quelopana</option>
+                <option value="Grover Munguia">Grover Munguia</option>
+                <option value="Ernesto Alfaro">Ernesto Alfaro</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- OBSERVACIONES -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-slate-700" for="observaciones">
+              Observaciones
+            </label>
+            <select
+              class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+              id="observaciones"
+              name="observaciones"
+              required
+            >
+              <option value="">Seleccione</option>
+              <option value="Descarga">Descarga</option>
+              <option value="Embarque">Embarque</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+        </section>
+
+        <aside class="col-span-1 space-y-4 sticky top-20">
+          <div class="rounded-2xl border border-indigo-100 bg-indigo-50 p-5 space-y-3 shadow-sm">
+            <div>
+              <p class="text-xs uppercase tracking-[0.2em] text-indigo-500 font-semibold">Detalle y evidencias</p>
+              <p class="text-sm text-slate-700">Guarda el detalle antes de registrar la inspecci&oacute;n.</p>
+            </div>
+
+            <input type="hidden" id="detalle" name="detalle" />
+            <p
+              id="detalleGuardadoAviso"
+              class="text-sm text-green-600 bg-green-50 border border-green-200 rounded-xl px-4 py-2 hidden"
+            >
+              Detalle guardado y listo para enviarse junto con la inspecci&oacute;n.
+            </p>
+
+            <button
+              type="button"
+              id="btnAgregarDetalle"
+              class="hidden inline-flex items-center justify-center w-full px-4 py-2 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-700 text-sm font-semibold shadow-sm hover:bg-indigo-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+            >
+              <i class="fas fa-list-ul mr-2 text-xs"></i>
+              Agregar detalle
+            </button>
+            <p class="text-[11px] text-indigo-700">Incluye fotos y medidas. Se abrir&aacute; un modal de previsualizaci&oacute;n.</p>
+          </div>
+
+          <div class="rounded-2xl border border-gray-100 bg-white p-5 space-y-3 shadow-sm">
+            <div>
+              <p class="text-xs uppercase tracking-[0.25em] text-slate-500 font-semibold">Evidencias</p>
+              <h3 class="text-lg font-semibold text-slate-800">Galer&iacute;a r&aacute;pida</h3>
+            </div>
+            <div id="galeriaMamparas" class="space-y-2 text-sm text-gray-500">
+              <p>Sin evidencias registradas a&uacute;n.</p>
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-gray-100 bg-white p-5 space-y-3 shadow-sm">
+            <p class="text-sm font-semibold text-slate-800">Notas r&aacute;pidas</p>
+            <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside">
+              <li>Autosave cada 10 segundos activo.</li>
+              <li>Exportaci&oacute;n a Word desde reportes.</li>
+              <li>Evita doble scroll en el modal de detalle.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+
+      <div class="flex flex-wrap gap-3 items-center justify-end">
         <button
           type="submit"
           class="px-6 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold shadow-lg hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
@@ -229,20 +259,22 @@
         </button>
       </div>
     </form>
-  </section>
+    </section>
+  </div>
 
   <!-- MODAL DETALLE -->
-  <div id="detalleModal" class="fixed inset-0 bg-black/40 items-center justify-center px-4" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl p-6 space-y-5">
-      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-        <h3 class="text-lg font-semibold text-gray-800">Detalle de la incorrecci&oacute;n</h3>
-        <button id="cerrarDetalleModal" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
-      </div>
+  <div id="detalleModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50">
+    <div class="modal-card bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 space-y-5 relative animate-fade animate-scale">
+      <button id="cerrarDetalleModal" class="absolute top-3 right-3 text-gray-500 hover:text-black text-2xl leading-none">&times;</button>
 
-      <p class="text-sm text-gray-500">
-        Completa la informaci&oacute;n y adjunta las evidencias solicitadas. Puedes realizar zoom sobre las
-        previsualizaciones.
-      </p>
+      <div class="space-y-2 pb-2 border-b border-gray-100">
+        <p class="text-xs uppercase tracking-[0.2em] text-indigo-500 font-semibold">Detalle</p>
+        <h3 class="text-lg font-semibold text-gray-800">Detalle de la incorrecci&oacute;n</h3>
+        <p class="text-sm text-gray-500">
+          Completa la informaci&oacute;n y adjunta las evidencias solicitadas. Puedes realizar zoom sobre las
+          previsualizaciones.
+        </p>
+      </div>
 
       <div
         id="detalleAlert"
@@ -273,16 +305,14 @@
   <!-- MODAL PLACA EXISTENTE -->
   <div
     id="modalPlacaExistente"
-    class="fixed inset-0 bg-black/50 items-center justify-center px-4"
-    style="display:none;"
+    class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center px-4 z-50"
   >
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl p-6 space-y-4">
-      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-        <div>
-          <p class="text-xs uppercase tracking-[0.2em] text-indigo-500 font-semibold">Alerta</p>
-          <h3 class="text-lg font-semibold text-gray-800">Placa registrada hoy</h3>
-        </div>
-        <button id="cerrarModalPlaca" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+    <div class="modal-card bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 space-y-4 relative animate-fade animate-scale">
+      <button id="cerrarModalPlaca" class="absolute top-3 right-3 text-gray-500 hover:text-black text-2xl leading-none">&times;</button>
+
+      <div class="space-y-2 pb-2 border-b border-gray-100">
+        <p class="text-xs uppercase tracking-[0.2em] text-indigo-500 font-semibold">Alerta</p>
+        <h3 class="text-lg font-semibold text-gray-800">Placa registrada hoy</h3>
       </div>
 
       <p class="text-sm text-gray-600">
@@ -318,8 +348,13 @@
   </div>
 
   <!-- MODAL FEEDBACK -->
-  <div id="feedbackModal" class="fixed inset-0 bg-black/40 items-center justify-center" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-2xl w-72 p-5 text-center space-y-3 modal-inner">
+  <div id="feedbackModal" class="modal-overlay fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="modal-card bg-white rounded-2xl shadow-xl w-72 p-5 text-center space-y-3 modal-inner relative animate-fade animate-scale">
+      <button
+        type="button"
+        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none"
+        data-close-feedback
+      >&times;</button>
       <div
         id="loadingAnimation"
         class="mx-auto h-10 w-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"
@@ -328,23 +363,20 @@
     </div>
   </div>
 
-  <!-- MODAL PREVISUALIZACI&Oacute;N -->
-  <div id="previewImagenModal" class="fixed inset-0 bg-black/70 items-center justify-center px-4" style="display:none;">
-    <div class="relative bg-white rounded-2xl shadow-2xl p-4 max-w-3xl w-full">
-      <img id="previewImagenSrc" src="" alt="Previsualizaci&oacute;n" class="w-full max-h-[80vh] object-contain rounded-xl" />
-      <button
-        id="cerrarPreviewImagen"
-        class="absolute top-2 right-2 bg-black/60 text-white px-3 py-1 rounded-lg text-sm hover:bg-black/80 transition"
-      >
-        Cerrar
+  <!-- MODAL PREVIEW FIJO Y FUNCIONAL -->
+  <div id="modalPreview" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm hidden items-center justify-center">
+    <div class="relative bg-white rounded-xl shadow-2xl max-w-3xl w-full p-6 animate-[fadeIn_0.3s_ease-out] overflow-hidden">
+      <button onclick="cerrarModalPreview()" class="absolute top-3 right-3 text-gray-600 hover:text-red-600 text-lg">
+        ❌
       </button>
+      <img id="previewImagen" src="" alt="Previsualización" class="rounded max-h-[80vh] w-full object-contain shadow-md" />
+      <p class="text-sm text-gray-500 text-center mt-4">Previsualización de la evidencia</p>
     </div>
   </div>
 </main>
 
 <script type="module" src="../../js/mamparas/script.js"></script>
 <script>
-// ?? NO BORRAR � QA Mamparas
+// ?? NO BORRAR — QA Mamparas
 console.log("QA Mamparas: archivo restaurado");
 </script>
-

@@ -12,6 +12,17 @@
 // ============================================================================
 
 import { BASE_PATH } from "../config.js";
+import {
+  applySidebarVisualState,
+  createRestoreButton,
+  createDesktopToggle,
+  loadSidebarState,
+  saveSidebarState,
+  syncContentLayout,
+  syncRestoreButton,
+  toggleCollapsed,
+  shouldShowDesktopToggle,
+} from "./sidebar-state.js";
 
 const MAIN_SELECTOR = "#dashboardContent";
 const DESKTOP_BREAK = 1024;
@@ -22,7 +33,7 @@ const PRELOADED_STYLES = new Set(
 );
 
 /**
- * Inicializa el sidebar SPA
+  // Inicializacin automatica
  */
 export async function initSidebar(
   containerSelector = "#sidebar-container",
@@ -120,52 +131,69 @@ export async function initSidebar(
   // Responsive
   const isDesktop = () => window.innerWidth >= DESKTOP_BREAK;
 
+  let sidebarState = loadSidebarState();
+  sidebarState.open = sidebarState.open !== false;
+  sidebarState.mode = sidebarState.mode === "collapsed" ? "collapsed" : "expanded";
+
+  const existingRestore = document.getElementById("sidebarRespawn");
+  const restoreButton = existingRestore || createRestoreButton();
+  if (!existingRestore) {
+    document.body.appendChild(restoreButton);
+  }
+
+  const existingDesktopToggle = document.getElementById("sidebarDesktopToggle");
+  const desktopToggle = existingDesktopToggle || createDesktopToggle();
+  if (!existingDesktopToggle) {
+    document.body.appendChild(desktopToggle);
+  }
+
   function adjustContentMargin() {
-    if (!mainContainer) return;
-
-    if (isDesktop()) {
-      document.body.classList.remove("sidebar-hidden");
-      sidebar.classList.add("show");
-      const rootStyles = getComputedStyle(document.documentElement);
-      const defaultWidth =
-        rootStyles.getPropertyValue("--sidebar-width")?.trim() || "250px";
-      const collapsedWidth =
-        rootStyles.getPropertyValue("--sidebar-width-collapsed")?.trim() ||
-        "70px";
-
-      const isCollapsed = sidebar.classList.contains("collapsed");
-      const sideWidth = isCollapsed ? collapsedWidth : defaultWidth;
-
-      mainContainer.style.marginLeft = sideWidth;
-      mainContainer.style.width = `calc(100% - ${sideWidth})`;
-    } else {
-      mainContainer.style.marginLeft = "0px";
-      mainContainer.style.width = "100%";
-    }
+    syncContentLayout(sidebarState, mainContainer);
   }
 
-  // Mobile open/close
-  function openMobile() {
-    sidebar.classList.add("show");
-    document.body.classList.remove("sidebar-hidden");
-  }
+  const updateToggles = () => {
+    const desktopMode = isDesktop();
+    const showRespawn = !sidebarState.open;
+    const showDesktopToggle = shouldShowDesktopToggle(desktopMode, sidebarState);
+    const showFloating = !desktopMode;
+    const showCollapse = desktopMode && sidebarState.open;
 
-  function closeMobile() {
-    sidebar.classList.remove("show");
-    document.body.classList.add("sidebar-hidden");
-  }
+    syncRestoreButton(restoreButton, showRespawn);
+    desktopToggle.style.display = showDesktopToggle ? "inline-flex" : "none";
+    toggleFloating.style.display = showFloating ? "inline-flex" : "none";
+    collapseBtn.style.display = showCollapse ? "inline-flex" : "none";
+  };
 
-  toggleFloating.addEventListener("click", openMobile);
-  toggleInternal.addEventListener("click", closeMobile);
+  const applySidebarState = () => {
+    applySidebarVisualState(sidebar, sidebarState, mainContainer);
+    updateToggles();
+    saveSidebarState(sidebarState);
+  };
+
+  // Mobile/Desktop open/close
+  const openSidebar = () => {
+    sidebarState = { ...sidebarState, open: true, mode: "expanded" };
+    applySidebarState();
+  };
+
+  const closeSidebar = () => {
+    sidebarState = { ...sidebarState, open: false };
+    applySidebarState();
+  };
+
+  toggleFloating.addEventListener("click", openSidebar);
+  toggleInternal.addEventListener("click", closeSidebar);
+  restoreButton.addEventListener("click", openSidebar);
 
   // Collapse desktop
   collapseBtn.addEventListener("click", () => {
-    const collapsed = sidebar.classList.toggle("collapsed");
+    sidebarState = toggleCollapsed(sidebar, sidebarState, true, mainContainer);
+    applySidebarState();
+  });
 
-    if (collapsed) document.body.classList.add("sidebar-collapsed");
-    else document.body.classList.remove("sidebar-collapsed");
-
-    adjustContentMargin();
+  desktopToggle.addEventListener("click", () => {
+    sidebarState = { ...sidebarState, mode: "expanded", open: true };
+    applySidebarState();
   });
 
   // Submenús
@@ -469,6 +497,12 @@ export async function initSidebar(
     bindMenuEvents(menuRoot);
   }
 
+  window.addEventListener("sidebar:state-sync", (ev) => {
+    if (!ev.detail) return;
+    sidebarState = { ...sidebarState, ...ev.detail };
+    applySidebarState();
+  });
+
   // Eventos del router SPA
   window.addEventListener("sidebar:navigate", (ev) => {
     if (ev.detail) loadPartial(ev.detail);
@@ -481,18 +515,25 @@ export async function initSidebar(
 
   // Cerrar en mobile
   document.addEventListener("click", (ev) => {
-    if (!isDesktop()) {
+    if (!isDesktop() && sidebarState.open) {
       if (
         !sidebar.contains(ev.target) &&
         !toggleFloating.contains(ev.target)
       ) {
-        closeMobile();
+        closeSidebar();
       }
     }
   });
 
   // Ajuste en resize
-  window.addEventListener("resize", adjustContentMargin);
+  window.addEventListener("resize", () => {
+    if (isDesktop()) {
+      sidebarState = { ...sidebarState, open: sidebarState.open !== false };
+    } else {
+      sidebarState = { ...sidebarState, open: false };
+    }
+    applySidebarState();
+  });
 
   // Inicialización automática
   const initialHref = hrefFromLocation();
@@ -505,11 +546,5 @@ export async function initSidebar(
     expandSubmenuByHref(homeHref);
   }
 
-  if (isDesktop()) {
-    sidebar.classList.add("show");
-  } else {
-    closeMobile();
-  }
-
-  adjustContentMargin();
+  applySidebarState();
 }

@@ -1,4 +1,4 @@
-/* ============================================================================
+﻿/* ============================================================================
    FORMULARIO DE INCIDENCIAS - TPP
    Arquitectura modular, limpia y preparada para SPA + Tailwind
    Compatible con formulario.html reconstruido
@@ -29,7 +29,7 @@ const VALID_ANEXO_FORMATS = [
 ];
 
 const VALID_ANEXO_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "pdf"];
-const MAX_ANEXOS = 10;
+const MAX_ANEXOS = 30;
 
 /* ---------------------------------------------------------------------------
    REFERENCIAS A ELEMENTOS DEL DOM
@@ -56,9 +56,8 @@ const btnSubirAnexos = document.getElementById("btnSubirAnexos");
 const progressBar = document.getElementById("progressBar");
 const progressLabel = document.getElementById("progressLabel");
 
-const lightboxOverlay = document.getElementById("lightboxOverlay");
-const lightboxImage = document.getElementById("lightboxImage");
-const lightboxCloseBtn = document.getElementById("lightboxClose");
+const modalOverlay = document.getElementById("modalPreview");
+const modalImage = document.getElementById("previewImagen");
 
 /* ---------------------------------------------------------------------------
    ESTADO DEL FORMULARIO
@@ -106,7 +105,7 @@ function renderCamposExtra(tipo) {
     "w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 " +
     "focus:ring-indigo-500 focus:border-indigo-500 transition";
 
-  // CABLE / MERCADERIA → SOLO CONTENEDOR
+  // CABLE / MERCADERIA â†’ SOLO CONTENEDOR
   if (tipo === "CABLE" || tipo === "MERCADERIA") {
     const label = document.createElement("label");
     label.className = "text-sm font-semibold text-gray-700";
@@ -129,7 +128,7 @@ function renderCamposExtra(tipo) {
     return;
   }
 
-  // CHOQUE → SOLO PLACA
+  // CHOQUE â†’ SOLO PLACA
   if (tipo === "CHOQUE") {
     const label = document.createElement("label");
     label.className = "text-sm font-semibold text-gray-700";
@@ -152,7 +151,7 @@ function renderCamposExtra(tipo) {
     return;
   }
 
-  // SINIESTRO → CONTENEDOR + PLACA
+  // SINIESTRO â†’ CONTENEDOR + PLACA
   if (tipo === "SINIESTRO") {
     const contLbl = document.createElement("label");
     contLbl.className = "text-sm font-semibold text-gray-700";
@@ -276,28 +275,31 @@ function sincronizarInputAnexos() {
 /* ---------------------------------------------------------------------------
    RENDER PREVIEW ANEXOS
 --------------------------------------------------------------------------- */
-function renderizarAnexosPreview() {
+function renderGaleriaAnexos(anexos = []) {
+  if (!anexosPreview) return;
+
   anexosPreview.innerHTML = "";
 
-  if (!anexosArchivos.length) {
+  if (!anexos.length) {
     const msg = document.createElement("p");
-    msg.className = "text-xs text-white/60 col-span-full text-center";
-    msg.textContent = "Aún no has cargado evidencias.";
+    msg.className = "text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-center";
+    msg.textContent = "Aun no has cargado evidencias.";
     anexosPreview.appendChild(msg);
     return;
   }
 
-  anexosArchivos.forEach((item) => {
+  anexos.forEach((item) => {
     const isPdf = item.type === "application/pdf" || item.name.toLowerCase().endsWith(".pdf");
 
     const card = document.createElement("div");
-    card.className = "anexo-card cursor-pointer group relative";
-    card.tabIndex = 0;
+    card.className =
+      "relative rounded-xl overflow-hidden shadow-md border border-gray-200 bg-white hover:scale-105 transition-transform duration-200 cursor-pointer";
 
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
-    removeBtn.className = "anexo-remove";
-    removeBtn.textContent = "❌";
+    removeBtn.className =
+      "absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 text-white text-sm flex items-center justify-center";
+    removeBtn.textContent = "\u2715";
     removeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       eliminarAnexo(item.id);
@@ -305,33 +307,37 @@ function renderizarAnexosPreview() {
     card.appendChild(removeBtn);
 
     if (isPdf) {
-      card.classList.add("anexo-card--pdf");
-
-      const icon = document.createElement("div");
-      icon.className = "anexo-pdf-icon";
-      icon.innerHTML = "<i class='fas fa-file-pdf'></i>";
-
-      const name = document.createElement("p");
-      name.className = "anexo-file-name";
-      name.textContent = item.name;
-
-      card.appendChild(icon);
-      card.appendChild(name);
+      const wrap = document.createElement("div");
+      wrap.className = "flex flex-col items-center justify-center gap-2 py-6 px-3 text-gray-700";
+      wrap.innerHTML = `
+        <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+          <i class="fas fa-file-pdf"></i>
+        </div>
+        <p class="text-xs text-center text-gray-600">${item.name}</p>
+      `;
+      card.appendChild(wrap);
     } else {
       const img = document.createElement("img");
       img.src = item.url;
       img.alt = item.name;
-      img.className = "rounded-lg shadow-md object-cover";
+      img.className = "w-full h-28 object-cover";
       card.appendChild(img);
     }
 
     card.addEventListener("click", () => {
-      if (isPdf) window.open(item.url, "_blank");
-      else abrirLightbox(item.url);
+      if (isPdf) {
+        window.open(item.url, "_blank");
+      } else {
+        abrirModalPreview(item.url);
+      }
     });
 
     anexosPreview.appendChild(card);
   });
+}
+
+function renderizarAnexosPreview() {
+  renderGaleriaAnexos(anexosArchivos);
 }
 
 /* ---------------------------------------------------------------------------
@@ -405,6 +411,8 @@ function setupAnexosSection() {
 
   if (!dropZoneAnexos) return;
 
+  dropZoneAnexos.addEventListener("click", () => anexosInput?.click());
+
   const activate = (e) => {
     e.preventDefault();
     dropZoneAnexos.classList.add("drop-zone--active");
@@ -430,66 +438,40 @@ function setupAnexosSection() {
 }
 
 /* ---------------------------------------------------------------------------
-   LIGHTBOX – Ver imagen ampliada
+   LIGHTBOX â€“ Ver imagen ampliada
 --------------------------------------------------------------------------- */
-function lockBodyScroll() {
-  if (!document.body.dataset.prevOverflow) {
-    document.body.dataset.prevOverflow = document.body.style.overflow || "";
-  }
-  document.body.style.overflow = "hidden";
+function abrirModalPreview(src) {
+  if (!src || !modalOverlay || !modalImage) return;
+
+  modalImage.src = src;
+  modalOverlay.classList.add("flex");
+  modalOverlay.classList.remove("hidden");
+  document.addEventListener("keydown", escCloseHandler);
+  modalOverlay.addEventListener("click", outsideClickHandler);
 }
 
-function unlockBodyScroll() {
-  document.body.style.overflow = document.body.dataset.prevOverflow || "";
-  delete document.body.dataset.prevOverflow;
+function cerrarModalPreview() {
+  if (!modalOverlay) return;
+  modalOverlay.classList.add("hidden");
+  modalOverlay.classList.remove("flex");
+  document.removeEventListener("keydown", escCloseHandler);
+  modalOverlay.removeEventListener("click", outsideClickHandler);
 }
 
-function abrirLightbox(url) {
-  if (!url || !lightboxOverlay || !lightboxImage) return;
-
-  lightboxImage.src = url;
-  lightboxOverlay.classList.remove("hidden");
-
-  requestAnimationFrame(() => {
-    lightboxOverlay.classList.add("active");
-  });
-
-  lightboxOverlay.setAttribute("aria-hidden", "false");
-
-  lockBodyScroll();
-  document.addEventListener("keydown", handleLightboxEsc);
+function escCloseHandler(e) {
+  if (e.key === "Escape") cerrarModalPreview();
 }
 
-function cerrarLightbox() {
-  if (!lightboxOverlay) return;
-
-  const end = () => {
-    lightboxOverlay.classList.add("hidden");
-    lightboxOverlay.removeEventListener("transitionend", end);
-  };
-
-  lightboxOverlay.classList.remove("active");
-  lightboxOverlay.setAttribute("aria-hidden", "true");
-  lightboxOverlay.addEventListener("transitionend", end);
-
-  unlockBodyScroll();
-  document.removeEventListener("keydown", handleLightboxEsc);
+function outsideClickHandler(e) {
+  if (e.target?.id === "modalPreview") cerrarModalPreview();
 }
 
-function handleLightboxEsc(e) {
-  if (e.key === "Escape") cerrarLightbox();
-}
+window.abrirModalPreview = abrirModalPreview;
+window.mostrarModal = abrirModalPreview;
+window.cerrarModalPreview = cerrarModalPreview;
 
-lightboxCloseBtn?.addEventListener("click", cerrarLightbox);
-lightboxOverlay?.addEventListener("click", (e) => {
-  if (e.target === lightboxOverlay || e.target.hasAttribute("data-lightbox-dismiss")) {
-    cerrarLightbox();
-  }
-});
-
-window.abrirLightbox = abrirLightbox;
 /* ============================================================================
-   VALIDACIONES — Campos extra según tipo
+   VALIDACIONES â€” Campos extra segÃºn tipo
 ============================================================================ */
 function validarCamposExtra() {
   const extra = obtenerValorExtra();
@@ -542,7 +524,7 @@ async function procesarAnexos(idRegistro) {
 ============================================================================ */
 async function guardarIncidencia(estado = "BORRADOR") {
   if (!tipoSeleccionado) {
-    alert("No se detectó el tipo de incidencia.");
+    alert("No se detectÃ³ el tipo de incidencia.");
     return;
   }
 
@@ -595,7 +577,7 @@ async function guardarIncidencia(estado = "BORRADOR") {
 }
 
 /* ============================================================================
-   EVENTOS — BOTONES PRINCIPALES
+   EVENTOS â€” BOTONES PRINCIPALES
 ============================================================================ */
 document.getElementById("btnGuardarBorrador")
   ?.addEventListener("click", (e) => {
@@ -617,12 +599,12 @@ document.getElementById("btnVolverDashboard")
   });
 
 /* ============================================================================
-   NUMERACIÓN AUTOMÁTICA EN TEXTAREAS
+   NUMERACIÃ“N AUTOMÃTICA EN TEXTAREAS
 ============================================================================ */
 function setupNumberedTextarea(el) {
   if (!el) return;
 
-  // Inicializar si está vacío
+  // Inicializar si estÃ¡ vacÃ­o
   if (!el.value.trim()) {
     el.value = "1. ";
     el.setSelectionRange(el.value.length, el.value.length);
@@ -675,7 +657,7 @@ setupAnexosSection();
 renderizarAnexosPreview();
 
 /* ============================================================================
-   HELPERS INTERNOS — Normalización y limpieza
+   HELPERS INTERNOS â€” NormalizaciÃ³n y limpieza
 ============================================================================ */
 
 /**
@@ -729,14 +711,14 @@ function armarPayloadFinal() {
 }
 
 /* ============================================================================
-   🔗 EXPORTAR WORD — Integración oficial con generador-docx.js
+   ðŸ”— EXPORTAR WORD â€” IntegraciÃ³n oficial con generador-docx.js
 ============================================================================ */
 
 /**
  * Construye el payload EXACTO requerido por generateWordFinal().
  * Incluye:
  *  - Campos visibles del formulario
- *  - Valores extra (según tipo)
+ *  - Valores extra (segÃºn tipo)
  *  - Evidencias locales (sin guardar)
  *  - Evidencias ya guardadas en Supabase (si existe id)
  */
@@ -756,7 +738,7 @@ async function armarPayloadWord() {
     anexos: [],
   };
 
-  // 1️⃣ anexos locales (no subidos aún)
+  // 1ï¸âƒ£ anexos locales (no subidos aÃºn)
   if (anexosArchivos?.length) {
     payload.anexos = anexosArchivos.map((a) => ({
       name: a.name,
@@ -765,7 +747,7 @@ async function armarPayloadWord() {
     }));
   }
 
-  // 2️⃣ anexos guardados en BD (si edición)
+  // 2ï¸âƒ£ anexos guardados en BD (si ediciÃ³n)
   const url = new URL(window.location.href);
   const id = url.searchParams.get("id");
 
@@ -785,7 +767,7 @@ async function armarPayloadWord() {
 }
 
 /* ============================================================================
-   BOTÓN EXPORTAR → GENERAR WORD REAL
+   BOTÃ“N EXPORTAR â†’ GENERAR WORD REAL
 ============================================================================ */
 
 document.getElementById("btnExportarWord")
@@ -794,13 +776,13 @@ document.getElementById("btnExportarWord")
       const payload = await armarPayloadWord();
       await generateWordFinal(payload);
     } catch (err) {
-      console.error("❌ Error exportando Word:", err);
+      console.error("âŒ Error exportando Word:", err);
       alert("No se pudo generar el documento Word.");
     }
   });
 
 /* ============================================================================
-   BOTÓN EXPORTAR DESHABILITADO SEGÚN PROGRESO
+   BOTÃ“N EXPORTAR DESHABILITADO SEGÃšN PROGRESO
 ============================================================================ */
 
 function actualizarEstadoBotonWord() {
@@ -829,7 +811,7 @@ function iniciarAutosave() {
   if (autosaveTimer) clearTimeout(autosaveTimer);
 
   autosaveTimer = setTimeout(() => {
-    console.log("🟡 AUTOSAVE READY (desactivado por ahora)");
+    console.log("ðŸŸ¡ AUTOSAVE READY (desactivado por ahora)");
   }, 2000);
 }
 
@@ -858,11 +840,11 @@ function resetFormularioParcial() {
   renderizarAnexosPreview();
   recalcularProgreso();
 
-  console.log("🔄 Formulario parcialmente restablecido.");
+  console.log("ðŸ”„ Formulario parcialmente restablecido.");
 }
 
 window.resetFormularioParcial = resetFormularioParcial;
 
 /* ============================================================================
-   🎉 FIN DEL ARCHIVO — FORMULARIO COMPLETO, LIMPIO Y FUNCIONAL
+   FIN DEL ARCHIVO FORMULARIO COMPLETO, LIMPIO Y FUNCIONAL
 ============================================================================ */
