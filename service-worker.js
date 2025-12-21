@@ -10,15 +10,7 @@
 
 const BASE_PATH = detectBasePath();
 
-const withBase = (path = "") => {
-  if (!path) return BASE_PATH || "";
-  if (/^(https?:)?\/\//i.test(path) || path.startsWith("data:")) return path;
-  const normalized = path.startsWith("/") ? path : `/${path}`;
-  if (BASE_PATH && (normalized === BASE_PATH || normalized.startsWith(`${BASE_PATH}/`))) {
-    return normalized;
-  }
-  return `${BASE_PATH}${normalized}`;
-};
+const withBase = (path = "") => `${BASE_PATH}/${path.replace(/^\//, "")}`;
 
 const VERSION = "v7.14";
 const CACHE_NAME = `CCTV-V75${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
