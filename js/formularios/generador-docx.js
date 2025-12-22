@@ -17,7 +17,7 @@ import { withBase } from "../config.js";
    1) Cargar plantilla Word como ArrayBuffer
 ---------------------------------------------------------- */
 async function loadTemplate() {
-  const url = withBase("/assets/templates/informe-base.docx");
+  const url = withBase("assets/templates/informe-base.docx");
 
   const res = await fetch(url);
   if (!res.ok) {
@@ -132,6 +132,7 @@ async function renderWord(context) {
   const doc = new Docxtemplater(zip, {
     paragraphLoop: true,
     linebreaks: true,
+    delimiters: { start: "{{", end: "}}" },
     modules: [imageModule],
     nullGetter: () => "",
   });
@@ -146,15 +147,15 @@ async function renderWord(context) {
     console.error("�?O Error renderizando DOCX:", err);
     throw err;
   }
+
+  const output = doc.getZip().generate({
+    type: "blob",
+    mimeType:
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  });
+
+  triggerDownload(output, `Informe_${Date.now()}.docx`);
 }
-
-const output = doc.getZip().generate({
-  type: "blob",
-  mimeType:
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-});
-
-triggerDownload(output, `Informe_${Date.now()}.docx`);
 /* ----------------------------------------------------------
    8) Descargar archivo final
 ---------------------------------------------------------- */
@@ -179,6 +180,7 @@ async function generateWordFinal(payload) {
     dirigido_a,
     remitente,
     fecha_informe,
+    introduccion,
     hechos,
     analisis,
     conclusiones,
@@ -187,6 +189,10 @@ async function generateWordFinal(payload) {
   } = payload;
 
   const anexosProcesados = await preprocessAnexos(anexos);
+  const anexosMap = {};
+  for (let i = 0; i < 10; i += 1) {
+    anexosMap[`ANEXO_${i + 1}`] = anexosProcesados[i] || "";
+  }
 
   const context = {
     ASUNTO: asunto || "",
@@ -195,11 +201,12 @@ async function generateWordFinal(payload) {
     DIRIGIDO_A: dirigido_a || "",
     REMITENTE: remitente || "",
     FECHA_INFORME: fecha_informe || "",
+    INTRODUCCION: normalizeMultiline(introduccion || ""),
     HECHOS: normalizeMultiline(hechos || ""),
     ANALISIS: normalizeMultiline(analisis || ""),
     CONCLUSIONES: normalizeMultiline(conclusiones || ""),
     RECOMENDACIONES: normalizeMultiline(recomendaciones || ""),
-    TABLA_ANEXOS: anexosProcesados,
+    ...anexosMap,
   };
 
   await renderWord(context);
@@ -220,6 +227,7 @@ async function generarDocxIncidencia(incidencia = {}) {
     dirigido_a: incidencia.dirigido_a || "",
     remitente: incidencia.remitente || "",
     fecha_informe: incidencia.fecha_informe || "",
+    introduccion: campos.introduccion || incidencia.introduccion || "",
     hechos: campos.hechos || "",
     analisis: incidencia.analisis || "",
     conclusiones: incidencia.conclusiones || "",

@@ -109,14 +109,14 @@ body {
   transition: margin-left 0.3s ease-in-out;
 }
 
-.sidebar.collapsed+.main-container {
+.legacy-sidebar.collapsed+.main-container {
   margin-left: 60px;
 }
 
 /* ===========================
    SIDEBAR OBSERVADO
 =========================== 
-.sidebar {
+.legacy-sidebar {
   width: 220px;
   background-color: var(--tpp-accent);
   padding-top: 20px;
@@ -131,11 +131,11 @@ body {
   transition: width 0.3s ease-in-out;
 }
 
-.sidebar.collapsed {
+.legacy-sidebar.collapsed {
   width: 60px;
 }
 
-.sidebar a {
+.legacy-sidebar a {
   padding: 12px 20px;
   text-decoration: none;
   color: var(--tpp-dark);
@@ -146,8 +146,8 @@ body {
   white-space: nowrap;
 }
 
-.sidebar a.active,
-.sidebar a:hover {
+.legacy-sidebar a.active,
+.legacy-sidebar a:hover {
   background-color: var(--tpp-border);
   color: white;
 }
@@ -435,7 +435,7 @@ body {
     flex-direction: column;
   }
 
-  .sidebar {
+  .legacy-sidebar {
     position: relative;
     width: 100%;
     height: auto;
@@ -453,7 +453,7 @@ body {
   }
 }*/
 /* Estilos adicionales para el menÃº lateral */
-.sidebar {
+.legacy-sidebar {
   position: fixed;
   left: 0;
   top: 0;
@@ -467,11 +467,11 @@ body {
   z-index: 100;
 }
 
-.sidebar.collapsed {
+.legacy-sidebar.collapsed {
   transform: translateX(-100%);
 }
 
-.sidebar a {
+.legacy-sidebar a {
   display: block;
   padding: 14px 20px;
   color: var(--tpp-dark);
@@ -480,7 +480,7 @@ body {
   transition: background 0.2s;
 }
 
-.sidebar a:hover {
+.legacy-sidebar a:hover {
   background-color: var(--tpp-light);
 }
 
@@ -502,7 +502,7 @@ body {
       transition: margin-left 0.3s ease-in-out;
     }
 
-    .sidebar.collapsed ~ .main-content {
+    .legacy-sidebar.collapsed ~ .main-content {
       margin-left: 20px;
     }
 
@@ -655,7 +655,7 @@ body {
 
 /* MEDIA QUERIES PARA RESPONSIVIDAD */
 @media screen and (max-width: 768px) {
-  .sidebar {
+  .legacy-sidebar {
     position: fixed;
     left: 0;
     top: 0;
@@ -670,7 +670,7 @@ body {
     z-index: 200;
   }
 
-  .sidebar.show {
+  .legacy-sidebar.show {
     transform: translateX(0);
   }
 
@@ -755,7 +755,7 @@ body {
 
 /* MOSTRAR NAV EN MOVILES */
 @media screen and (max-width: 768px) {
-  .sidebar {
+  .legacy-sidebar {
     display: none;
   }
 
@@ -782,7 +782,7 @@ body {
     display: none;
   }
 
-  .sidebar {
+  .legacy-sidebar {
     width: 220px;
     position: fixed;
     left: 0;

@@ -10,25 +10,29 @@
 
 const BASE_PATH = detectBasePath();
 
-const withBase = (path = "") => `${BASE_PATH}/${path.replace(/^\//, "")}`;
+const asset = (path = "") => {
+  const cleaned = path.replace(/^\/+/, "");
+  if (!BASE_PATH) return cleaned;
+  return `${BASE_PATH}/${cleaned}`;
+};
 
-const VERSION = "v7.14";
-const CACHE_NAME = `CCTV-V75${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
+const VERSION = "v7.23";
+const CACHE_NAME = `CCTV-${VERSION}${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
 // Archivos que intentaremos cachear si existen:
 const STATIC_ASSETS = [
-  "/css/global.css",
-  "/css/tailwind.css",
-  "/css/dashboard/dashboard.css",
-  "/css/estilos-sidebar/sidebar.css",
-  "/css/styles.css",
-  "/js/sidebar/sidebar-loader.js",
-  "/js/sidebar/sidebar.js",
-  "/js/libs/docxtemplater-image-module.js",
-  "/js/dashboard.js",
-  "/manifest.json",
-  "/favicon.ico",
-].map(withBase);
+  "CSS/global.css",
+  "CSS/tailwind.css",
+  "CSS/dashboard/dashboard.css",
+  "CSS/estilos-sidebar/sidebar.css",
+  "CSS/styles.css",
+  "js/sidebar/sidebar-loader.js",
+  "js/sidebar/sidebar.js",
+  "js/libs/docxtemplater-image-module.js",
+  "js/dashboard/dashboard.js",
+  "manifest.json",
+  "favicon.ico",
+].map(asset);
 
 const STATIC_FILE_REGEX = /\.(css|js|png|jpg|jpeg|svg|webp|ico)$/i;
 

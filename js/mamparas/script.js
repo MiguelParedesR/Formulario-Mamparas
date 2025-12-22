@@ -165,7 +165,53 @@ function arrayBufferToBase64(buffer) {
   return btoa(String.fromCharCode(...bytes));
 }
 
+function parseDetalleJSON(detalleJSON) {
+  if (!detalleJSON) return null;
+  if (typeof detalleJSON === "object") return detalleJSON;
+  if (typeof detalleJSON !== "string") return null;
+  try {
+    return JSON.parse(detalleJSON);
+  } catch {
+    return null;
+  }
+}
+
+function normalizarNumero(valor) {
+  if (valor === null || valor === undefined || valor === "") return null;
+  const numero = Number.parseFloat(valor);
+  return Number.isFinite(numero) ? numero : null;
+}
+
+function formatearMedidaTexto(valor) {
+  if (valor === null || valor === undefined || valor === "") return null;
+  const texto = String(valor).trim();
+  if (!texto) return null;
+  return /cm$/i.test(texto) ? texto : `${texto} cm`;
+}
+
 export async function guardarInspeccion(datosFormulario, detalleJSON) {
+  const detalleObj = parseDetalleJSON(detalleJSON);
+  const detalleDatos = detalleObj?.datos || {};
+  const detalleImagenes = detalleObj?.imagenes || {};
+  const esMampara = detalleObj?.tipo === "Mampara";
+  const separacionCentralRaw = esMampara
+    ? detalleDatos.separacion_lateral_central ?? detalleDatos.separacion_central ?? null
+    : null;
+  const alturaMamparaRaw = esMampara ? detalleDatos.altura_mampara ?? null : null;
+
+  const separacionCentral = normalizarNumero(separacionCentralRaw);
+  const alturaMampara = normalizarNumero(alturaMamparaRaw);
+  const medidaCentral = esMampara ? formatearMedidaTexto(separacionCentralRaw) : null;
+  const medidaAltura = esMampara ? formatearMedidaTexto(alturaMamparaRaw) : null;
+
+  const fotoUnidad = esMampara
+    ? detalleImagenes.foto_panoramica_unidad ||
+      detalleImagenes.foto_lateral_central ||
+      detalleImagenes.foto_altura_mampara ||
+      null
+    : null;
+  const fotoObservacion = !esMampara ? detalleImagenes.foto_observacion || null : null;
+
   const registro = {
     fecha: datosFormulario.fecha,
     hora: datosFormulario.hora,
@@ -176,6 +222,12 @@ export async function guardarInspeccion(datosFormulario, detalleJSON) {
     lugar: datosFormulario.lugar,
     incorreccion: datosFormulario.incorreccion,
     observaciones: datosFormulario.observaciones,
+    separacion_central: separacionCentral,
+    medida_altura: medidaAltura,
+    medida_central: medidaCentral,
+    altura_mampara: alturaMampara,
+    foto_unidad: fotoUnidad,
+    foto_observacion: fotoObservacion,
     detalle: detalleJSON,
   };
 

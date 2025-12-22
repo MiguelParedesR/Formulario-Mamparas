@@ -10,6 +10,8 @@
 // ============================================================================
 
 
+import { withBase } from "../config.js";
+
 /**
  * Navega a formulario.html con parámetro ?tipo=
  * @param {string} tipo  Ej: "CABLE", "MERCADERIA", "CHOQUE", "SINIESTRO"
@@ -17,7 +19,7 @@
 export function navigateToFormulario(tipo) {
   if (!tipo) return;
 
-  const url = `./html/formulario.html?tipo=${encodeURIComponent(tipo)}`;
+  const url = withBase(`html/formulario.html?tipo=${encodeURIComponent(tipo)}`);
 
   console.log(`➡️ Navegando a: ${url}`);
 
@@ -32,7 +34,7 @@ export function navigateToFormulario(tipo) {
  * (ruta real del proyecto)
  */
 export function navigateToMamparas() {
-  const url = "./html/formulario-mamparas/registro.html";
+  const url = withBase("html/formulario-mamparas/registro.html");
 
   console.log(`➡️ Navegando a: ${url}`);
 

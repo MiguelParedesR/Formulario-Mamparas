@@ -43,6 +43,7 @@ const dirigidoAInput = document.getElementById("dirigidoA");
 const remitenteInput = document.getElementById("remitente");
 const fechaInformeInput = document.getElementById("fechaInforme");
 
+const introduccionInput = document.getElementById("introduccion");
 const hechosInput = document.getElementById("hechos");
 const analisisInput = document.getElementById("analisis");
 const conclusionesInput = document.getElementById("conclusiones");
@@ -224,6 +225,7 @@ function recalcularProgreso() {
     dirigidoAInput,
     remitenteInput,
     fechaInformeInput,
+    introduccionInput,
     hechosInput,
     analisisInput,
     conclusionesInput,
@@ -544,6 +546,7 @@ async function guardarIncidencia(estado = "BORRADOR") {
     campos: {
       valorExtra,
       hechos: hechosInput.value || "",
+      introduccion: introduccionInput.value || "",
     },
     progreso: parseInt(progressLabel.textContent),
     estado,
@@ -594,7 +597,7 @@ document.getElementById("btnGuardarCompleto")
 document.getElementById("btnVolverDashboard")
   ?.addEventListener("click", () => {
     window.dispatchEvent(
-      new CustomEvent("sidebar:navigate", { detail: withBase("/index.html") })
+      new CustomEvent("sidebar:navigate", { detail: withBase("index.html") })
     );
   });
 
@@ -649,7 +652,7 @@ if (tipoDetectado) {
 }
 
 // Inicializar textareas numeradas
-[hechosInput, analisisInput, conclusionesInput, recomendacionesInput]
+[introduccionInput, hechosInput, analisisInput, conclusionesInput, recomendacionesInput]
   .forEach(setupNumberedTextarea);
 
 // Inicializar anexos
@@ -701,6 +704,7 @@ function armarPayloadFinal() {
     conclusiones: procesarTextoNumerado(conclusionesInput.value),
     recomendaciones: procesarTextoNumerado(recomendacionesInput.value),
     hechos: procesarTextoNumerado(hechosInput.value),
+    introduccion: procesarTextoNumerado(introduccionInput.value),
     extras: valorExtra,
     anexos: anexosArchivos.map((a) => ({
       name: a.name,
@@ -731,6 +735,7 @@ async function armarPayloadWord() {
     dirigido_a: dirigidoAInput.value || "",
     remitente: remitenteInput.value || "",
     fecha_informe: fechaInformeInput.value || "",
+    introduccion: introduccionInput.value || "",
     hechos: hechosInput.value || "",
     analisis: analisisInput.value || "",
     conclusiones: conclusionesInput.value || "",
@@ -820,6 +825,7 @@ function iniciarAutosave() {
   dirigidoAInput,
   remitenteInput,
   fechaInformeInput,
+  introduccionInput,
   hechosInput,
   analisisInput,
   conclusionesInput,
@@ -831,6 +837,7 @@ function iniciarAutosave() {
 ============================================================================ */
 
 function resetFormularioParcial() {
+  introduccionInput.value = "1. ";
   hechosInput.value = "1. ";
   analisisInput.value = "1. ";
   conclusionesInput.value = "1. ";

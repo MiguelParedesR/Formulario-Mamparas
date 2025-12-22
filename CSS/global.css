@@ -570,6 +570,10 @@ body.sidebar-hidden #dashboardContent {
     animation: fadeIn 0.3s ease-out;
 }
 
+.modal-overlay.hidden {
+    display: none;
+}
+
 .modal-content {
     background: #fff;
     border-radius: 1rem;

@@ -55,7 +55,7 @@ export async function initSidebar(
     return `${prefix}${normalized}`;
   };
 
-  const htmlPath = withBasePath(options.htmlPath ?? "/html/base/sidebar.html");
+  const htmlPath = withBasePath(options.htmlPath ?? "html/base/sidebar.html");
   const enableRouting = options.enableRouting !== false;
 
   const container = document.querySelector(containerSelector);
@@ -197,15 +197,33 @@ export async function initSidebar(
   });
 
   // Submenús
+  function syncOpenSubmenuHeights(start) {
+    let node = start?.parentElement;
+    while (node) {
+      if (node.classList?.contains("submenu")) {
+        node.style.maxHeight = node.scrollHeight + "px";
+      }
+      node = node.parentElement;
+    }
+  }
+
   function setSubmenuState(li, open) {
     li.classList.toggle("active", open);
 
     const submenu = li.querySelector(":scope > .submenu");
     if (!submenu) return;
 
-    submenu.style.display = open ? "block" : "none";
-    submenu.style.maxHeight = open ? submenu.scrollHeight + "px" : "0px";
-    submenu.style.opacity = open ? "1" : "0";
+    if (open) {
+      submenu.style.display = "block";
+      submenu.style.maxHeight = submenu.scrollHeight + "px";
+      submenu.style.opacity = "1";
+    } else {
+      submenu.style.maxHeight = "0px";
+      submenu.style.opacity = "0";
+      submenu.style.display = "none";
+    }
+
+    syncOpenSubmenuHeights(submenu);
   }
 
   function toggleSubmenu(li) {
@@ -541,7 +559,7 @@ export async function initSidebar(
   if (initialHref) {
     loadPartial(initialHref, { push: false });
   } else {
-    const homeHref = withBasePath("/index.html");
+    const homeHref = withBasePath("index.html");
     highlightActive(homeHref);
     expandSubmenuByHref(homeHref);
   }

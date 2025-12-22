@@ -12,14 +12,14 @@
 
 import { BASE_PATH, withBase } from "../config.js";
 
-const SIDEBAR_HTML = withBase("/html/base/sidebar.html");
-const SIDEBAR_JS = withBase("/js/sidebar/sidebar.js");
-const SIDEBAR_CSS = withBase("/css/estilos-sidebar/sidebar.css");
+const SIDEBAR_HTML = withBase("html/base/sidebar.html");
+const SIDEBAR_JS = withBase("js/sidebar/sidebar.js");
+const SIDEBAR_CSS = withBase("CSS/estilos-sidebar/sidebar.css");
 const CORE_STYLES = [
-  withBase("/css/tailwind.css"),
-  withBase("/css/global.css"),
-  withBase("/css/dashboard/dashboard.css"),
-  withBase("/css/styles.css"),
+  withBase("CSS/tailwind.css"),
+  withBase("CSS/global.css"),
+  withBase("CSS/dashboard/dashboard.css"),
+  withBase("CSS/styles.css"),
 ];
 
 const FONT_AWESOME =
@@ -122,7 +122,9 @@ async function injectSidebarHTML() {
 // ============================================================================
 async function initSidebarJS() {
   try {
-    const module = await import(`${SIDEBAR_JS}?v=${Date.now()}`);
+    const moduleUrl = new URL(SIDEBAR_JS, window.location.href);
+    moduleUrl.searchParams.set("v", Date.now());
+    const module = await import(moduleUrl.href);
     const initSidebar = module.initSidebar;
 
     if (typeof initSidebar !== "function") {

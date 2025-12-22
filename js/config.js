@@ -1,6 +1,8 @@
 // Ruta base autocalculada para funcionar en raiz o en GitHub Pages.
 // Si necesitas forzarla manualmente, define window.BASE_PATH_OVERRIDE antes de cargar este archivo.
 
+const REPO_BASE = "/Formulario-Mamparas";
+
 const normalizeBase = (path = "") => {
   if (!path) return "";
   const trimmed = path.trim().replace(/\/+$/, "");
@@ -9,16 +11,25 @@ const normalizeBase = (path = "") => {
 };
 
 const detectBasePath = () => {
-  if (typeof window === "undefined") return "";
+  if (typeof window === "undefined") return normalizeBase(REPO_BASE);
 
   const override = window.BASE_PATH_OVERRIDE || window.__BASE_PATH_OVERRIDE__;
   if (override) return normalizeBase(override);
 
-  const { protocol, pathname } = window.location;
+  const { protocol, hostname, pathname } = window.location;
   if (protocol === "file:") return "";
+
+  if (hostname.endsWith("github.io")) {
+    return normalizeBase(REPO_BASE);
+  }
 
   const segments = pathname.split("/").filter(Boolean);
   if (!segments.length) return "";
+
+  const repoName = REPO_BASE.replace(/^\//, "");
+  if (segments[0] === repoName) {
+    return normalizeBase(REPO_BASE);
+  }
 
   const last = segments[segments.length - 1];
   const isFile = /\.[a-zA-Z0-9]+$/.test(last);
@@ -26,29 +37,34 @@ const detectBasePath = () => {
 
   if (!baseSegments.length) return "";
 
-  // GitHub Pages expone la app bajo /REPO/, por eso tomamos solo el primer segmento.
   return normalizeBase(`/${baseSegments[0]}`);
 };
 
 const BASE_PATH = detectBasePath();
 
-const withBase = (path = "") => {
+const asset = (path = "") => {
   if (!path) return BASE_PATH || "";
-  if (/^(https?:)?\/\//i.test(path) || path.startsWith("data:")) return path;
-
-  const normalized = path.startsWith("/") ? path : `/${path}`;
-  const prefix = BASE_PATH || "";
-
-  if (prefix && (normalized === prefix || normalized.startsWith(`${prefix}/`))) {
-    return normalized;
+  if (
+    /^(https?:)?\/\//i.test(path) ||
+    path.startsWith("data:") ||
+    path.startsWith("mailto:") ||
+    path.startsWith("tel:")
+  ) {
+    return path;
   }
 
-  return `${prefix}${normalized}`;
+  const cleaned = path.replace(/^\/+/, "");
+  if (!BASE_PATH) return `./${cleaned}`;
+
+  return `${BASE_PATH}/${cleaned}`;
 };
+
+const withBase = asset;
 
 if (typeof window !== "undefined") {
   window.BASE_PATH = BASE_PATH;
+  window.asset = asset;
   window.withBase = withBase;
 }
 
-export { BASE_PATH, withBase };
+export { BASE_PATH, asset, withBase };

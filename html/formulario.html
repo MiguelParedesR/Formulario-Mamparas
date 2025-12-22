@@ -1,14 +1,14 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TPP â€“ Nuevo Informe de Incidencia</title>
+  <title>TPP &mdash; Nuevo Informe de Incidencia</title>
 
-  <link rel="stylesheet" href="../css/tailwind.css" />
-  <link rel="stylesheet" href="../css/global.css" />
-  <link rel="stylesheet" href="../css/dashboard/dashboard.css" />
+  <link rel="stylesheet" href="../CSS/tailwind.css" />
+  <link rel="stylesheet" href="../CSS/global.css" />
+  <link rel="stylesheet" href="../CSS/dashboard/dashboard.css" />
 
   <style>
     body {
@@ -31,7 +31,7 @@
           <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
             <i class="fas fa-file-signature text-indigo-600"></i> Nuevo Informe de Incidencia
           </h1>
-          <p class="text-sm text-gray-500" id="tipoDescripcion">Obteniendo informaciÃ³n del tipo seleccionadoâ€¦</p>
+          <p class="text-sm text-gray-500" id="tipoDescripcion">Obteniendo informaci&oacute;n del tipo seleccionado&hellip;</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
@@ -146,12 +146,12 @@
             <!-- COLUMNA DERECHA -->
             <aside class="space-y-4 sticky top-6 bg-white border border-gray-200 rounded-xl shadow p-4 max-h-[90vh] overflow-y-auto">
               <section class="space-y-2">
-                <h2 class="text-sm font-semibold text-gray-700">SECCION VIII — Evidencias</h2>
+                <h2 class="text-sm font-semibold text-gray-700">SECCION VIII � Evidencias</h2>
 
                 <input id="anexos" type="file" accept="image/*,.pdf" multiple class="sr-only" />
                 <button type="button" id="btnSubirAnexos"
                   class="w-full px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition">
-                  Subir evidencias (máx. 30)
+                  Subir evidencias (m&aacute;x. 30)
                 </button>
 
                 <div id="anexosPreview" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
@@ -162,15 +162,14 @@
           </div>
         </form>
       </section>
-
       <!-- MODAL PREVIEW -->
       <div id="modalPreview" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
         <div class="relative bg-white rounded-xl shadow-2xl max-w-3xl w-full p-4 animate-[fadeIn_0.3s_ease-out]">
           <button onclick="cerrarModalPreview()" class="absolute top-2 right-2 text-xl text-gray-600 hover:text-red-500">
-            ❌
+            &times;
           </button>
-          <img id="previewImagen" src="" alt="Previsualización" class="w-full max-h-[80vh] object-contain rounded" />
-          <p class="text-sm text-center text-gray-500 mt-2">Previsualización</p>
+          <img id="previewImagen" src="" alt="Previsualizaci&oacute;n" />
+          <p class="text-sm text-center text-gray-500 mt-2">Previsualizaci&oacute;n</p>
         </div>
       </div>
 
@@ -181,3 +180,6 @@
 </body>
 
 </html>
+
+
+

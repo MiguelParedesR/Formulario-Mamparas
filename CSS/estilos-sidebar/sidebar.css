@@ -255,11 +255,21 @@ body.sidebar-hidden #sidebarRespawn {
   padding-left: 14px;
   margin: 0;
   display: none;
+  overflow: hidden;
+  position: static;
+  width: 100%;
+}
+
+.submenu li {
+  display: block;
+  float: none;
+  clear: both;
 }
 
 .submenu .submenu-link {
   font-size: 0.9rem;
   padding: 10px 12px 10px 26px;
+  line-height: 1.35;
 }
 
 /* ========================================================================== */

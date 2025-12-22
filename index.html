@@ -4,27 +4,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <base href="https://miguelparedesr.github.io/Formulario-Mamparas/" />
-  <title>TPP – Dashboard</title>
+  <title>TPP &mdash; Dashboard</title>
 
   <!-- PWA -->
   <link rel="manifest" href="./manifest.json" />
   <meta name="theme-color" content="#2f3b52" />
 
   <!-- Tailwind -->
-  <link rel="stylesheet" href="./css/tailwind.css" />
+  <link rel="stylesheet" href="./CSS/tailwind.css" />
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- Sidebar + Global -->
-  <link rel="stylesheet" href="./css/estilos-sidebar/sidebar.css" />
-  <link rel="stylesheet" href="./css/global.css" />
-  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./CSS/estilos-sidebar/sidebar.css" />
+  <link rel="stylesheet" href="./CSS/global.css" />
+  <link rel="stylesheet" href="./CSS/styles.css" />
 
   <!-- Dashboard CSS -->
-  <link rel="stylesheet" href="./css/dashboard/dashboard.css" />
+  <link rel="stylesheet" href="./CSS/dashboard/dashboard.css" />
 
   <style>
     body {
@@ -35,8 +34,8 @@
 
 <body>
 
-  <button id="sidebarRespawn" type="button" aria-label="Mostrar menú lateral" class="sidebar-respawn">
-    ☰
+  <button id="sidebarRespawn" type="button" aria-label="Mostrar men&uacute; lateral" class="sidebar-respawn">
+    <i class="fas fa-bars"></i>
   </button>
 
   <!-- SIDEBAR -->
@@ -50,7 +49,7 @@
         ======================= -->
     <section id="dashboardView">
 
-      <!-- TÍTULO -->
+      <!-- TITULO -->
       <div class="fade-up">
         <h1 class="text-3xl font-bold text-tpp-dark flex items-center gap-3">
           <i class="fas fa-layer-group text-indigo-600"></i>
@@ -74,12 +73,12 @@
               class="w-12 h-12 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 text-2xl mb-4">
               <i class="fas fa-bolt"></i>
             </div>
-            <h2 class="text-xl font-semibold text-gray-800">Sustracción de Cable RH</h2>
+            <h2 class="text-xl font-semibold text-gray-800">Sustracci&oacute;n de Cable RH</h2>
             <p class="text-sm text-gray-500 mt-1">Informe oficial para incidentes en Reefers.</p>
           </div>
         </div>
 
-        <!-- MERCADERÍA -->
+        <!-- MERCADERIA -->
         <div onclick="navigateToFormulario('MERCADERIA')"
           class="dashboard-card bg-white border border-gray-200 shadow-md p-7 rounded-2xl relative cursor-pointer">
           <div class="dashboard-icon-bg"><i class="fas fa-box-open"></i></div>
@@ -89,8 +88,8 @@
               class="w-12 h-12 flex items-center justify-center rounded-full bg-yellow-50 text-yellow-600 text-2xl mb-4">
               <i class="fas fa-box-open"></i>
             </div>
-            <h2 class="text-xl font-semibold text-gray-800">Sustracción de Mercadería</h2>
-            <p class="text-sm text-gray-500 mt-1">Informe detallado de pérdida de carga.</p>
+            <h2 class="text-xl font-semibold text-gray-800">Sustracci&oacute;n de Mercader&iacute;a</h2>
+            <p class="text-sm text-gray-500 mt-1">Informe detallado de p&eacute;rdida de carga.</p>
           </div>
         </div>
 
@@ -134,7 +133,7 @@
               <i class="fas fa-warehouse"></i>
             </div>
             <h2 class="text-xl font-semibold text-gray-800">Formulario Mamparas</h2>
-            <p class="text-sm text-gray-500 mt-1">Registro y reportes del módulo existente.</p>
+            <p class="text-sm text-gray-500 mt-1">Registro y reportes del m&oacute;dulo existente.</p>
           </div>
         </div>
 
@@ -142,7 +141,7 @@
     </section>
   </main>
 
-  <!-- Navegación SPA -->
+  <!-- Navegacion SPA -->
   <script type="module">
     import { BASE_PATH, withBase } from "./js/config.js";
     import { toggleSidebar, initializeSidebarState } from "./js/sidebar/sidebar-state.js";
@@ -155,7 +154,7 @@
       if (!tipo) return;
       window.dispatchEvent(
         new CustomEvent("sidebar:navigate", {
-          detail: withBase(`/html/formulario.html?tipo=${tipo}`),
+          detail: withBase(`html/formulario.html?tipo=${tipo}`),
         })
       );
     };
@@ -163,24 +162,30 @@
     window.navigateToMamparas = () => {
       window.dispatchEvent(
         new CustomEvent("sidebar:navigate", {
-          detail: withBase("/html/formulario-mamparas/registro.html"),
+          detail: withBase("html/formulario-mamparas/registro.html"),
         })
       );
     };
 
     if ("serviceWorker" in navigator) {
+      const scope = BASE_PATH ? `${BASE_PATH}/` : "./";
       navigator.serviceWorker
-        .register(withBase("/service-worker.js"), {
-          scope: withBase("/") || "/",
+        .register(withBase("service-worker.js"), {
+          scope,
         })
         .then((reg) => console.log("SW registrado", reg.scope))
         .catch((err) => console.error("Error registrando SW", err));
     }
 
-    import(withBase("/js/sidebar/sidebar-loader.js"));
+    import(withBase("js/sidebar/sidebar-loader.js"));
     console.log("BASE_PATH activo:", BASE_PATH || "(raiz)");
   </script>
 
 </body>
 
 </html>
+
+
+
+
+

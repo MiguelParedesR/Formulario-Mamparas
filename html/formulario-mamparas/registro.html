@@ -1,4 +1,4 @@
-﻿<!-- ?? NO BORRAR — Bloque restaurado/corregido del m&oacute;dulo Mamparas -->
+<!-- NO BORRAR - Bloque restaurado/corregido del m&oacute;dulo Mamparas -->
 <main class="mamparas-root app-layout text-gray-800">
   <div class="app-layout-inner space-y-6">
     <div class="space-y-1">
@@ -226,7 +226,7 @@
               <i class="fas fa-list-ul mr-2 text-xs"></i>
               Agregar detalle
             </button>
-            <p class="text-[11px] text-indigo-700">Incluye fotos y medidas. Se abrir&aacute; un modal de previsualizaci&oacute;n.</p>
+            <p class="text-[11px] text-indigo-700">Incluye fotos y medidas. Se abrir&aacute; un modal de Previsualizaci&oacute;n</p>
           </div>
 
           <div class="rounded-2xl border border-gray-100 bg-white p-5 space-y-3 shadow-sm">
@@ -271,9 +271,7 @@
         <p class="text-xs uppercase tracking-[0.2em] text-indigo-500 font-semibold">Detalle</p>
         <h3 class="text-lg font-semibold text-gray-800">Detalle de la incorrecci&oacute;n</h3>
         <p class="text-sm text-gray-500">
-          Completa la informaci&oacute;n y adjunta las evidencias solicitadas. Puedes realizar zoom sobre las
-          previsualizaciones.
-        </p>
+          Completa la informaci&oacute;n y adjunta las evidencias solicitadas. Puedes realizar zoom sobre las previsualizaciones.</p>
       </div>
 
       <div
@@ -362,21 +360,22 @@
       <p id="feedbackMessage" class="message text-sm font-medium"></p>
     </div>
   </div>
-
   <!-- MODAL PREVIEW FIJO Y FUNCIONAL -->
   <div id="modalPreview" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm hidden items-center justify-center">
     <div class="relative bg-white rounded-xl shadow-2xl max-w-3xl w-full p-6 animate-[fadeIn_0.3s_ease-out] overflow-hidden">
-      <button onclick="cerrarModalPreview()" class="absolute top-3 right-3 text-gray-600 hover:text-red-600 text-lg">
-        ❌
-      </button>
-      <img id="previewImagen" src="" alt="Previsualización" class="rounded max-h-[80vh] w-full object-contain shadow-md" />
-      <p class="text-sm text-gray-500 text-center mt-4">Previsualización de la evidencia</p>
+      <button onclick="cerrarModalPreview()" class="absolute top-3 right-3 text-gray-600 hover:text-red-600 text-lg">&times;</button>
+      <img id="previewImagen" src="" alt="Previsualizaci&oacute;n" />
+      <p class="text-sm text-gray-500 text-center mt-4">Previsualizaci&oacute;n</p>
     </div>
   </div>
 </main>
 
 <script type="module" src="../../js/mamparas/script.js"></script>
 <script>
-// ?? NO BORRAR — QA Mamparas
+  // NO BORRAR - QA Mamparas
 console.log("QA Mamparas: archivo restaurado");
 </script>
+
+
+
+
