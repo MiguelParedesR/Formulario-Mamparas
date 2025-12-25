@@ -258,6 +258,8 @@ body.sidebar-hidden #sidebarRespawn {
   overflow: hidden;
   position: static;
   width: 100%;
+  transition: max-height 0.28s ease, opacity 0.18s ease;
+  opacity: 0;
 }
 
 .submenu li {
@@ -270,6 +272,40 @@ body.sidebar-hidden #sidebarRespawn {
   font-size: 0.9rem;
   padding: 10px 12px 10px 26px;
   line-height: 1.35;
+}
+
+/* Resaltar submenu seleccionado */
+.submenu .submenu-link.active-link {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 8px;
+  transform: translateX(0);
+}
+
+/* Suave animación de aparición para los links del submenu */
+.submenu .submenu-link {
+  transform: translateX(-6px);
+  transition: transform 220ms ease, background 200ms ease, color 180ms ease;
+}
+.submenu .submenu-link:hover {
+  transform: translateX(0);
+}
+
+/* Ajuste para visibilidad dinámica de botones */
+.sidebar.collapsed .sidebar-toggle-floating {
+  display: none !important;
+}
+
+.sidebar.collapsed .sidebar-toggle {
+  display: inline-flex !important;
+}
+
+.sidebar-hidden .sidebar-toggle-floating {
+  display: inline-flex !important;
+}
+
+.sidebar-hidden .sidebar-toggle {
+  display: none !important;
 }
 
 /* ========================================================================== */

@@ -11,6 +11,7 @@
 
 
 import { withBase } from "../config.js";
+import { navigateTo } from "../utils/navigation.js";
 
 /**
  * Navega a formulario.html con parámetro ?tipo=
@@ -18,14 +19,7 @@ import { withBase } from "../config.js";
  */
 export function navigateToFormulario(tipo) {
   if (!tipo) return;
-
-  const url = withBase(`html/formulario.html?tipo=${encodeURIComponent(tipo)}`);
-
-  console.log(`➡️ Navegando a: ${url}`);
-
-  window.dispatchEvent(
-    new CustomEvent("sidebar:navigate", { detail: url })
-  );
+  navigateTo(`html/formulario.html?tipo=${encodeURIComponent(tipo)}`);
 }
 
 
@@ -34,13 +28,7 @@ export function navigateToFormulario(tipo) {
  * (ruta real del proyecto)
  */
 export function navigateToMamparas() {
-  const url = withBase("html/formulario-mamparas/registro.html");
-
-  console.log(`➡️ Navegando a: ${url}`);
-
-  window.dispatchEvent(
-    new CustomEvent("sidebar:navigate", { detail: url })
-  );
+  navigateTo("html/formulario-mamparas/registro.html");
 }
 
 

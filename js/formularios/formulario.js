@@ -8,6 +8,7 @@ import { supabase } from "../utils/supabase.js";
 import { uploadFiles } from "../utils/storage.js";
 import { generateWordFinal } from "./generador-docx.js";
 import { withBase } from "../config.js";
+import "../mamparas/detalle-modal.js";
 
 /* ---------------------------------------------------------------------------
    CONSTANTES DE PLANTILLA / TIPOS DE INCIDENCIA

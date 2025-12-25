@@ -16,7 +16,8 @@ const asset = (path = "") => {
   return `${BASE_PATH}/${cleaned}`;
 };
 
-const VERSION = "v7.23";
+// Incremento de versión para forzar actualización del cache
+const VERSION = "v7.77";
 const CACHE_NAME = `CCTV-${VERSION}${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
 // Archivos que intentaremos cachear si existen:
@@ -134,6 +135,32 @@ self.addEventListener("fetch", (event) => {
       }
     })()
   );
+});
+
+// Forzar actualización de archivos críticos
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+
+  if (STATIC_FILE_REGEX.test(req.url)) {
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedResponse = await cache.match(req);
+
+        if (cachedResponse) {
+          // Forzar actualización desde la red
+          const networkResponse = await fetch(req);
+          if (networkResponse.ok) {
+            cache.put(req, networkResponse.clone());
+            return networkResponse;
+          }
+          return cachedResponse;
+        }
+
+        return fetch(req);
+      })()
+    );
+  }
 });
 
 // ============================================================================

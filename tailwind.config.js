@@ -13,7 +13,13 @@ module.exports = {
           mid: "#3e4b67",
           light: "#f4f6f8",
           orange: "#ffa500",
+          border: "#e5e7eb",
+          text: "#1f2937",
         },
+      },
+      spacing: {
+        sidebar: "250px",
+        sidebarCollapsed: "70px",
       },
       animation: {
         fade: "fadeIn 0.4s ease-out",

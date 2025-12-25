@@ -129,7 +129,7 @@ export async function initSidebar(
   let isNavigating = false;
 
   // Responsive
-  const isDesktop = () => window.innerWidth >= DESKTOP_BREAK;
+  const checkDesktopView = () => window.innerWidth >= DESKTOP_BREAK;
 
   let sidebarState = loadSidebarState();
   sidebarState.open = sidebarState.open !== false;
@@ -152,7 +152,7 @@ export async function initSidebar(
   }
 
   const updateToggles = () => {
-    const desktopMode = isDesktop();
+    const desktopMode = checkDesktopView();
     const showRespawn = !sidebarState.open;
     const showDesktopToggle = shouldShowDesktopToggle(desktopMode, sidebarState);
     const showFloating = !desktopMode;
@@ -213,15 +213,60 @@ export async function initSidebar(
     const submenu = li.querySelector(":scope > .submenu");
     if (!submenu) return;
 
+    // If opening, close sibling submenus at the same level to ensure only one open
     if (open) {
+      const parentList = li.parentElement;
+      if (parentList) {
+        Array.from(parentList.children)
+          .filter((c) => c !== li && c.classList && c.classList.contains("has-submenu"))
+          .forEach((sib) => setSubmenuState(sib, false));
+      }
+    }
+
+    // Smooth open/close with CSS transitions
+    const TRANSITION_TIMEOUT = 350; // ms fallback
+
+    const doOpen = () => {
+      submenu.style.removeProperty("display");
       submenu.style.display = "block";
-      submenu.style.maxHeight = submenu.scrollHeight + "px";
-      submenu.style.opacity = "1";
-    } else {
+      // Start from collapsed
+      submenu.style.overflow = "hidden";
       submenu.style.maxHeight = "0px";
       submenu.style.opacity = "0";
-      submenu.style.display = "none";
-    }
+
+      // Force layout then expand
+      requestAnimationFrame(() => {
+        submenu.style.transition = "max-height 0.28s ease, opacity 0.18s ease";
+        submenu.style.maxHeight = submenu.scrollHeight + "px";
+        submenu.style.opacity = "1";
+      });
+    };
+
+    const doClose = () => {
+      submenu.style.transition = "max-height 0.28s ease, opacity 0.18s ease";
+      submenu.style.maxHeight = "0px";
+      submenu.style.opacity = "0";
+
+      const cleanup = () => {
+        submenu.style.display = "none";
+        submenu.style.removeProperty("transition");
+        submenu.style.removeProperty("max-height");
+        submenu.style.removeProperty("opacity");
+        submenu.style.removeProperty("overflow");
+        submenu.removeEventListener("transitionend", onEnd);
+      };
+
+      const onEnd = (ev) => {
+        if (ev.target === submenu) cleanup();
+      };
+
+      submenu.addEventListener("transitionend", onEnd);
+      // Fallback cleanup
+      setTimeout(cleanup, TRANSITION_TIMEOUT);
+    };
+
+    if (open) doOpen();
+    else doClose();
 
     syncOpenSubmenuHeights(submenu);
   }
@@ -244,7 +289,7 @@ export async function initSidebar(
         const openFlyoutMode =
           isTopLevel &&
           !isFlyout &&
-          isDesktop() &&
+          checkDesktopView() &&
           sidebar.classList.contains("collapsed");
 
         if (openFlyoutMode) {
@@ -275,7 +320,7 @@ export async function initSidebar(
 
   // Flyout (desplegable lateral)
   function openFlyout(li) {
-    if (!isDesktop() || !sidebar.classList.contains("collapsed")) return;
+    if (!checkDesktopView() || !sidebar.classList.contains("collapsed")) return;
 
     const old = document.querySelector(".sidebar-flyout");
     if (old) old.remove();
@@ -424,8 +469,8 @@ export async function initSidebar(
 
   // Normaliza ruta
   function normalizeHref(href) {
-    const hrefWithBase = withBasePath(href);
-    const parsed = new URL(hrefWithBase, window.location.origin);
+    const hrefWithBasePath = withBasePath(href);
+    const parsed = new URL(hrefWithBasePath, window.origin);
 
     const stateUrl = new URL(window.location.href);
     const viewValue =
@@ -533,7 +578,7 @@ export async function initSidebar(
 
   // Cerrar en mobile
   document.addEventListener("click", (ev) => {
-    if (!isDesktop() && sidebarState.open) {
+    if (!checkDesktopView() && sidebarState.open) {
       if (
         !sidebar.contains(ev.target) &&
         !toggleFloating.contains(ev.target)
@@ -545,7 +590,7 @@ export async function initSidebar(
 
   // Ajuste en resize
   window.addEventListener("resize", () => {
-    if (isDesktop()) {
+    if (checkDesktopView()) {
       sidebarState = { ...sidebarState, open: sidebarState.open !== false };
     } else {
       sidebarState = { ...sidebarState, open: false };
@@ -565,4 +610,83 @@ export async function initSidebar(
   }
 
   applySidebarState();
+
+  // Detectar dispositivo y condicionar botones interactivos
+  const isDesktop = window.innerWidth >= DESKTOP_BREAK;
+
+  if (isDesktop) {
+    createDesktopToggle();
+  } else {
+    createRestoreButton();
+  }
+
+  window.addEventListener("resize", () => {
+    const isNowDesktop = checkDesktopView();
+
+    if (isNowDesktop) {
+      createDesktopToggle();
+      document.querySelector("#restoreButton")?.remove();
+    } else {
+      createRestoreButton();
+      document.querySelector("#desktopToggle")?.remove();
+    }
+  });
+
+  // Ajuste para condicionar visibilidad de botones
+  const isDesktopView = () => window.innerWidth >= DESKTOP_BREAK;
+
+  function updateSidebarButtons() {
+    const toggleFloating = document.querySelector("#sidebarUniversalToggle");
+    const toggleInternal = document.querySelector("#sidebarInternalToggle");
+    const collapseBtn = document.querySelector("#collapseBtn");
+
+    if (isDesktopView()) {
+      toggleFloating?.classList.add("hidden");
+      toggleInternal?.classList.add("hidden");
+      collapseBtn?.classList.remove("hidden");
+    } else {
+      toggleFloating?.classList.remove("hidden");
+      toggleInternal?.classList.remove("hidden");
+      collapseBtn?.classList.add("hidden");
+    }
+  }
+
+  window.addEventListener("resize", updateSidebarButtons);
+  updateSidebarButtons();
+
+  // Ajuste para manejar el botón único
+  const toggleSidebar = () => {
+    const sidebar = document.querySelector("#sidebar");
+    const toggleBtn = document.querySelector("#sidebarToggle");
+
+    if (!sidebar || !toggleBtn) return;
+
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      toggleBtn.querySelector("i").classList.toggle("fa-angle-left");
+      toggleBtn.querySelector("i").classList.toggle("fa-angle-right");
+    });
+  };
+
+  toggleSidebar();
+
+  // Ajuste para manejar visibilidad dinámica de botones
+  const updateSidebarState = () => {
+    const sidebar = document.querySelector("#sidebar");
+    const toggleBtn = document.querySelector("#sidebarToggle");
+    const floatingBtn = document.querySelector("#sidebarUniversalToggle");
+
+    if (!sidebar || !toggleBtn || !floatingBtn) return;
+
+    if (sidebar.classList.contains("collapsed")) {
+      toggleBtn.style.display = "inline-flex";
+      floatingBtn.style.display = "none";
+    } else {
+      toggleBtn.style.display = "none";
+      floatingBtn.style.display = "inline-flex";
+    }
+  };
+
+  window.addEventListener("resize", updateSidebarState);
+  updateSidebarState();
 }

@@ -1,4 +1,7 @@
-﻿/* ===========================
+﻿/* Este archivo está en proceso de migración a Tailwind CSS */
+/* Las reglas específicas serán reemplazadas por clases utilitarias */
+
+/* ===========================
    RESET & BASE
 =========================== */
 * {
@@ -299,18 +302,6 @@ body {
   background-color: var(--tpp-dark);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
 /* ===========================
    ESTILO CAMPOS DETALLE MODAL
 =========================== */
@@ -402,25 +393,25 @@ body {
 /* ===========================
    ANIMACIONES
 =========================== */
-@keyframes fadeSlideIn {
-  0% {
+@keyframes fadeIn {
+  from {
     opacity: 0;
     transform: translateY(20px);
   }
 
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
 @keyframes zoomIn {
-  0% {
+  from {
     transform: scale(0.95);
     opacity: 0;
   }
 
-  100% {
+  to {
     transform: scale(1);
     opacity: 1;
   }
@@ -452,249 +443,39 @@ body {
     border-top: 2px solid var(--tpp-border);
   }
 }*/
-/* Estilos adicionales para el menÃº lateral */
-.legacy-sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 100vh;
-  width: 220px;
-  background-color: #fff;
-  border-right: 2px solid var(--tpp-border);
-  box-shadow: 2px 0 6px rgba(47, 59, 82, 0.15);
-  padding-top: 60px;
-  transition: transform 0.3s ease-in-out;
-  z-index: 100;
-}
-
-.legacy-sidebar.collapsed {
-  transform: translateX(-100%);
-}
-
-.legacy-sidebar a {
-  display: block;
-  padding: 14px 20px;
-  color: var(--tpp-dark);
-  text-decoration: none;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-.legacy-sidebar a:hover {
-  background-color: var(--tpp-light);
-}
-
-.toggle-btn {
-  /*top: 20px;
-      left: 20px;
-      z-index: 101;
-      background-color: var(--tpp-mid);
-      color: white;
-      border: none;*/
-  padding: 10px 12px;
-  border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(255, 138, 0, 0.4);
-}
-
-/*.main-content {
-      margin-left: 0;
-      padding: 40px 20px;
-      transition: margin-left 0.3s ease-in-out;
-    }
-
-    .legacy-sidebar.collapsed ~ .main-content {
-      margin-left: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .main-content {
-        margin-left: 20px;
-      }
-    }*/
-/******************/
-/* Estilos para el modal de confirmacion boton Guardar Detalle*/
-.feedback-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.modal-inner {
-  background: white;
-  padding: 20px 30px;
-  border-radius: 10px;
-  text-align: center;
-  min-width: 250px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-.loader {
-  border: 6px solid #f3f3f3;
-  border-top: 6px solid #3498db;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin: auto;
-}
-
-.message.success {
-  color: green;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-.message.error {
-  color: red;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
+/* Enhanced responsiveness for better mobile and tablet support */
+@media screen and (max-width: 1150px) {
+  .main-container {
+    margin-left: 0;
+    flex-direction: column;
   }
 
-  100% {
-    transform: rotate(360deg);
+  .legacy-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .toggle-btn {
+    display: none;
+  }
+
+  .form-container {
+    border-left: none;
+    border-top: 2px solid var(--tpp-border);
   }
 }
 
-/* NUEVOS ESTILOS PARA LA TABLA Y CUADRO DE BUSQUEDA */
-/* Estilo del buscador */
-.search-bar {
-  margin-bottom: 10px;
-  text-align: right;
-}
-
-.search-bar input {
-  padding: 8px 15px;
-  width: 300px;
-  font-size: 14px;
-  border-radius: 8px;
-  border: 1px solid var(--tpp-border);
-  text-transform: uppercase;
-}
-
-/* Tabla estilizada */
-.table-wrapper {
-  overflow-y: auto;
-  max-height: 710px;
-  border: 1px solid var(--tpp-border);
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.styled-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  text-transform: uppercase;
-}
-
-.styled-table thead {
-  position: sticky;
-  top: 0;
-  background-color: var(--tpp-mid);
-  color: #fff;
-  z-index: 10;
-}
-
-.styled-table th,
-.styled-table td {
-  padding: 12px 15px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
-}
-
-.styled-table tbody tr:hover {
-  background-color: #f2f2f2;
-  transition: background-color 0.3s;
-}
-
-/* BotÃ³n cerrar modal */
-.detalle-modal-content button {
-  padding: 10px 20px;
-  background-color: var(--tpp-accent);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.detalle-modal-content button:hover {
-  background-color: var(--tpp-dark);
-}
-
-/*************RESPONSIVE STYLES FOR TABLE AND SEARCH BAR */
-/* DiseÃ±o general responsivo */
-
-
-/* Main container adaptativo */
-.main-container {
-  padding: 20px;
-  margin-left: 0;
-  transition: margin-left 0.3s;
-}
-
-.styled-table {
-  width: 100%;
-  min-width: 900px;
-  /* Ancho mÃ­nimo para scroll en mÃ³viles */
-  border-collapse: collapse;
-  font-size: 14px;
-  background-color: white;
-}
-
-/* MEDIA QUERIES PARA RESPONSIVIDAD */
 @media screen and (max-width: 768px) {
   .legacy-sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 220px;
-    height: 100vh;
-    padding-top: 60px;
-    background-color: #fff;
-    border-right: 2px solid var(--tpp-border);
-    box-shadow: 2px 0 6px rgba(47, 59, 82, 0.15);
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
-    z-index: 200;
-  }
-
-  .legacy-sidebar.show {
-    transform: translateX(0);
   }
 
   .main-container {
-    margin-left: 0;
-  }
-
-  /*
-  .toggle-btn {
-    display: block;
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 201;
-  }
-*/
-
-  .styled-table {
-    font-size: 12px;
-    min-width: unset;
-  }
-
-  .table-wrapper {
-    max-height: 400px;
+    padding: 1rem;
   }
 }
 

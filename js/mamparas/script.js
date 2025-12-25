@@ -1,14 +1,9 @@
-﻿// ðŸš« NO BORRAR â€” Bloque restaurado/corregido del mÃ³dulo Mamparas
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4?bundle&target=es2020";
+// ðŸš« NO BORRAR â€” Bloque restaurado/corregido del mÃ³dulo Mamparas
+import { supabase } from "../utils/supabase.js";
 
 const STORAGE_BUCKET = "mamparas";
 const VALIDACION_PLACA_DELAY = 450;
 const MIN_PLACA_LENGTH = 5;
-
-export const supabase = createClient(
-  "https://qjefbngewwthawycvutl.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqZWZibmdld3d0aGF3eWN2dXRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxMjA2MTUsImV4cCI6MjA2MTY5NjYxNX0.q4J3bF6oC7x9dhW5cwHr-qtqSSqI_8ju7fHvyfO_Sh0"
-);
 
 let actualizarEmpresaPersonalizadaFn = null;
 let actualizarBotonDetalleFn = null;
@@ -799,7 +794,7 @@ function initValidacionPlaca() {
 function initFormulario() {
   const form = document.getElementById("form-inspeccion");
   if (!form) {
-    console.warn("initMamparasForm: formulario no encontrado, se omite inicializaci\u00F3n.");
+    // console.warn("initMamparasForm: formulario no encontrado, se omite inicializaci\u00F3n.");
     return;
   }
 
@@ -876,4 +871,3 @@ if (document.readyState === "loading") {
 
 // ðŸš« NO BORRAR â€” QA Mamparas
 console.log("QA Mamparas: archivo restaurado");
-

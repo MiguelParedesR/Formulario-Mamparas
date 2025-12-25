@@ -1,28 +1,38 @@
 <!-- ====================================================
      TOGGLE UNIVERSAL FLOTANTE (solo visible en movil)
      ==================================================== -->
-<button id="sidebarUniversalToggle" class="sidebar-toggle-floating">
+<button id="sidebarUniversalToggle" class="sidebar-toggle-floating hidden lg:block">
     <i class="fas fa-bars"></i>
 </button>
 
 <!-- ====================================================
      SIDEBAR PRINCIPAL
      ==================================================== -->
-<nav id="sidebar" class="sidebar" aria-label="Sidebar principal">
+<nav id="sidebar" class="sidebar" style="z-index:60;" aria-label="Sidebar principal">
 
     <!-- LOGO + TOGGLES -->
     <div class="logo">
-        <span class="logo-text">TPP DASHBOARD</span>
+        <span class="logo-text">CCTV DASHBOARD</span>
 
-        <!-- Collapse desktop -->
-        <button id="collapseBtn" class="collapse-btn" aria-label="Colapsar">
+        <!-- Botón único para colapsar/expandir -->
+        <button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle Sidebar">
             <i class="fas fa-angle-left"></i>
-        </button>
-        <!-- Toggle interno movil -->
-        <button id="sidebarInternalToggle" class="sidebar-toggle-internal" aria-label="Cerrar">
-            <i class="fas fa-bars"></i>
+        </button> <!-- Botón para colapsar el sidebar -->
+        <button id="collapseBtn" class="sidebar-collapse">
         </button>
     </div>
+
+    <!-- Botón flotante para móvil -->
+    <button id="sidebarUniversalToggle" class="sidebar-toggle-floating">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Botón interno para móvil -->
+    <button id="sidebarInternalToggle" class="sidebar-toggle-internal">
+        <i class="fas fa-bars"></i>
+    </button>
+
+
 
     <!-- ====================================================
           MENUS PRINCIPAL
@@ -110,7 +120,8 @@
             </a>
 
             <ul class="submenu">
-                <li><a class="submenu-link" href="./html/formulario-mamparas/registro.html">Nueva Inspecci&oacute;n</a></li>
+                <li><a class="submenu-link" href="./html/formulario-mamparas/registro.html">Nueva Inspecci&oacute;n</a>
+                </li>
                 <li><a class="submenu-link" href="./html/formulario-mamparas/registros.html">Registros</a></li>
                 <li><a class="submenu-link" href="./html/formulario-mamparas/reportes.html">Reportes</a></li>
             </ul>
@@ -125,16 +136,3 @@
 
     </ul>
 </nav>
-
-
-
-
-
-
-
-
-
-
-
-
-

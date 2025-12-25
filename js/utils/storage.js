@@ -74,7 +74,12 @@ export async function getFileBase64(url) {
   return getRemoteBase64(url);
 }
 
-function arrayBufferToBase64(buffer) {
+/**
+ * Centralized function to convert ArrayBuffer to Base64
+ * @param {ArrayBuffer} buffer - The buffer to convert
+ * @returns {string} Base64 encoded string
+ */
+export function arrayBufferToBase64(buffer) {
   let binary = "";
   const bytes = new Uint8Array(buffer);
 
@@ -85,7 +90,12 @@ function arrayBufferToBase64(buffer) {
   return btoa(binary);
 }
 
-function inferMimeFromUrl(url = "") {
+/**
+ * Centralized function to infer MIME type from URL
+ * @param {string} url - The URL to infer MIME type from
+ * @returns {string|null} MIME type or null if not found
+ */
+export function inferMimeFromUrl(url = "") {
   const cleanUrl = url.split("?")[0];
   const ext = (cleanUrl.split(".").pop() || "").toLowerCase();
 

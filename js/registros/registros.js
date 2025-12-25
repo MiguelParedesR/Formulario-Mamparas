@@ -11,8 +11,10 @@ import {
   calcularProgresoInforme,
   obtenerEstadoListado,
 } from "../dashboard/progreso.js";
+import "../mamparas/detalle-modal.js";
 import { uploadFiles } from "../utils/storage.js";
 import { generarDocxIncidencia } from "../formularios/generador-docx.js";
+import { getSidebarOffset, positionModal, watchModalPosition } from "../utils/helpers.js";
 
 let incidencias = [];
 let incidenciaActual = null;
@@ -101,12 +103,7 @@ function renderTabla(lista) {
   tablaBody.innerHTML = "";
 
   if (!lista.length) {
-    tablaBody.innerHTML = `
-            <tr>
-                <td colspan="8" class="text-center py-4 text-gray-500">
-                    No hay registros para mostrar
-                </td>
-            </tr>`;
+    renderEmptyTableMessage(tablaBody);
     return;
   }
 
@@ -114,40 +111,67 @@ function renderTabla(lista) {
     const estado = obtenerEstadoListado(inc);
     const extra = obtenerValorExtra(inc);
 
-    const tr = document.createElement("tr");
-    tr.className = "hover:bg-gray-50 transition";
-
-    tr.innerHTML = `
-            <td class="px-3 py-2 text-sm">${inc.fecha_informe || "-"}</td>
-            <td class="px-3 py-2 text-sm">${inc.tipo_incidencia || "-"}</td>
-            <td class="px-3 py-2 text-sm">${extra.placa || "-"}</td>
-            <td class="px-3 py-2 text-sm">${extra.contenedor || "-"}</td>
-
-            <td class="px-3 py-2">
-                <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="h-2 rounded-full ${estado.color
-      }" style="width:${estado.porcentaje}%"></div>
-                </div>
-                <span class="text-xs text-gray-600">${estado.porcentaje}%</span>
-            </td>
-
-            <td class="px-3 py-2 text-sm font-semibold ${estado.estado === "COMPLETO" ? "text-green-600" : "text-amber-600"
-      }">
-                ${estado.estado}
-            </td>
-
-            <td class="px-3 py-2 text-sm flex gap-2">
-                <button class="ver-btn px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 shadow"
-                        data-id="${inc.id}">
-                    Ver / Editar
-                </button>
-            </td>
-        `;
+    const tr = createIncidentRow(inc, estado, extra);
 
     tablaBody.appendChild(tr);
   });
 
   activarBotones();
+}
+
+/**
+ * Centralized function to render empty table message
+ * @param {HTMLElement} tableBody - The table body element
+ */
+function renderEmptyTableMessage(tableBody) {
+  tableBody.innerHTML = `
+    <tr>
+      <td colspan="8" class="text-center py-4 text-gray-500">
+        No hay registros para mostrar
+      </td>
+    </tr>`;
+}
+
+/**
+ * Centralized function to create table row for an incident
+ * @param {Object} incident - The incident data
+ * @param {Object} state - The state of the incident
+ * @param {Object} extra - Extra data for the incident
+ * @returns {HTMLTableRowElement} The table row element
+ */
+function createIncidentRow(incident, state, extra) {
+  // Ajuste de clases dinámicas para barras de progreso
+  state.color = `bg-${state.color}`;
+
+  const tr = document.createElement("tr");
+  tr.className = "hover:bg-gray-50 transition";
+
+  tr.innerHTML = `
+    <td class="px-3 py-2 text-sm">${incident.fecha_informe || "-"}</td>
+    <td class="px-3 py-2 text-sm">${incident.tipo_incidencia || "-"}</td>
+    <td class="px-3 py-2 text-sm">${extra.placa || "-"}</td>
+    <td class="px-3 py-2 text-sm">${extra.contenedor || "-"}</td>
+
+    <td class="px-3 py-2">
+      <div class="w-full bg-gray-200 rounded-full h-2">
+        <div class="h-2 rounded-full ${state.color}" style="width:${state.porcentaje}%"></div>
+      </div>
+      <span class="text-xs text-gray-600">${state.porcentaje}%</span>
+    </td>
+
+    <td class="px-3 py-2 text-sm font-semibold ${state.estado === "COMPLETO" ? "text-green-600" : "text-amber-600"}">
+      ${state.estado}
+    </td>
+
+    <td class="px-3 py-2 text-sm flex gap-2">
+      <button class="ver-btn px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 shadow"
+              data-id="${incident.id}">
+        Ver / Editar
+      </button>
+    </td>
+  `;
+
+  return tr;
 }
 
 function activarBotones() {
@@ -176,6 +200,7 @@ async function abrirModalIncidencia(id) {
   };
   incidenciaActual.anexos = incidenciaActual.anexos || [];
 
+  ensureModalPositioning();
   pintarModal();
   toggleModal(true);
 }
@@ -307,6 +332,20 @@ function toggleModal(show) {
   }
 }
 
+// Ensure modal is positioned to avoid overlapping the sidebar (attach once)
+let modalPositioningAttached = false;
+function ensureModalPositioning() {
+  if (!modalOverlay) return;
+  if (modalPositioningAttached) return;
+  try {
+    positionModal(modalOverlay);
+    watchModalPosition(modalOverlay);
+    modalPositioningAttached = true;
+  } catch (err) {
+    console.warn("No se pudo aplicar posicionamiento del modal:", err);
+  }
+}
+
 function sincronizarIncidenciaDesdeModal() {
   incidenciaActual.campos = incidenciaActual.campos || {};
 
@@ -332,18 +371,7 @@ function actualizarBarraModal() {
   const progreso = calcularProgresoInforme(incidenciaActual);
 
   if (modalProgressBar && modalProgressLabel) {
-    modalProgressBar.style.width = `${progreso.porcentaje}%`;
-
-    if (progreso.porcentaje < 50)
-      modalProgressBar.className =
-        "h-2 rounded-full bg-red-500 transition-all duration-300";
-    else if (progreso.porcentaje < 100)
-      modalProgressBar.className =
-        "h-2 rounded-full bg-amber-500 transition-all duration-300";
-    else
-      modalProgressBar.className =
-        "h-2 rounded-full bg-green-600 transition-all duration-300";
-
+    modalProgressBar.classList.add(`bg-${progreso.color}`, `w-[${progreso.porcentaje}%]`);
     modalProgressLabel.textContent = `${progreso.porcentaje}%`;
   }
 
