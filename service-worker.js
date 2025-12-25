@@ -17,7 +17,7 @@ const asset = (path = "") => {
 };
 
 // Incremento de versión para forzar actualización del cache
-const VERSION = "v7.98";
+const VERSION = "v7.99";
 const CACHE_NAME = `CCTV-${VERSION}${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
 // Archivos que intentaremos cachear si existen:
@@ -25,7 +25,7 @@ const STATIC_ASSETS = [
   "CSS/global.css",
   "CSS/tailwind.css",
   "CSS/dashboard/dashboard.css",
-  "css/estilos-sidebar/sidebar.css",
+  "CSS/estilos-sidebar/sidebar.css",
   "CSS/styles.css",
   "js/sidebar/sidebar-loader.js",
   "js/sidebar/sidebar.js",
