@@ -135,11 +135,9 @@
   <!-- Navegacion SPA -->
   <script type="module">
     import { BASE_PATH, withBase } from "./js/config.js";
-    import { toggleSidebar, initializeSidebarState } from "./js/sidebar/sidebar-state.js";
+    import { initializeSidebarState } from "./js/sidebar/sidebar-state.js";
 
-    const respawnBtn = document.getElementById("sidebarRespawn");
     initializeSidebarState();
-    respawnBtn?.addEventListener("click", () => toggleSidebar());
 
     window.navigateToFormulario = (tipo) => {
       if (!tipo) return;

@@ -45,15 +45,20 @@ export function saveSidebarState(state) {
 }
 
 export function syncContentLayout(state, mainContainer = document.querySelector("#dashboardContent")) {
-  if (!mainContainer) return;
+  const target =
+    mainContainer ||
+    document.querySelector("#dashboardContent") ||
+    document.querySelector("main");
+  if (!target) return;
 
   const isDesktop = window.innerWidth >= 1024;
   const isCollapsed = state.mode === "collapsed";
   const isOpen = state.open !== false;
 
+  // NOTE: Keep the push layout only on desktop to avoid mobile squeeze.
   if (!isDesktop || !isOpen) {
-    mainContainer.style.marginLeft = "0px";
-    mainContainer.style.width = "100%";
+    target.style.setProperty("margin-left", "0px", "important");
+    target.style.setProperty("width", "100%", "important");
     return;
   }
 
@@ -62,8 +67,9 @@ export function syncContentLayout(state, mainContainer = document.querySelector(
   const collapsedWidth = rootStyles.getPropertyValue("--sidebar-width-collapsed")?.trim() || "72px";
   const sideWidth = isCollapsed ? collapsedWidth : expandedWidth;
 
-  mainContainer.style.marginLeft = sideWidth;
-  mainContainer.style.width = `calc(100% - ${sideWidth})`;
+  // IMPORTANT: keep !important to override global main resets (prevents overlay).
+  target.style.setProperty("margin-left", sideWidth, "important");
+  target.style.setProperty("width", `calc(100% - ${sideWidth})`, "important");
 }
 
 export function applySidebarVisualState(
@@ -76,10 +82,13 @@ export function applySidebarVisualState(
 
   if (sidebar) {
     sidebar.classList.toggle("show", isOpen);
+    // NOTE: ui-sidebar-active controls off-canvas transform; keep in sync.
+    sidebar.classList.toggle("ui-sidebar-active", isOpen);
     sidebar.classList.toggle("collapsed", isCollapsed);
   }
 
   document.body.classList.toggle("sidebar-hidden", !isOpen);
+  document.body.classList.toggle("sidebar-open", isOpen);
   document.body.classList.toggle("sidebar-collapsed", isOpen && isCollapsed);
 
   syncRestoreButton(document.getElementById("sidebarRespawn"), !isOpen);

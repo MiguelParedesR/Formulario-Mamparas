@@ -1,5 +1,6 @@
 // ðŸš« NO BORRAR â€” Bloque restaurado/corregido del mÃ³dulo Mamparas
 import { supabase } from "../utils/supabase.js";
+export { supabase };
 
 const STORAGE_BUCKET = "mamparas";
 const VALIDACION_PLACA_DELAY = 450;
@@ -199,13 +200,10 @@ export async function guardarInspeccion(datosFormulario, detalleJSON) {
   const medidaCentral = esMampara ? formatearMedidaTexto(separacionCentralRaw) : null;
   const medidaAltura = esMampara ? formatearMedidaTexto(alturaMamparaRaw) : null;
 
-  const fotoUnidad = esMampara
-    ? detalleImagenes.foto_panoramica_unidad ||
-      detalleImagenes.foto_lateral_central ||
-      detalleImagenes.foto_altura_mampara ||
-      null
-    : null;
-  const fotoObservacion = !esMampara ? detalleImagenes.foto_observacion || null : null;
+  const fotoUnidad = esMampara ? detalleImagenes.foto_panoramica_unidad || null : null;
+  const fotoObservacion = esMampara
+    ? detalleImagenes.foto_altura_mampara || null
+    : detalleImagenes.foto_observacion || null;
 
   const registro = {
     fecha: datosFormulario.fecha,

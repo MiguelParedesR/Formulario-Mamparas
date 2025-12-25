@@ -14,12 +14,14 @@ import { BASE_PATH, withBase } from "../config.js";
 
 const SIDEBAR_HTML = withBase("html/base/sidebar.html");
 const SIDEBAR_JS = withBase("js/sidebar/sidebar.js");
-const SIDEBAR_CSS = withBase("CSS/estilos-sidebar/sidebar.css");
+const SIDEBAR_CSS = withBase("css/estilos-sidebar/sidebar.css");
+// Keep this order aligned with index.html to avoid cascade mismatches in SPA.
 const CORE_STYLES = [
-  withBase("CSS/tailwind.css"),
-  withBase("CSS/global.css"),
-  withBase("CSS/dashboard/dashboard.css"),
-  withBase("CSS/styles.css"),
+  withBase("css/tailwind.css"),
+  SIDEBAR_CSS,
+  withBase("css/global.css"),
+  withBase("css/styles.css"),
+  withBase("css/dashboard/dashboard.css"),
 ];
 
 const FONT_AWESOME =
@@ -126,77 +128,26 @@ async function injectSidebarHTML() {
       console.error("❌ sidebar-loader: Elementos clave faltantes en sidebar.html");
       return;
     }
+    // Sidebar controls must be present to avoid duplicated or corrupted menu rendering.
+    const requiredSelectors = ["#sidebarToggle", "#sidebarBackdrop"];
 
-    // ----- Unificación de botón único y creación de proxies -----
-    // Elegimos un botón primario visible que use el id esperado por sidebar.js: #sidebarUniversalToggle
-    // Si ya existe uno, lo usamos; si no, lo creamos dentro de la cabecera (.logo) si es posible.
-    let primaryBtn = container.querySelector("#sidebarUniversalToggle");
-    const logo = container.querySelector(".logo") || container;
+    const missing = requiredSelectors.filter(
+      (selector) => !container.querySelector(selector)
+    );
 
-    if (!primaryBtn) {
-      primaryBtn = document.createElement("button");
-      primaryBtn.id = "sidebarUniversalToggle";
-      primaryBtn.className = "sidebar-toggle-floating";
-      primaryBtn.innerHTML = '<i class="fas fa-bars"></i>';
-      // Insertar al inicio de la cabecera para evitar desplazamientos
-      logo.insertBefore(primaryBtn, logo.firstChild);
+    if (missing.length) {
+      console.error(
+        "sidebar-loader: faltan controles del sidebar:",
+        missing.join(", ")
+      );
+    } else {
+      console.log("sidebar cargado correctamente (sin proxies)");
     }
-
-    // Asegurarnos que el botón primario sea visible y único
-    primaryBtn.style.display = "inline-flex";
-    primaryBtn.classList.remove("hidden");
-
-    // Lista de IDs que `initSidebar` espera. Creamos proxies ocultos que reenviarán clicks al primary button
-    const requiredProxyIds = [
-      "sidebarInternalToggle",
-      "collapseBtn",
-      "sidebarRespawn",
-      "sidebarDesktopToggle",
-      "sidebarToggle" // mantener compatibilidad con posibles referencias
-    ];
-
-    requiredProxyIds.forEach((id) => {
-      let el = container.querySelector(`#${id}`) || document.getElementById(id);
-      if (el) {
-        // Si existe y no es el primary, ocultarlo para evitar botones visibles duplicados
-        if (el !== primaryBtn) {
-          el.style.display = "none";
-          el.classList?.add?.("hidden");
-        }
-        // No añadimos forwarding desde el proxy al primary aquí — lo haremos después de initSidebar
-      } else {
-        // Crear proxy oculto en el body para que `sidebar.js` pueda encontrar el elemento por ID
-        const proxy = document.createElement("button");
-        proxy.id = id;
-        proxy.style.display = "none";
-        proxy.className = "hidden";
-        document.body.appendChild(proxy);
-      }
-    });
-
-    // Finalmente, asegurar que haya exactamente un visible que controle la apertura/cierre
-    // (primaryBtn ya está visible). Ocultamos otros toggles si quedan.
-    const otherToggles = container.querySelectorAll("#sidebarToggle, #sidebarInternalToggle, #collapseBtn");
-    otherToggles.forEach((btn) => {
-      if (btn !== primaryBtn) {
-        btn.style.display = "none";
-        btn.classList?.add?.("hidden");
-      }
-    });
-
-    console.log("✅ sidebar cargado correctamente y unificado en un único botón de interacción");
   } catch (err) {
     console.error("❌ Error cargando sidebar.html", err);
   }
 }
 
-function createButton(id) {
-  const button = document.createElement("button");
-  button.id = id;
-  button.style.display = "none"; // Ocultar por defecto hasta que sea necesario
-  document.body.appendChild(button);
-  return button;
-}
 
 // ============================================================================
 //  Importar sidebar.js y ejecutar initSidebar()
@@ -224,56 +175,6 @@ async function initSidebarJS() {
   }
 }
 
-// Después de inicializar `sidebar.js`, unificar los botones: el primary visible reenviará clicks
-// a los proxies/elementos que `sidebar.js` haya inicializado (para que sus listeners se ejecuten).
-function unifyButtonsPostInit() {
-  try {
-    const container = document.getElementById("sidebar-container");
-    if (!container) return;
-
-    const primary = container.querySelector("#sidebarUniversalToggle");
-    if (!primary) return;
-
-    // Asegurar estilo visible consistente (evitar que media queries lo oculten)
-    primary.style.display = "inline-flex";
-    primary.style.position = primary.style.position || "fixed";
-    primary.style.top = primary.style.top || "16px";
-    primary.style.left = primary.style.left || "16px";
-    primary.style.zIndex = primary.style.zIndex || "2100";
-
-    const targetIds = [
-      "sidebarDesktopToggle",
-      "sidebarRespawn",
-      "sidebarInternalToggle",
-      "collapseBtn",
-      "sidebarToggle",
-    ];
-
-    const targets = targetIds
-      .map((id) => document.getElementById(id) || container.querySelector(`#${id}`))
-      .filter(Boolean);
-
-    // Evitar doble registro
-    if (primary.__unify_attached__) return;
-
-    primary.addEventListener("click", (e) => {
-      // Reenviar el click a todos los targets para que sus listeners (creados por sidebar.js)
-      // respondan normalmente. Disparamos el evento de forma síncrona.
-      targets.forEach((t) => {
-        try {
-          t.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
-        } catch (err) {
-          // ignore
-        }
-      });
-    });
-
-    primary.__unify_attached__ = true;
-  } catch (err) {
-    console.error("❌ unifyButtonsPostInit error", err);
-  }
-}
-
 // ============================================================================
 //  Loader principal auto-ejecutable
 // ============================================================================
@@ -286,13 +187,10 @@ function unifyButtonsPostInit() {
       await Promise.all([
         ...CORE_STYLES.map((href) => ensureCss(href)),
         ensureCss(FONT_AWESOME),
-        ensureCss(SIDEBAR_CSS),
       ]);
 
       await injectSidebarHTML();
       await initSidebarJS();
-      // Unificar botones después de que `sidebar.js` haya inicializado sus listeners
-      unifyButtonsPostInit();
 
       window.__SIDEBAR_LOADED__ = true;
       console.log("✅ sidebar-loader inicializado correctamente");

@@ -8,7 +8,8 @@
 /* Layout base */
 :root {
     --sidebar-width: 250px;
-    --sidebar-width-collapsed: 70px;
+    /* Keep in sync with css/estilos-sidebar/sidebar.css */
+    --sidebar-width-collapsed: 72px;
 }
 
 html,
@@ -60,17 +61,17 @@ body.sidebar-collapsed #dashboardContent {
     }
 }
 
-/* Estado cuando el sidebar está oculto en mobile */
+/* Estado cuando el sidebar esto oculto en mobile */
 @media (max-width: 1023px) {
-    #dashboardContent,
-    body.sidebar-collapsed #dashboardContent {
+    /* NOTE: Keep push layout when sidebar is open to avoid SPA overlap. */
+    body.sidebar-hidden #dashboardContent {
         margin-left: 0 !important;
         width: 100% !important;
     }
 
-    /* Estado cuando el sidebar está oculto en mobile */
+    /* Estado cuando el sidebar esto oculto en mobile */
     .sidebar-hidden #sidebar {
-        transform: translateX(-260px);
+        transform: translateX(-100%);
     }
 }
 
@@ -358,7 +359,8 @@ body {
 }
 
 /* MAIN usa todo el alto disponible sin dejar espacio alrededor */
-main {
+/* NOTE: Do NOT reset margins on #dashboardContent or sidebar push breaks. */
+main:not(#dashboardContent) {
     width: 100% !important;
     min-height: calc(100vh) !important;
     padding: 0 !important;
@@ -393,7 +395,8 @@ section,
 }
 
 /* ÚLTIMO FIX: elimina todo gap extraño externo */
-body>* {
+/* NOTE: Keep #dashboardContent margins for sidebar offset. */
+body>*:not(#dashboardContent) {
     margin: 0 !important;
 }
 
@@ -589,3 +592,4 @@ body.sidebar-hidden #dashboardContent {
 .modal-card {
     animation: popIn 0.3s ease-out;
 }
+

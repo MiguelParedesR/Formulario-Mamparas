@@ -37,7 +37,8 @@
 
 @media (min-width: 1024px) {
   .mamparas-root {
-    margin-left: var(--tpp-sidebar-width);
+    /* Sidebar offset is handled by #dashboardContent; keep this at 0 to avoid double spacing */
+    margin-left: 0;
     padding-left: clamp(2rem, 3vw, 3.5rem);
     padding-right: clamp(2rem, 3vw, 3.5rem);
   }

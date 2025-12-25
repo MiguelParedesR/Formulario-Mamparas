@@ -14,14 +14,9 @@
 import { BASE_PATH } from "../config.js";
 import {
   applySidebarVisualState,
-  createRestoreButton,
-  createDesktopToggle,
   loadSidebarState,
   saveSidebarState,
   syncContentLayout,
-  syncRestoreButton,
-  toggleCollapsed,
-  shouldShowDesktopToggle,
 } from "./sidebar-state.js";
 
 const MAIN_SELECTOR = "#dashboardContent";
@@ -83,12 +78,11 @@ export async function initSidebar(
   }
 
   const sidebar = container.querySelector("#sidebar");
-  const toggleFloating = container.querySelector("#sidebarUniversalToggle");
-  const toggleInternal = container.querySelector("#sidebarInternalToggle");
-  const collapseBtn = container.querySelector("#collapseBtn");
+  const toggleBtn = container.querySelector("#sidebarToggle");
+  const backdrop = container.querySelector("#sidebarBackdrop");
   const menuRoot = sidebar.querySelector(".menu");
 
-  if (!sidebar || !toggleFloating || !toggleInternal || !collapseBtn) {
+  if (!sidebar || !toggleBtn) {
     console.error("⚠️ initSidebar: Faltan elementos del sidebar.");
     return;
   }
@@ -124,6 +118,24 @@ export async function initSidebar(
       document.head.appendChild(style);
       loadedStyles.add(fullHref);
     });
+
+    // Preserve inline <style> blocks from views loaded via SPA.
+    const inlineStyles = doc?.querySelectorAll?.("style") || [];
+    inlineStyles.forEach((styleNode) => {
+      const cssText = styleNode.textContent?.trim();
+      if (!cssText) return;
+
+      const exists = Array.from(
+        document.querySelectorAll("style[data-spa-inline-style]")
+      ).some((node) => node.textContent?.trim() === cssText);
+
+      if (exists) return;
+
+      const inline = document.createElement("style");
+      inline.setAttribute("data-spa-inline-style", "1");
+      inline.textContent = cssText;
+      document.head.appendChild(inline);
+    });
   }
 
   let isNavigating = false;
@@ -135,38 +147,33 @@ export async function initSidebar(
   sidebarState.open = sidebarState.open !== false;
   sidebarState.mode = sidebarState.mode === "collapsed" ? "collapsed" : "expanded";
 
-  const existingRestore = document.getElementById("sidebarRespawn");
-  const restoreButton = existingRestore || createRestoreButton();
-  if (!existingRestore) {
-    document.body.appendChild(restoreButton);
-  }
-
-  const existingDesktopToggle = document.getElementById("sidebarDesktopToggle");
-  const desktopToggle = existingDesktopToggle || createDesktopToggle();
-  if (!existingDesktopToggle) {
-    document.body.appendChild(desktopToggle);
+  // On desktop the sidebar should always be visible (avoid hidden state bleed).
+  if (checkDesktopView()) {
+    sidebarState = { ...sidebarState, open: true };
   }
 
   function adjustContentMargin() {
     syncContentLayout(sidebarState, mainContainer);
   }
 
-  const updateToggles = () => {
+  const syncBackdrop = () => {
+    if (!backdrop) return;
     const desktopMode = checkDesktopView();
-    const showRespawn = !sidebarState.open;
-    const showDesktopToggle = shouldShowDesktopToggle(desktopMode, sidebarState);
-    const showFloating = !desktopMode;
-    const showCollapse = desktopMode && sidebarState.open;
+    const showBackdrop = !desktopMode && sidebarState.open;
+    backdrop.classList.toggle("is-active", showBackdrop);
+    backdrop.setAttribute("aria-hidden", showBackdrop ? "false" : "true");
+  };
 
-    syncRestoreButton(restoreButton, showRespawn);
-    desktopToggle.style.display = showDesktopToggle ? "inline-flex" : "none";
-    toggleFloating.style.display = showFloating ? "inline-flex" : "none";
-    collapseBtn.style.display = showCollapse ? "inline-flex" : "none";
+  const syncToggleLabel = () => {
+    if (!toggleBtn) return;
+    const label = sidebarState.open ? "Cerrar menu" : "Mostrar menu";
+    toggleBtn.setAttribute("aria-label", label);
   };
 
   const applySidebarState = () => {
     applySidebarVisualState(sidebar, sidebarState, mainContainer);
-    updateToggles();
+    syncBackdrop();
+    syncToggleLabel();
     saveSidebarState(sidebarState);
   };
 
@@ -181,20 +188,23 @@ export async function initSidebar(
     applySidebarState();
   };
 
-  toggleFloating.addEventListener("click", openSidebar);
-  toggleInternal.addEventListener("click", closeSidebar);
-  restoreButton.addEventListener("click", openSidebar);
+  // Unified toggle (single control for desktop/mobile).
+  toggleBtn.addEventListener("click", () => {
+    if (checkDesktopView()) {
+      const nextMode = sidebarState.mode === "collapsed" ? "expanded" : "collapsed";
+      sidebarState = { ...sidebarState, mode: nextMode, open: true };
+      applySidebarState();
+      return;
+    }
 
-  // Collapse desktop
-  collapseBtn.addEventListener("click", () => {
-    sidebarState = toggleCollapsed(sidebar, sidebarState, true, mainContainer);
-    applySidebarState();
+    if (sidebarState.open) {
+      closeSidebar();
+    } else {
+      openSidebar();
+    }
   });
 
-  desktopToggle.addEventListener("click", () => {
-    sidebarState = { ...sidebarState, mode: "expanded", open: true };
-    applySidebarState();
-  });
+  backdrop?.addEventListener("click", closeSidebar);
 
   // Submenús
   function syncOpenSubmenuHeights(start) {
@@ -265,10 +275,17 @@ export async function initSidebar(
       setTimeout(cleanup, TRANSITION_TIMEOUT);
     };
 
-    if (open) doOpen();
-    else doClose();
+    const syncHeights = () => syncOpenSubmenuHeights(submenu);
 
-    syncOpenSubmenuHeights(submenu);
+    if (open) {
+      doOpen();
+      // Keep parent heights in sync after animation to avoid clipped submenus.
+      requestAnimationFrame(syncHeights);
+      setTimeout(syncHeights, TRANSITION_TIMEOUT);
+    } else {
+      doClose();
+      setTimeout(syncHeights, TRANSITION_TIMEOUT);
+    }
   }
 
   function toggleSubmenu(li) {
@@ -284,7 +301,8 @@ export async function initSidebar(
         e.preventDefault();
 
         const li = link.parentElement;
-        const isTopLevel = li.closest(".menu") === menuRoot;
+        // Only treat direct children of .menu as top-level (avoids nested submenu misfires).
+        const isTopLevel = li.parentElement === menuRoot;
 
         const openFlyoutMode =
           isTopLevel &&
@@ -313,6 +331,9 @@ export async function initSidebar(
           link.addEventListener("click", (e) => {
             e.preventDefault();
             loadPartial(href);
+            if (!checkDesktopView()) {
+              closeSidebar();
+            }
           });
         }
       });
@@ -376,16 +397,23 @@ export async function initSidebar(
     const targetHref = normalizeForMatch(href);
     if (!targetHref) return;
 
-    const target = Array.from(
+    const allLinks = Array.from(
       sidebar.querySelectorAll(".menu-link, .submenu-link")
-    ).find((link) => {
+    );
+
+    // Prefer exact match (including query params) to avoid activating wrong submenu.
+    let target = allLinks.find((link) => {
       const linkHref = normalizeForMatch(link.getAttribute("href"));
-      if (!linkHref) return false;
-      return (
-        linkHref === targetHref ||
-        linkHref.split("?")[0] === targetHref.split("?")[0]
-      );
+      return linkHref && linkHref === targetHref;
     });
+
+    if (!target) {
+      target = allLinks.find((link) => {
+        const linkHref = normalizeForMatch(link.getAttribute("href"));
+        if (!linkHref) return false;
+        return linkHref.split("?")[0] === targetHref.split("?")[0];
+      });
+    }
 
     if (!target) return;
 
@@ -581,7 +609,7 @@ export async function initSidebar(
     if (!checkDesktopView() && sidebarState.open) {
       if (
         !sidebar.contains(ev.target) &&
-        !toggleFloating.contains(ev.target)
+        !toggleBtn.contains(ev.target)
       ) {
         closeSidebar();
       }
@@ -591,7 +619,7 @@ export async function initSidebar(
   // Ajuste en resize
   window.addEventListener("resize", () => {
     if (checkDesktopView()) {
-      sidebarState = { ...sidebarState, open: sidebarState.open !== false };
+      sidebarState = { ...sidebarState, open: true };
     } else {
       sidebarState = { ...sidebarState, open: false };
     }
@@ -610,83 +638,4 @@ export async function initSidebar(
   }
 
   applySidebarState();
-
-  // Detectar dispositivo y condicionar botones interactivos
-  const isDesktop = window.innerWidth >= DESKTOP_BREAK;
-
-  if (isDesktop) {
-    createDesktopToggle();
-  } else {
-    createRestoreButton();
-  }
-
-  window.addEventListener("resize", () => {
-    const isNowDesktop = checkDesktopView();
-
-    if (isNowDesktop) {
-      createDesktopToggle();
-      document.querySelector("#restoreButton")?.remove();
-    } else {
-      createRestoreButton();
-      document.querySelector("#desktopToggle")?.remove();
-    }
-  });
-
-  // Ajuste para condicionar visibilidad de botones
-  const isDesktopView = () => window.innerWidth >= DESKTOP_BREAK;
-
-  function updateSidebarButtons() {
-    const toggleFloating = document.querySelector("#sidebarUniversalToggle");
-    const toggleInternal = document.querySelector("#sidebarInternalToggle");
-    const collapseBtn = document.querySelector("#collapseBtn");
-
-    if (isDesktopView()) {
-      toggleFloating?.classList.add("hidden");
-      toggleInternal?.classList.add("hidden");
-      collapseBtn?.classList.remove("hidden");
-    } else {
-      toggleFloating?.classList.remove("hidden");
-      toggleInternal?.classList.remove("hidden");
-      collapseBtn?.classList.add("hidden");
-    }
-  }
-
-  window.addEventListener("resize", updateSidebarButtons);
-  updateSidebarButtons();
-
-  // Ajuste para manejar el botón único
-  const toggleSidebar = () => {
-    const sidebar = document.querySelector("#sidebar");
-    const toggleBtn = document.querySelector("#sidebarToggle");
-
-    if (!sidebar || !toggleBtn) return;
-
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("collapsed");
-      toggleBtn.querySelector("i").classList.toggle("fa-angle-left");
-      toggleBtn.querySelector("i").classList.toggle("fa-angle-right");
-    });
-  };
-
-  toggleSidebar();
-
-  // Ajuste para manejar visibilidad dinámica de botones
-  const updateSidebarState = () => {
-    const sidebar = document.querySelector("#sidebar");
-    const toggleBtn = document.querySelector("#sidebarToggle");
-    const floatingBtn = document.querySelector("#sidebarUniversalToggle");
-
-    if (!sidebar || !toggleBtn || !floatingBtn) return;
-
-    if (sidebar.classList.contains("collapsed")) {
-      toggleBtn.style.display = "inline-flex";
-      floatingBtn.style.display = "none";
-    } else {
-      toggleBtn.style.display = "none";
-      floatingBtn.style.display = "inline-flex";
-    }
-  };
-
-  window.addEventListener("resize", updateSidebarState);
-  updateSidebarState();
 }

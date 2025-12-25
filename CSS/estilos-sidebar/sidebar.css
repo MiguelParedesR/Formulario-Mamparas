@@ -24,6 +24,38 @@ body {
   transition: background 0.25s ease;
 }
 
+/* Body + content areas */
+.sidebar-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0 12px;
+}
+
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px;
+  border-top: 1px solid var(--sidebar-border);
+  background: var(--sidebar-bg-dark);
+}
+
+/* Mobile backdrop for overlay mode */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1500;
+}
+
+.sidebar-backdrop.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 /* ========================================================================== */
 /* SIDEBAR                                                                    */
 /* ========================================================================== */
@@ -35,17 +67,43 @@ body {
   height: 100vh;
   background: var(--sidebar-bg);
   color: var(--sidebar-text);
-  overflow-y: auto;
+  overflow: hidden;
   z-index: 2000;
-  transform: translateX(0);
+  display: flex;
+  flex-direction: column;
   transition: transform 0.3s ease, width 0.25s ease;
   box-shadow: var(--sidebar-shadow);
 }
 
-.sidebar::-webkit-scrollbar {
+/* External ui-sidebar mapping: keep the SPA push layout stable. */
+.ui-sidebar {
+  padding: 0;
+  transition: transform 0.3s ease;
+}
+
+.ui-sidebar-left {
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100%;
+  transform: translateX(-100%);
+}
+
+.ui-sidebar-left.ui-sidebar-active {
+  transform: translateX(0);
+}
+
+/* Prevent legacy global "transition: all" from CSS/styles.css inside sidebar */
+#sidebar,
+#sidebar * {
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease,
+    width 0.25s ease, opacity 0.2s ease;
+}
+
+.sidebar-body::-webkit-scrollbar {
   width: 6px;
 }
-.sidebar::-webkit-scrollbar-thumb {
+.sidebar-body::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.45);
   border-radius: 3px;
 }
@@ -66,12 +124,8 @@ body {
 }
 
 /* Oculto en mobile */
-.sidebar-hidden .sidebar {
-  transform: translateX(-260px);
-}
-
 body.sidebar-hidden .sidebar {
-  display: none;
+  transform: translateX(-100%);
   opacity: 0;
   pointer-events: none;
 }
@@ -84,7 +138,8 @@ body.sidebar-hidden .sidebar {
 /* ========================================================================== */
 /* LOGO + TOGGLES                                                             */
 /* ========================================================================== */
-.logo {
+.logo,
+.sidebar-header {
   position: relative;
   padding: 18px 12px;
   display: flex;
@@ -101,7 +156,9 @@ body.sidebar-hidden .sidebar {
 
 .collapse-btn,
 .sidebar-toggle-internal,
-.sidebar-toggle-floating {
+.sidebar-toggle-floating,
+.sidebar-toggle,
+.sidebar-button {
   width: 32px;
   height: 32px;
   border: 1px solid var(--sidebar-border);
@@ -117,7 +174,9 @@ body.sidebar-hidden .sidebar {
 
 .collapse-btn:hover,
 .sidebar-toggle-internal:hover,
-.sidebar-toggle-floating:hover {
+.sidebar-toggle-floating:hover,
+.sidebar-toggle:hover,
+.sidebar-button:hover {
   background: rgba(255, 255, 255, 0.14);
 }
 
@@ -127,6 +186,23 @@ body.sidebar-hidden .sidebar {
   left: 16px;
   z-index: 2100;
   display: inline-flex;
+}
+
+/* Unified sidebar toggle (single control for desktop/mobile). */
+.sidebar-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2100;
+  transition: left 0.25s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+body.sidebar-open #sidebarToggle {
+  left: calc(var(--sidebar-width) - 44px);
+}
+
+body.sidebar-open.sidebar-collapsed #sidebarToggle {
+  left: calc(var(--sidebar-width-collapsed) - 44px);
 }
 .sidebar-respawn {
   position: fixed;
@@ -187,6 +263,10 @@ body.sidebar-hidden #sidebarRespawn {
   .sidebar-toggle-floating {
     display: none !important;
   }
+
+  .sidebar-toggle-internal {
+    display: none !important;
+  }
 }
 
 /* ========================================================================== */
@@ -195,6 +275,7 @@ body.sidebar-hidden #sidebarRespawn {
 .menu {
   list-style: none;
   padding: 10px 0;
+  margin: 0;
 }
 
 .menu li {
@@ -210,6 +291,8 @@ body.sidebar-hidden #sidebarRespawn {
   color: var(--sidebar-muted);
   text-decoration: none;
   font-size: 0.95rem;
+  line-height: 1.35;
+  white-space: normal;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
@@ -291,6 +374,26 @@ body.sidebar-hidden #sidebarRespawn {
   transform: translateX(0);
 }
 
+/* Flyout styling for collapsed sidebar (keep palette consistent) */
+.sidebar-flyout {
+  background: var(--sidebar-bg);
+  border: 1px solid var(--sidebar-border);
+  box-shadow: var(--sidebar-shadow);
+  border-radius: 12px;
+  padding: 6px 0;
+  min-width: 220px;
+}
+
+.sidebar-flyout .submenu {
+  display: block;
+  max-height: none;
+  padding-left: 10px;
+}
+
+.sidebar-flyout .submenu-link {
+  color: var(--sidebar-muted);
+}
+
 /* Ajuste para visibilidad dinámica de botones */
 .sidebar.collapsed .sidebar-toggle-floating {
   display: none !important;
@@ -313,11 +416,15 @@ body.sidebar-hidden #sidebarRespawn {
 /* ========================================================================== */
 @media (max-width: 1023px) {
   .sidebar {
-    transform: translateX(-260px);
+    transform: translateX(-100%);
   }
 
   .sidebar.show {
     transform: translateX(0);
+  }
+
+  .sidebar-footer {
+    display: none;
   }
 }
 
