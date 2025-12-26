@@ -231,7 +231,7 @@ function recalcularProgreso() {
     analisisInput,
     conclusionesInput,
     recomendacionesInput,
-  ];
+  ].filter(Boolean);
 
   if (extraRefs.contenedor) camposRequired.push(extraRefs.contenedor);
   if (extraRefs.placa) camposRequired.push(extraRefs.placa);
@@ -537,17 +537,17 @@ async function guardarIncidencia(estado = "BORRADOR") {
 
   const payload = {
     tipo_incidencia: tipoSeleccionado,
-    asunto: asuntoInput.value,
-    dirigido_a: dirigidoAInput.value,
-    remitente: remitenteInput.value,
-    fecha_informe: fechaInformeInput.value,
-    analisis: analisisInput.value,
-    conclusiones: conclusionesInput.value,
-    recomendaciones: recomendacionesInput.value,
+    asunto: obtenerValorInput(asuntoInput),
+    dirigido_a: obtenerValorInput(dirigidoAInput),
+    remitente: obtenerValorInput(remitenteInput),
+    fecha_informe: obtenerValorInput(fechaInformeInput),
+    analisis: obtenerValorInput(analisisInput),
+    conclusiones: obtenerValorInput(conclusionesInput),
+    recomendaciones: obtenerValorInput(recomendacionesInput),
     campos: {
       valorExtra,
-      hechos: hechosInput.value || "",
-      introduccion: introduccionInput.value || "",
+      hechos: obtenerValorInput(hechosInput),
+      introduccion: obtenerValorInput(introduccionInput),
     },
     progreso: parseInt(progressLabel.textContent),
     estado,
@@ -664,6 +664,10 @@ renderizarAnexosPreview();
    HELPERS INTERNOS â€” NormalizaciÃ³n y limpieza
 ============================================================================ */
 
+function obtenerValorInput(input) {
+  return input?.value ?? "";
+}
+
 /**
  * Limpia texto para mejor compatibilidad con DOCX
  */
@@ -697,15 +701,15 @@ function armarPayloadFinal() {
 
   return {
     tipo: tipoSeleccionado,
-    asunto: limpiarTextoParaWord(asuntoInput.value),
-    dirigido_a: limpiarTextoParaWord(dirigidoAInput.value),
-    remitente: limpiarTextoParaWord(remitenteInput.value),
-    fecha_informe: fechaInformeInput.value,
-    analisis: procesarTextoNumerado(analisisInput.value),
-    conclusiones: procesarTextoNumerado(conclusionesInput.value),
-    recomendaciones: procesarTextoNumerado(recomendacionesInput.value),
-    hechos: procesarTextoNumerado(hechosInput.value),
-    introduccion: procesarTextoNumerado(introduccionInput.value),
+    asunto: limpiarTextoParaWord(obtenerValorInput(asuntoInput)),
+    dirigido_a: limpiarTextoParaWord(obtenerValorInput(dirigidoAInput)),
+    remitente: limpiarTextoParaWord(obtenerValorInput(remitenteInput)),
+    fecha_informe: obtenerValorInput(fechaInformeInput),
+    analisis: procesarTextoNumerado(obtenerValorInput(analisisInput)),
+    conclusiones: procesarTextoNumerado(obtenerValorInput(conclusionesInput)),
+    recomendaciones: procesarTextoNumerado(obtenerValorInput(recomendacionesInput)),
+    hechos: procesarTextoNumerado(obtenerValorInput(hechosInput)),
+    introduccion: procesarTextoNumerado(obtenerValorInput(introduccionInput)),
     extras: valorExtra,
     anexos: anexosArchivos.map((a) => ({
       name: a.name,
@@ -731,16 +735,16 @@ async function armarPayloadWord() {
   const valorExtra = obtenerValorExtra();
 
   const payload = {
-    asunto: asuntoInput.value || "",
+    asunto: obtenerValorInput(asuntoInput),
     valorExtra,
-    dirigido_a: dirigidoAInput.value || "",
-    remitente: remitenteInput.value || "",
-    fecha_informe: fechaInformeInput.value || "",
-    introduccion: introduccionInput.value || "",
-    hechos: hechosInput.value || "",
-    analisis: analisisInput.value || "",
-    conclusiones: conclusionesInput.value || "",
-    recomendaciones: recomendacionesInput.value || "",
+    dirigido_a: obtenerValorInput(dirigidoAInput),
+    remitente: obtenerValorInput(remitenteInput),
+    fecha_informe: obtenerValorInput(fechaInformeInput),
+    introduccion: obtenerValorInput(introduccionInput),
+    hechos: obtenerValorInput(hechosInput),
+    analisis: obtenerValorInput(analisisInput),
+    conclusiones: obtenerValorInput(conclusionesInput),
+    recomendaciones: obtenerValorInput(recomendacionesInput),
     anexos: [],
   };
 

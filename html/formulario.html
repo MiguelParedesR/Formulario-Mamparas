@@ -81,19 +81,26 @@
                   <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion I</p>
                   <h2 class="text-lg font-semibold text-gray-900">Asunto y serie</h2>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div class="space-y-1">
-                    <label class="text-sm font-semibold text-gray-700">Asunto (automatico)</label>
-                    <input id="asunto" readonly class="w-full rounded-xl border border-gray-200 bg-white shadow-sm px-4 py-2 text-sm" />
+                <div class="space-y-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="space-y-1">
+                      <label class="text-sm font-semibold text-gray-700">Asunto (automatico)</label>
+                      <input id="asunto" readonly class="w-full rounded-xl border border-gray-200 bg-white shadow-sm px-4 py-2 text-sm" />
+                    </div>
+                    <div class="space-y-1">
+                      <label class="text-sm font-semibold text-gray-700">Dirigido a</label>
+                      <input id="dirigidoA" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2 text-sm" placeholder="Ingresa el destinatario" />
+                    </div>
+                    <div class="space-y-1">
+                      <label class="text-sm font-semibold text-gray-700">Remitente</label>
+                      <input id="remitente" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2 text-sm" placeholder="Ingresa el remitente" />
+                    </div>
+                    <div class="space-y-1">
+                      <label class="text-sm font-semibold text-gray-700">Fecha del informe</label>
+                      <input id="fechaInforme" type="date" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2 text-sm" />
+                    </div>
                   </div>
-                  <div class="space-y-1">
-                    <label class="text-sm font-semibold text-gray-700">Contenedor</label>
-                    <input id="contenedor" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2 text-sm" placeholder="Ingresa la serie del contenedor" />
-                  </div>
-                  <div class="space-y-1">
-                    <label class="text-sm font-semibold text-gray-700">Placa unidad</label>
-                    <input id="placa" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2 text-sm" placeholder="ABC-123" />
-                  </div>
+                  <div id="campoExtraContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
                 </div>
               </section>
 

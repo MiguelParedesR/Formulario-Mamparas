@@ -82,13 +82,18 @@ const construirPayloadDetalle = (registro) => {
 };
 
 const renderFila = (registro) => {
-  const registroDataString = JSON.stringify(registro || {}).replace(/"/g, "&quot;");
+  const registroDataString = JSON.stringify(registro || {}).replace(
+    /"/g,
+    "&quot;"
+  );
   return `
     <tr class="odd:bg-gray-50 even:bg-white text-gray-700 text-sm leading-relaxed">
       <td class="px-3 py-2">${registro.fecha || "-"}</td>
       <td class="px-3 py-2">${registro.hora || "-"}</td>
       <td class="px-3 py-2">${registro.empresa || "-"}</td>
-      <td class="px-3 py-2 font-semibold text-gray-900">${registro.placa || "-"}</td>
+      <td class="px-3 py-2 font-semibold text-gray-900">${
+        registro.placa || "-"
+      }</td>
       <td class="px-3 py-2">${registro.chofer || "-"}</td>
       <td class="px-3 py-2">${registro.lugar || "-"}</td>
       <td class="px-3 py-2">${registro.incorreccion || "-"}</td>
@@ -115,7 +120,8 @@ const cargarRegistros = async () => {
   const cuerpo = document.getElementById(TABLA_ID);
   if (!cuerpo) return;
 
-  cuerpo.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-gray-500">Cargando registros...</td></tr>';
+  cuerpo.innerHTML =
+    '<tr><td colspan="9" class="text-center py-4 text-gray-500">Cargando registros...</td></tr>';
 
   const { data, error } = await supabase
     .from("inspecciones")
@@ -125,12 +131,14 @@ const cargarRegistros = async () => {
 
   if (error) {
     console.error("Error al cargar registros:", error.message);
-    cuerpo.innerHTML = '<tr><td colspan="9" class="py-3 text-center text-red-600">Error al cargar los datos.</td></tr>';
+    cuerpo.innerHTML =
+      '<tr><td colspan="9" class="py-3 text-center text-red-600">Error al cargar los datos.</td></tr>';
     return;
   }
 
   if (!data || !data.length) {
-    cuerpo.innerHTML = '<tr><td colspan="9" class="py-3 text-center text-gray-500">No hay registros disponibles.</td></tr>';
+    cuerpo.innerHTML =
+      '<tr><td colspan="9" class="py-3 text-center text-gray-500">No hay registros disponibles.</td></tr>';
     return;
   }
 
@@ -166,7 +174,9 @@ const initRegistros = () => {
     if (!boton?.dataset?.registro) return;
 
     try {
-      const registro = JSON.parse(boton.dataset.registro.replace(/&quot;/g, '"'));
+      const registro = JSON.parse(
+        boton.dataset.registro.replace(/&quot;/g, '"')
+      );
       const payload = construirPayloadDetalle(registro);
       mostrarDetalleMampara(payload);
     } catch (error) {

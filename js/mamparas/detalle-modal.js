@@ -10,7 +10,8 @@ const MODAL_ID = "mampara-modal";
 const CARRUSEL_ID = "mampara-carrusel";
 const DARK_BUTTON_BASE =
   "rounded-full text-white shadow-lg flex items-center justify-center transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-white/60";
-const DARK_BUTTON_STYLE = "background-color: #0b1a2a; border: 1px solid rgba(255,255,255,0.22);";
+const DARK_BUTTON_STYLE =
+  "background-color: #0b1a2a; border: 1px solid rgba(255,255,255,0.22);";
 
 const textoSeguro = (valor, fallback = "--") => {
   if (valor === null || valor === undefined || valor === "") return fallback;
@@ -66,7 +67,9 @@ const construirMiniaturas = (imagenes) => {
         ? "cursor-pointer hover:shadow-md hover:ring-2 hover:ring-blue-500"
         : "cursor-not-allowed opacity-60";
       const contenido = habilitada
-        ? `<img src="${img.url}" alt="${textoSeguro(img.label)}" class="w-full h-full object-cover" loading="lazy" />`
+        ? `<img src="${img.url}" alt="${textoSeguro(
+            img.label
+          )}" class="w-full h-full object-cover" loading="lazy" />`
         : `<div class="w-full h-full flex items-center justify-center text-xs text-gray-400">Sin foto</div>`;
 
       return `
@@ -104,13 +107,13 @@ export function mostrarDetalleMampara(payload) {
   overlay.setAttribute("aria-modal", "true");
 
   overlay.innerHTML = `
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl p-6 sm:p-8 relative animate-grow" style="padding-top: 3.75rem;">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl p-6 sm:p-8 relative animate-grow" style="overflow: visible;">
       <button
         type="button"
-        class="${DARK_BUTTON_BASE} absolute top-4 right-4 w-10 h-10 text-xl leading-none z-10"
+        class="${DARK_BUTTON_BASE} absolute w-10 h-10 text-xl leading-none z-10"
         data-close
         aria-label="Cerrar"
-        style="${DARK_BUTTON_STYLE}"
+        style="${DARK_BUTTON_STYLE} top: -16px; right: -16px;"
       >&times;</button>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -136,7 +139,8 @@ export function mostrarDetalleMampara(payload) {
     </div>
   `;
 
-  const container = document.getElementById("mampara-detalle-modal-container") || document.body;
+  const container =
+    document.getElementById("mampara-detalle-modal-container") || document.body;
   container.appendChild(overlay);
   limpiarDetalleOffset = aplicarOffsetSidebar(overlay);
   registrarEscape();
@@ -159,7 +163,10 @@ export function mostrarDetalleMampara(payload) {
 const abrirCarrusel = (indiceInicial) => {
   if (!carruselImagenes.length) return;
 
-  carruselIndice = Math.max(0, Math.min(indiceInicial, carruselImagenes.length - 1));
+  carruselIndice = Math.max(
+    0,
+    Math.min(indiceInicial, carruselImagenes.length - 1)
+  );
   const mostrarControles = carruselImagenes.length > 1;
 
   const overlay = document.createElement("div");
@@ -234,7 +241,9 @@ const abrirCarrusel = (indiceInicial) => {
 
 const moverCarrusel = (direccion) => {
   if (!carruselImagenes.length) return;
-  carruselIndice = (carruselIndice + direccion + carruselImagenes.length) % carruselImagenes.length;
+  carruselIndice =
+    (carruselIndice + direccion + carruselImagenes.length) %
+    carruselImagenes.length;
   actualizarCarrusel();
 };
 

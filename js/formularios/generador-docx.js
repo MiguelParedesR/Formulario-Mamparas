@@ -8,8 +8,8 @@
 ============================================================================ */
 
 import PizZip from "https://cdn.jsdelivr.net/npm/pizzip@3.1.4/+esm";
-import Docxtemplater from "https://esm.sh/docxtemplater@3.67.5";
-import ImageModule from "https://esm.sh/docxtemplater-image-module@3.1.0";
+import Docxtemplater from "https://esm.sh/docxtemplater@3.1.0?target=es2022";
+import ImageModule from "https://esm.sh/docxtemplater-image-module@3.1.0?deps=docxtemplater@3.1.0&target=es2022";
 import { getFileBase64 } from "../utils/storage.js";
 import { withBase } from "../config.js";
 
@@ -125,17 +125,24 @@ async function renderWord(context) {
   const zip = new PizZip(templateBinary);
 
   const imageModule = new ImageModule({
-    getImage: (tagValue) => base64ToArrayBuffer(tagValue),
+    getImage: (tagValue) => {
+      if (!tagValue || typeof tagValue !== "string" || !tagValue.includes(",")) {
+        return null;
+      }
+      return base64ToArrayBuffer(tagValue);
+    },
     getSize: () => [520, 360],
   });
 
-  const doc = new Docxtemplater(zip, {
+  const doc = new Docxtemplater();
+  doc.loadZip(zip);
+  doc.setOptions({
     paragraphLoop: true,
     linebreaks: true,
     delimiters: { start: "{{", end: "}}" },
-    modules: [imageModule],
     nullGetter: () => "",
   });
+  doc.attachModule(imageModule);
   doc.setData(context);
 
   try {
