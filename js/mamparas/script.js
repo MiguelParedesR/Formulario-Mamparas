@@ -200,8 +200,11 @@ export function mostrarModalCorreo(datosFormulario = {}, detalleJSON, options = 
       ];
 
   const imagenesDisponibles = [];
+  const thumbnailWidth = 120;
+  const thumbnailHeight = 80;
+
   const imagenesCards = imagenesCorreo
-    .map((img) => {
+    .map((img, idx) => {
       let index = -1;
       if (img.url) {
         imagenesDisponibles.push(img);
@@ -211,24 +214,27 @@ export function mostrarModalCorreo(datosFormulario = {}, detalleJSON, options = 
       const dataAttr = habilitada
         ? `data-correo-img=\"${index}\" role=\"button\" tabindex=\"0\"`
         : "aria-disabled=\"true\"";
-      const claseBase =
-        "w-32 h-20 rounded-xl border border-gray-200 shadow-sm overflow-hidden transition";
       const claseEstado = habilitada
         ? "cursor-pointer hover:shadow-md hover:ring-2 hover:ring-indigo-500"
         : "cursor-not-allowed opacity-60";
+      const wrapperStyle = `width:${thumbnailWidth}px;height:${thumbnailHeight}px;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;`;
       const contenido = habilitada
         ? `<img src="${escapeHtml(img.url)}" alt="${escapeHtml(
             img.label
-          )}" class="w-full h-full object-cover" loading="lazy" />`
-        : `<div class="w-full h-full flex items-center justify-center text-xs text-gray-400">Sin foto</div>`;
+          )}" width="${thumbnailWidth}" height="${thumbnailHeight}" style="display:block;width:${thumbnailWidth}px;height:${thumbnailHeight}px;object-fit:cover;" loading="lazy" />`
+        : `<div style="${wrapperStyle}display:flex;align-items:center;justify-content:center;font-size:11px;color:#9ca3af;">Sin foto</div>`;
+      const card = habilitada
+        ? `<div class="${claseEstado}" ${dataAttr} style="${wrapperStyle}">${contenido}</div>`
+        : contenido;
+      const cellPadding = idx < imagenesCorreo.length - 1 ? "12px" : "0";
 
       return `
-        <div class="flex flex-col items-center gap-2" style="width: 140px;">
-          <p class="text-xs font-semibold text-gray-600">${img.labelHtml}</p>
-          <div class="${claseBase} ${claseEstado}" ${dataAttr}>
-            ${contenido}
+        <td style="padding-right:${cellPadding};vertical-align:top;">
+          <div style="font-size:12px;font-weight:600;color:#4b5563;margin-bottom:6px;text-align:center;">
+            ${img.labelHtml}
           </div>
-        </div>
+          ${card}
+        </td>
       `;
     })
     .join("");
@@ -347,8 +353,12 @@ export function mostrarModalCorreo(datosFormulario = {}, detalleJSON, options = 
           <p class="text-xs uppercase tracking-[0.2em] text-gray-500 font-semibold">
             IM&Aacute;GENES REGISTRADAS
           </p>
-          <div class="flex flex-nowrap gap-4 overflow-x-auto pb-2">
-            ${imagenesCards}
+          <div style="overflow-x:auto;padding-bottom:8px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+              <tr>
+                ${imagenesCards}
+              </tr>
+            </table>
           </div>
           </div>
         </div>
