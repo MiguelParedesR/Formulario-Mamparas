@@ -211,9 +211,7 @@ export function mostrarModalCorreo(datosFormulario = {}, detalleJSON, options = 
         index = imagenesDisponibles.length - 1;
       }
       const habilitada = index >= 0;
-      const dataAttr = habilitada
-        ? `data-correo-img=\"${index}\" role=\"button\" tabindex=\"0\"`
-        : "aria-disabled=\"true\"";
+      const dataAttr = habilitada ? `data-correo-img=\"${index}\"` : "aria-disabled=\"true\"";
       const claseEstado = habilitada
         ? "cursor-pointer hover:shadow-md hover:ring-2 hover:ring-indigo-500"
         : "cursor-not-allowed opacity-60";
@@ -221,10 +219,12 @@ export function mostrarModalCorreo(datosFormulario = {}, detalleJSON, options = 
       const contenido = habilitada
         ? `<img src="${escapeHtml(img.url)}" alt="${escapeHtml(
             img.label
-          )}" width="${thumbnailWidth}" height="${thumbnailHeight}" style="display:block;width:${thumbnailWidth}px;height:${thumbnailHeight}px;object-fit:cover;" loading="lazy" />`
+          )}" width="${thumbnailWidth}" height="${thumbnailHeight}" border="0" style="display:block;width:${thumbnailWidth}px;height:${thumbnailHeight}px;object-fit:cover;border:0;outline:none;text-decoration:none;" loading="lazy" />`
         : `<div style="${wrapperStyle}display:flex;align-items:center;justify-content:center;font-size:11px;color:#9ca3af;">Sin foto</div>`;
       const card = habilitada
-        ? `<div class="${claseEstado}" ${dataAttr} style="${wrapperStyle}">${contenido}</div>`
+        ? `<a href="${escapeHtml(
+            img.url
+          )}" target="_blank" rel="noopener noreferrer" class="${claseEstado}" ${dataAttr} style="${wrapperStyle}display:inline-block;text-decoration:none;">${contenido}</a>`
         : contenido;
       const cellPadding = idx < imagenesCorreo.length - 1 ? "12px" : "0";
 
@@ -411,6 +411,7 @@ export function mostrarModalCorreo(datosFormulario = {}, detalleJSON, options = 
 
     const btn = event.target.closest("[data-correo-img]");
     if (btn) {
+      event.preventDefault();
       const index = Number(btn.dataset.correoImg);
       const imagen = imagenesDisponibles[index];
       if (imagen?.url) {
@@ -975,14 +976,17 @@ function renderGaleriaMamparas(detalle) {
   }
 
   const grid = document.createElement("div");
-  grid.className = "grid grid-cols-2 gap-3";
+  grid.className = "flex";
+  grid.style.cssText = "display:flex; gap:10px; align-items:flex-start; flex-wrap: nowrap;";
 
   Object.values(imagenes).forEach((url) => {
     if (!url) return;
     const item = document.createElement("div");
     item.className =
       "rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition cursor-pointer";
-    item.innerHTML = `<img src="${url}" alt="Evidencia" class="w-full h-24 object-cover" />`;
+    item.style.flex = "0 0 auto";
+    item.style.width = "120px";
+    item.innerHTML = `<img src="${url}" alt="Evidencia" style="width:120px;height:72px;object-fit:cover;display:block;" />`;
     item.addEventListener("click", () => abrirPreviewImagenModal(url));
     grid.appendChild(item);
   });

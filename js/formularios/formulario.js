@@ -93,6 +93,12 @@ function configurarTipo(tipo) {
   renderCamposExtra(tipoSeleccionado);
   recalcularProgreso();
 }
+
+function prellenarFechaInforme() {
+  if (!fechaInformeInput || fechaInformeInput.value) return;
+  const hoy = new Date().toISOString().slice(0, 10);
+  fechaInformeInput.value = hoy;
+}
 /* ---------------------------------------------------------------------------
    GENERAR CAMPOS EXTRA (Contenedor / Placa / Ambos)
 --------------------------------------------------------------------------- */
@@ -540,7 +546,7 @@ async function guardarIncidencia(estado = "BORRADOR") {
     asunto: obtenerValorInput(asuntoInput),
     dirigido_a: obtenerValorInput(dirigidoAInput),
     remitente: obtenerValorInput(remitenteInput),
-    fecha_informe: obtenerValorInput(fechaInformeInput),
+    fecha_informe: obtenerFechaInput(fechaInformeInput),
     analisis: obtenerValorInput(analisisInput),
     conclusiones: obtenerValorInput(conclusionesInput),
     recomendaciones: obtenerValorInput(recomendacionesInput),
@@ -549,7 +555,7 @@ async function guardarIncidencia(estado = "BORRADOR") {
       hechos: obtenerValorInput(hechosInput),
       introduccion: obtenerValorInput(introduccionInput),
     },
-    progreso: parseInt(progressLabel.textContent),
+    progreso: obtenerProgresoActual(),
     estado,
   };
 
@@ -562,8 +568,8 @@ async function guardarIncidencia(estado = "BORRADOR") {
     .single();
 
   if (error) {
-    console.error(error);
-    alert("Error guardando incidencia.");
+    console.error("Supabase insert error:", error);
+    alert(error?.message || "Error guardando incidencia.");
     return;
   }
 
@@ -651,6 +657,7 @@ if (tipoDetectado) {
 } else {
   tipoDescripcion.textContent = "Seleccione el tipo en dashboard o sidebar.";
 }
+prellenarFechaInforme();
 
 // Inicializar textareas numeradas
 [introduccionInput, hechosInput, analisisInput, conclusionesInput, recomendacionesInput]
@@ -666,6 +673,17 @@ renderizarAnexosPreview();
 
 function obtenerValorInput(input) {
   return input?.value ?? "";
+}
+
+function obtenerFechaInput(input) {
+  const value = obtenerValorInput(input).trim();
+  return value ? value : null;
+}
+
+function obtenerProgresoActual() {
+  const raw = progressLabel?.textContent || "0";
+  const parsed = parseInt(raw, 10);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 /**
