@@ -17,7 +17,7 @@ const asset = (path = "") => {
 };
 
 // Incremento de versión para forzar actualización del cache
-const VERSION = "v7.122";
+const VERSION = "v7.123";
 const CACHE_NAME = `CCTV-${VERSION}${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
 // Archivos que intentaremos cachear si existen:

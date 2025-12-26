@@ -882,6 +882,10 @@ function cerrarModalPreview() {
   modal.removeEventListener("click", outsideClickHandler);
 }
 
+if (typeof window !== "undefined") {
+  window.cerrarModalPreview = cerrarModalPreview;
+}
+
 function escCloseHandler(e) {
   if (e.key === "Escape") cerrarModalPreview();
 }
