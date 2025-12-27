@@ -118,11 +118,51 @@ function normalizeMultiline(text = "") {
 }
 
 /* ----------------------------------------------------------
-   7) Render principal
+   7) Insertar descripciones debajo de anexos
 ---------------------------------------------------------- */
-async function renderWord(context) {
+function insertAnexoDescriptions(templateXml, indices = []) {
+  if (!templateXml || !indices.length) return templateXml;
+
+  const closeTag = "</w:p>";
+  const unique = Array.from(new Set(indices)).sort((a, b) => a - b);
+  let updated = templateXml;
+
+  unique.forEach((index) => {
+    const placeholder = `{{%ANEXO_${index}}}`;
+    const tagPos = updated.indexOf(placeholder);
+    if (tagPos === -1) return;
+
+    const closePos = updated.indexOf(closeTag, tagPos);
+    if (closePos === -1) return;
+
+    const descTag = `{{ANEXO_${index}_DESC}}`;
+    const descParagraph =
+      `<w:p><w:r><w:rPr><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr>` +
+      `<w:t>${descTag}</w:t></w:r></w:p>`;
+    const insertPos = closePos + closeTag.length;
+
+    updated = updated.slice(0, insertPos) + descParagraph + updated.slice(insertPos);
+  });
+
+  return updated;
+}
+
+/* ----------------------------------------------------------
+   8) Render principal
+---------------------------------------------------------- */
+async function renderWord(context, descripcionIndices = []) {
   const templateBinary = await loadTemplate();
   const zip = new PizZip(templateBinary);
+
+  if (Array.isArray(descripcionIndices) && descripcionIndices.length) {
+    const xmlPath = "word/document.xml";
+    const xmlFile = zip.file(xmlPath);
+    if (xmlFile) {
+      const xml = xmlFile.asText();
+      const updated = insertAnexoDescriptions(xml, descripcionIndices);
+      zip.file(xmlPath, updated);
+    }
+  }
 
   const imageModule = new ImageModule({
     getImage: (tagValue) => {
@@ -201,6 +241,17 @@ async function generateWordFinal(payload) {
     anexosMap[`ANEXO_${i + 1}`] = anexosProcesados[i] || "";
   }
 
+  const anexosDescripcionMap = {};
+  const descripcionIndices = [];
+  anexos.slice(0, 10).forEach((anexo, index) => {
+    const raw = (anexo?.descripcion || "").trim();
+    if (!raw) return;
+    const desc = normalizeMultiline(raw);
+    const key = `ANEXO_${index + 1}_DESC`;
+    anexosDescripcionMap[key] = desc;
+    descripcionIndices.push(index + 1);
+  });
+
   const context = {
     ASUNTO: asunto || "",
     SERIE_CONTENEDOR: valorExtra?.contenedor || "",
@@ -214,9 +265,10 @@ async function generateWordFinal(payload) {
     CONCLUSIONES: normalizeMultiline(conclusiones || ""),
     RECOMENDACIONES: normalizeMultiline(recomendaciones || ""),
     ...anexosMap,
+    ...anexosDescripcionMap,
   };
 
-  await renderWord(context);
+  await renderWord(context, descripcionIndices);
 }
 
 console.log("QA DOCX: generador-docx.js cargado correctamente");

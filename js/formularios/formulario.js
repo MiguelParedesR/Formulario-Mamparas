@@ -381,6 +381,7 @@ function agregarAnexos(files) {
       name: file.name,
       type: file.type,
       url: URL.createObjectURL(file),
+      descripcion: "",
     };
     anexosArchivos.push(entry);
   });
@@ -453,6 +454,73 @@ function abrirModalPreview(src) {
   if (!src || !modalOverlay || !modalImage) return;
 
   modalImage.src = src;
+
+  const anexo = anexosArchivos.find((item) => item.url === src);
+  const modalCard = modalImage.parentElement;
+  if (modalCard) {
+    let descWrap = modalCard.querySelector("#modalDescripcionAnexo");
+    let feedback = modalCard.querySelector("#modalDescripcionFeedback");
+
+    if (!descWrap) {
+      descWrap = document.createElement("div");
+      descWrap.id = "modalDescripcionAnexo";
+      descWrap.className = "mt-4 flex gap-2 items-start";
+
+      const textarea = document.createElement("textarea");
+      textarea.className = "flex-1 border rounded-lg px-3 py-2 text-sm";
+      textarea.placeholder = "Agregar descripcion de la imagen...";
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className =
+        "px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700";
+      button.textContent = "Aceptar";
+
+      descWrap.appendChild(textarea);
+      descWrap.appendChild(button);
+    }
+
+    if (!feedback) {
+      feedback = document.createElement("p");
+      feedback.id = "modalDescripcionFeedback";
+      feedback.className = "text-xs text-gray-500 mt-2";
+    }
+
+    const paragraphs = modalCard.querySelectorAll("p");
+    const previewText = paragraphs.length ? paragraphs[paragraphs.length - 1] : null;
+    if (previewText) {
+      modalCard.insertBefore(descWrap, previewText);
+      modalCard.insertBefore(feedback, previewText);
+    } else {
+      modalCard.appendChild(descWrap);
+      modalCard.appendChild(feedback);
+    }
+
+    const textarea = descWrap.querySelector("textarea");
+    const button = descWrap.querySelector("button");
+
+    if (textarea) {
+      textarea.value = anexo?.descripcion || "";
+    }
+
+    if (feedback) {
+      feedback.textContent = "";
+    }
+
+    if (button) {
+      const habilitado = Boolean(anexo);
+      button.disabled = !habilitado;
+      button.classList.toggle("opacity-50", !habilitado);
+      button.classList.toggle("cursor-not-allowed", !habilitado);
+
+      button.onclick = () => {
+        if (!anexo || !textarea) return;
+        anexo.descripcion = textarea.value.trim();
+        if (feedback) feedback.textContent = "Descripcion guardada";
+      };
+    }
+  }
+
   modalOverlay.classList.add("flex");
   modalOverlay.classList.remove("hidden");
   document.addEventListener("keydown", escCloseHandler);
@@ -772,6 +840,7 @@ async function armarPayloadWord() {
       name: a.name,
       url: a.url,
       type: a.type,
+      descripcion: a.descripcion || "",
     }));
   }
 
