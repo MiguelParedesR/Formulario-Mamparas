@@ -40,6 +40,19 @@ body {
   background: var(--sidebar-bg-dark);
 }
 
+.sidebar-footer .sidebar-return {
+  width: 100%;
+  justify-content: center;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--sidebar-text);
+}
+
+.sidebar-footer .sidebar-return:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 /* Mobile backdrop for overlay mode */
 .sidebar-backdrop {
   position: fixed;
@@ -421,10 +434,6 @@ body.sidebar-hidden #sidebarRespawn {
 
   .sidebar.show {
     transform: translateX(0);
-  }
-
-  .sidebar-footer {
-    display: none;
   }
 }
 

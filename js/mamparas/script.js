@@ -12,7 +12,8 @@ let registroPlacaDetectado = null;
 let placaIgnorada = "";
 let detallePrefill = null;
 let placaPrefill = "";
-let formularioInicializado = false;
+let formularioInicializado = null;
+let fechaHoraListenerActivo = false;
 
 const toggleHidden = (el, hidden) => {
   if (!el) return;
@@ -709,9 +710,11 @@ export async function guardarInspeccion(datosFormulario, detalleJSON) {
     ? detalleImagenes.foto_altura_mampara || null
     : detalleImagenes.foto_observacion || null;
 
+  const fechaHoraLocal = obtenerFechaHoraLocal();
+
   const registro = {
-    fecha: datosFormulario.fecha,
-    hora: datosFormulario.hora,
+    fecha: datosFormulario.fecha || fechaHoraLocal.fecha,
+    hora: datosFormulario.hora || fechaHoraLocal.hora,
     responsable: datosFormulario.responsable,
     empresa: datosFormulario.empresa,
     placa: datosFormulario.placa,
@@ -1186,13 +1189,35 @@ function initDetalleTrigger() {
 function autocompletarFechaHora() {
   const fecha = obtenerInput("fecha");
   const hora = obtenerInput("hora");
-  const ahora = new Date();
+  const { fecha: fechaLocal, hora: horaLocal } = obtenerFechaHoraLocal();
   if (fecha) {
-    fecha.value = ahora.toISOString().split("T")[0];
+    forzarValorInput(fecha, fechaLocal, true);
   }
   if (hora) {
-    hora.value = ahora.toTimeString().slice(0, 5);
+    forzarValorInput(hora, horaLocal, false);
   }
+}
+
+function obtenerFechaHoraLocal() {
+  const ahora = new Date();
+  const offsetMs = ahora.getTimezoneOffset() * 60000;
+  const local = new Date(ahora.getTime() - offsetMs);
+  return {
+    fecha: local.toISOString().slice(0, 10),
+    hora: ahora.toTimeString().slice(0, 5),
+  };
+}
+
+function forzarValorInput(input, value, usarFecha) {
+  if (!input || !value) return;
+  const eraReadOnly = input.readOnly;
+  input.readOnly = false;
+  input.value = value;
+  input.setAttribute("value", value);
+  if (usarFecha && !input.value) {
+    input.valueAsDate = new Date(`${value}T00:00:00`);
+  }
+  input.readOnly = eraReadOnly;
 }
 
 function initEmpresaPersonalizada() {
@@ -1512,16 +1537,27 @@ function initValidacionPlaca() {
 }
 
 function initFormulario() {
-  if (formularioInicializado) return;
   const form = document.getElementById("form-inspeccion");
   if (!form) {
     // console.warn("initMamparasForm: formulario no encontrado, se omite inicializaci\u00F3n.");
     return;
   }
 
-  formularioInicializado = true;
+  if (formularioInicializado === form) return;
+  formularioInicializado = form;
   cerrarTodosLosModales();
   autocompletarFechaHora();
+  setTimeout(autocompletarFechaHora, 0);
+  setTimeout(autocompletarFechaHora, 200);
+  setTimeout(autocompletarFechaHora, 800);
+  const fechaInput = obtenerInput("fecha");
+  const horaInput = obtenerInput("hora");
+  fechaInput?.addEventListener("focus", autocompletarFechaHora);
+  horaInput?.addEventListener("focus", autocompletarFechaHora);
+  if (!fechaHoraListenerActivo) {
+    window.addEventListener("focus", autocompletarFechaHora);
+    fechaHoraListenerActivo = true;
+  }
   initEmpresaPersonalizada();
   initDetalleTrigger();
   initDetalleModal();
@@ -1534,6 +1570,8 @@ function initFormulario() {
       mostrarModal("error", "Completa los campos obligatorios antes de continuar.");
       return;
     }
+
+    autocompletarFechaHora();
 
     const detalleCampo = obtenerInput("detalle");
     if (!detalleCampo || !detalleCampo.value) {
@@ -1553,8 +1591,8 @@ function initFormulario() {
     }
 
     const datos = {
-      fecha: obtenerInput("fecha")?.value || "",
-      hora: obtenerInput("hora")?.value || "",
+      fecha: obtenerInput("fecha")?.value || obtenerFechaHoraLocal().fecha,
+      hora: obtenerInput("hora")?.value || obtenerFechaHoraLocal().hora,
       responsable: obtenerInput("responsable")?.value || "",
       empresa: empresaValor,
       placa: (obtenerInput("placa")?.value || "").trim().toUpperCase(),
@@ -1609,8 +1647,8 @@ function initFormulario() {
 }
 
 function esperarFormulario() {
-  if (formularioInicializado) return;
-  if (document.getElementById("form-inspeccion")) {
+  const form = document.getElementById("form-inspeccion");
+  if (form) {
     initFormulario();
     return;
   }
