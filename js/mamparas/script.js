@@ -1543,7 +1543,8 @@ function initFormulario() {
     return;
   }
 
-  if (formularioInicializado === form) return;
+  if (form.dataset.mamparasInit === "1") return;
+  form.dataset.mamparasInit = "1";
   formularioInicializado = form;
   cerrarTodosLosModales();
   autocompletarFechaHora();

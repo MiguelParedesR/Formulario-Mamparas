@@ -295,17 +295,22 @@
       <p id="feedbackMessage" class="message text-sm font-medium"></p>
     </div>
   </div>
-  <!-- MODAL PREVIEW FIJO Y FUNCIONAL -->
+  <!-- MODAL PREVIEW -->
   <div id="modalPreview" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm hidden items-center justify-center">
     <div
       class="relative bg-white rounded-xl shadow-2xl max-w-3xl w-full p-6 animate-[fadeIn_0.3s_ease-out] overflow-hidden">
-      <button onclick="cerrarModalPreview()"
+      <button type="button" onclick="cerrarModalPreview()"
         class="absolute top-3 right-3 text-gray-600 hover:text-red-600 text-lg">&times;</button>
       <div class="space-y-4">
         <div class="rounded-xl border border-gray-100 bg-gray-50 p-3">
           <img id="previewImagen" src="" alt="Previsualizaci&oacute;n"
             class="w-full max-h-[60vh] object-contain rounded-lg" />
         </div>
-        <div class="space-y-2">
-          <labe      <img id="previewImagen" src="" alt="Previsualizaci&oacute;n" />
-      <p class="text-sm text-gray-500 text-center mt-4">Previsualizaci&oacute;n</p>
+        <p class="text-sm text-gray-500 text-center">Previsualizaci&oacute;n</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script type="module" src="../../js/mamparas/script.js"></script>
+</main>
