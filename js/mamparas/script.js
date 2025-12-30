@@ -4,7 +4,8 @@ export { supabase };
 
 const STORAGE_BUCKET = "mamparas";
 const VALIDACION_PLACA_DELAY = 450;
-const MIN_PLACA_LENGTH = 5;
+const MAX_PLACA_LENGTH = 6;
+const MIN_PLACA_LENGTH = MAX_PLACA_LENGTH;
 
 let actualizarEmpresaPersonalizadaFn = null;
 let actualizarBotonDetalleFn = null;
@@ -1243,7 +1244,11 @@ function initEmpresaPersonalizada() {
 async function consultarPlacaExistente(placa) {
   const placaRaw = String(placa || "").toUpperCase().trim();
   const placaNormalizada = normalizarPlaca(placaRaw);
-  const posibles = [placaRaw, placaNormalizada].filter(
+  const placaConGuion =
+    placaNormalizada.length === MAX_PLACA_LENGTH
+      ? `${placaNormalizada.slice(0, 3)}-${placaNormalizada.slice(3)}`
+      : "";
+  const posibles = [placaRaw, placaNormalizada, placaConGuion].filter(
     (valor, index, arr) => valor && arr.indexOf(valor) === index
   );
 
@@ -1499,9 +1504,13 @@ function initValidacionPlaca() {
   let ultimoValorConsultado = "";
 
   placaInput.addEventListener("input", () => {
-    placaInput.value = placaInput.value.toUpperCase().trim();
-    const valor = placaInput.value.replace(/\s+/g, "");
-    const valorNormalizado = normalizarPlaca(valor);
+    let valorNormalizado = normalizarPlaca(placaInput.value);
+    if (valorNormalizado.length > MAX_PLACA_LENGTH) {
+      valorNormalizado = valorNormalizado.slice(0, MAX_PLACA_LENGTH);
+    }
+    if (placaInput.value !== valorNormalizado) {
+      placaInput.value = valorNormalizado;
+    }
 
     if (placaPrefill && valorNormalizado !== placaPrefill) {
       detallePrefill = null;
@@ -1531,7 +1540,7 @@ function initValidacionPlaca() {
     debounceId = setTimeout(() => {
       if (valorNormalizado === ultimoValorConsultado) return;
       ultimoValorConsultado = valorNormalizado;
-      consultarPlacaExistente(valor);
+      consultarPlacaExistente(valorNormalizado);
     }, VALIDACION_PLACA_DELAY);
   });
 }
