@@ -13,13 +13,14 @@ const asset = (path = "") => {
   return BASE_PATH ? `${BASE_PATH}/${cleaned}` : cleaned;
 };
 
-const VERSION = "v7.139";
+const VERSION = "v7.140";
 const CACHE_NAME = `CCTV-${VERSION}${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
 const STATIC_ASSETS = [
   "CSS/global.css",
   "CSS/tailwind.css",
   "CSS/dashboard/dashboard.css",
+  "CSS/apple-redesign.css",
   "CSS/estilos-sidebar/sidebar.css",
   "CSS/styles.css",
   "js/sidebar/sidebar-loader.js",
