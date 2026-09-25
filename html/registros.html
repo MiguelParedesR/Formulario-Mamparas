@@ -1,69 +1,61 @@
 <link rel="stylesheet" href="../CSS/apple-redesign.css" />
 
-<main class="mamparas-modern">
-  <div class="mamparas-header">
-    <div>
-      <p class="section-kicker">Incidencias</p>
-      <h1>Registros de informes</h1>
-      <p>Consulta, filtra y edita los informes manteniendo la misma estructura documental usada al crearlos.</p>
-    </div>
-    <div class="w-full md:w-80">
-      <label for="buscarPlaca">Buscar placa o contenedor</label>
-      <input id="buscarPlaca" type="search" placeholder="Ej. ABC123 / TCLU..." autocomplete="off" />
+<main class="v3-records">
+  <div class="v3-filterbar">
+    <div class="search-group">
+      <label for="buscarPlaca">Buscar</label>
+      <input id="buscarPlaca" type="search" placeholder="Placa o contenedor" autocomplete="off" />
     </div>
   </div>
 
-  <section class="mamparas-form-surface">
-    <div class="overflow-x-auto">
-      <table id="tabla-registros" class="w-full text-left text-sm">
-        <thead>
-          <tr>
-            <th class="px-4 py-3">Fecha</th>
-            <th class="px-4 py-3">Tipo</th>
-            <th class="px-4 py-3">Placa</th>
-            <th class="px-4 py-3">Contenedor</th>
-            <th class="px-4 py-3">Progreso</th>
-            <th class="px-4 py-3">Estado</th>
-            <th class="px-4 py-3">Acciones</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </section>
+  <div class="v3-table-wrap">
+    <table id="tabla-registros">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th>Placa</th>
+          <th>Contenedor</th>
+          <th>Progreso</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-  <div id="verEditarModal" class="fixed inset-0 bg-black/55 backdrop-blur-md hidden opacity-0 items-center justify-center z-[6000] transition-opacity duration-200">
-    <div id="verEditarPanel" class="bg-[#f5f5f7] w-full mx-4 rounded-2xl overflow-hidden transform transition-all duration-200 scale-95 opacity-0" style="max-width:1500px;max-height:94vh">
-      <div class="document-toolbar" style="margin:0;border-radius:16px 16px 0 0;position:relative">
-        <div class="document-titlebar">
-          <div class="document-icon"><i class="fas fa-file-lines"></i></div>
-          <div>
-            <h1>Ver / editar incidencia</h1>
-            <p>Edita el documento sin perder la estructura del informe.</p>
+  <div id="verEditarModal" class="fixed inset-0 hidden opacity-0 items-center justify-center z-[6000] transition-opacity duration-200">
+    <div id="verEditarPanel" class="w-full mx-4 overflow-hidden transform transition-all duration-200 scale-95 opacity-0" style="max-width:1500px;max-height:94vh;background:#e9edf3">
+      <div class="v3-doc-top">
+        <div class="document-toolbar" style="position:relative!important;top:0!important">
+          <div class="document-titlebar">
+            <p>Edición del documento</p>
+          </div>
+          <div class="document-actions">
+            <button id="modalExportarWord" type="button" class="button-word">Exportar Word</button>
+            <button id="modalGuardarCambios" type="button" class="button-primary">Guardar cambios</button>
+            <button id="modalClose" type="button">Cerrar</button>
           </div>
         </div>
-        <div class="document-actions">
-          <button id="modalExportarWord" type="button" class="button-word"><i class="fas fa-file-word"></i>&nbsp; Exportar Word</button>
-          <button id="modalGuardarCambios" type="button" class="button-primary">Guardar cambios</button>
-          <button id="modalClose" type="button" aria-label="Cerrar"><i class="fas fa-times"></i></button>
-        </div>
-      </div>
 
-      <div class="px-5 pt-4">
-        <div id="modalFeedback" class="hidden"><p id="modalFeedbackText"></p></div>
+        <div class="px-4">
+          <div id="modalFeedback" class="hidden"><p id="modalFeedbackText"></p></div>
+        </div>
+
         <div class="document-progress">
-          <span class="progress-copy">Avance del informe</span>
+          <span class="progress-copy">Avance del documento</span>
+          <div class="progress-track"><div id="modalProgressBar" style="width:0;background:#c94d4d"></div></div>
           <span id="modalProgressLabel" class="progress-value">0%</span>
-          <div class="progress-track"><div id="modalProgressBar" style="width:0;background:#c9342f"></div></div>
         </div>
       </div>
 
-      <form id="formModalIncidencia" class="px-5 pb-6 overflow-y-auto" style="max-height:calc(94vh - 150px)">
+      <form id="formModalIncidencia" class="overflow-y-auto" style="max-height:calc(94vh - 115px)">
         <div class="word-workspace">
-          <div class="word-column">
+          <article class="word-column">
             <section class="word-section">
-              <p class="section-kicker">Sección I</p>
-              <h2>Encabezado</h2>
+              <p class="section-kicker">Documento · 01</p>
+              <h2>Contexto y cabecera</h2>
               <div class="word-metadata">
                 <div><label>Tipo</label><input id="modalTipo" readonly /></div>
                 <div><label>Fecha</label><input id="modalFecha" type="date" /></div>
@@ -71,13 +63,13 @@
                 <div class="field-wide"><label>Dirigido a</label><input id="modalDirigidoA" /></div>
                 <div class="field-wide"><label>Remitente</label><input id="modalRemitente" /></div>
               </div>
-              <div id="modalCampoExtra" style="margin-top:12px"></div>
+              <div id="modalCampoExtra" class="word-metadata" style="margin-top:11px"></div>
             </section>
 
             <section class="word-section">
               <p class="section-kicker">Sección II</p>
               <h2>Introducción</h2>
-              <textarea id="modalIntroduccion" rows="7" placeholder="1. Contexto del informe..."></textarea>
+              <textarea id="modalIntroduccion" rows="7"></textarea>
             </section>
 
             <section class="word-section">
@@ -85,13 +77,13 @@
               <h2>Análisis</h2>
               <textarea id="modalAnalisis" rows="8"></textarea>
             </section>
-          </div>
+          </article>
 
-          <div class="word-column">
+          <article class="word-column">
             <section class="word-section">
-              <p class="section-kicker">Sección III</p>
+              <p class="section-kicker">Documento · 02</p>
               <h2>Hechos</h2>
-              <textarea id="modalHechos" rows="16" placeholder="1. Primer hecho..."></textarea>
+              <textarea id="modalHechos" rows="16"></textarea>
             </section>
             <section class="word-section">
               <p class="section-kicker">Sección VI</p>
@@ -103,28 +95,28 @@
               <h2>Recomendaciones</h2>
               <textarea id="modalRecomendaciones" rows="8"></textarea>
             </section>
-          </div>
+          </article>
 
           <aside class="word-column evidence-sheet">
             <div class="evidence-head">
               <div>
-                <p class="section-kicker">Sección VIII</p>
-                <h2>Anexos</h2>
-                <p>Agrega o revisa las evidencias del informe.</p>
+                <p class="section-kicker">Documento · 03</p>
+                <h2>Evidencias</h2>
+                <p>Revisa los anexos o agrega nuevas evidencias.</p>
               </div>
             </div>
             <input id="modalAnexos" type="file" multiple accept="image/*,.pdf" />
-            <div id="modalListaAnexos" style="margin-top:12px"></div>
+            <div id="modalListaAnexos" style="margin-top:10px"></div>
           </aside>
         </div>
       </form>
     </div>
   </div>
 
-  <div id="registroPreviewModal" class="fixed inset-0 z-[7000] hidden items-center justify-center" style="background:rgba(0,0,0,.8);backdrop-filter:blur(12px)">
+  <div id="registroPreviewModal" class="fixed inset-0 z-[7000] hidden items-center justify-center" style="background:rgba(10,20,34,.93);backdrop-filter:blur(18px)">
     <div class="relative" style="width:min(1180px,96vw)">
-      <button id="registroPreviewClose" type="button" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-black/70 text-white" aria-label="Cerrar">&times;</button>
-      <img id="registroPreviewImage" alt="Evidencia ampliada" style="width:100%;max-height:88vh;object-fit:contain;border-radius:12px;background:#111" />
+      <button id="registroPreviewClose" type="button" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-black/70 text-white" aria-label="Cerrar">×</button>
+      <img id="registroPreviewImage" alt="Evidencia ampliada" style="width:100%;max-height:88vh;object-fit:contain;border-radius:8px;background:#0e1723" />
     </div>
   </div>
 </main>
