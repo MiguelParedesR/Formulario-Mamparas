@@ -1,69 +1,48 @@
-<!-- MÓDULO MAMPARAS — REPORTES -->
-<main class="mamparas-root p-6 space-y-6 text-gray-800">
-  <div class="space-y-1">
-    <h1 class="text-2xl font-bold flex items-center gap-3 text-slate-900">
-      <i class="fas fa-file-export text-indigo-600"></i>
-      Reportes
-    </h1>
-    <p class="text-sm text-gray-600">
-      Exporta el registro de faltas o incorrecciones por mes y operador usando el formato corporativo F-OPESEG-045.
-    </p>
+<link rel="stylesheet" href="../../CSS/apple-redesign.css" />
+
+<main class="mamparas-root mamparas-modern">
+  <div class="mamparas-header">
+    <div>
+      <p class="section-kicker">Mamparas</p>
+      <h1>Reportes</h1>
+      <p>Genera el formato corporativo F-OPESEG-045 por período y operador, con feedback visible de carga, vacío, éxito o error.</p>
+    </div>
   </div>
 
-  <section class="mamparas-panel bg-white border border-gray-100 rounded-2xl shadow-xl p-6 sm:p-8 space-y-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      <div class="space-y-2">
-        <label class="block text-sm font-semibold text-gray-700" for="mes">Seleccionar mes</label>
-        <div class="input-icon-wrapper">
-          <span class="input-icon"><i class="far fa-calendar-alt"></i></span>
-          <input
-            class="w-full rounded-xl border border-gray-200 bg-white pr-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-            type="month"
-            id="mes"
-          />
+  <section class="mamparas-form-surface">
+    <div class="mamparas-form-section">
+      <h2>Parámetros de exportación</h2>
+      <div class="mamparas-fields">
+        <div>
+          <label for="mes">Mes</label>
+          <input type="month" id="mes" />
+          <p class="helper">Se consultarán únicamente registros dentro del mes seleccionado.</p>
         </div>
-        <p class="text-xs text-gray-500">El período se aplica sobre los registros de inspecciones.</p>
-      </div>
-
-      <div class="space-y-2">
-        <label class="block text-sm font-semibold text-gray-700" for="operador">Seleccionar operador</label>
-        <div class="input-icon-wrapper">
-          <span class="input-icon"><i class="fas fa-user-check"></i></span>
-          <select
-            class="w-full rounded-xl border border-gray-200 bg-white py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 appearance-none has-right-icon"
-            id="operador"
-          >
+        <div>
+          <label for="operador">Operador</label>
+          <select id="operador">
             <option value="Todos">Todos (sin filtro)</option>
           </select>
         </div>
       </div>
     </div>
 
-    <div
-      id="reportStatus"
-      class="hidden rounded-xl border px-4 py-3 text-sm"
-      role="alert"
-      aria-live="assertive"
-    ></div>
-
-    <div class="flex flex-wrap items-center gap-3">
-      <button
-        id="btnExportarExcel"
-        type="button"
-        class="px-6 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold shadow-lg hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 flex items-center gap-2 w-fit"
-      >
-        <i class="fas fa-download text-xs"></i>
-        <span>Generar Excel F-OPESEG-045</span>
-      </button>
-      <span class="text-xs text-gray-500">Se genera un archivo .xlsx con el formato histórico del módulo.</span>
+    <div class="mamparas-form-section">
+      <div id="reportStatus" class="hidden rounded-xl border px-4 py-3 text-sm" role="alert" aria-live="assertive"></div>
+      <div class="flex flex-wrap items-center gap-3">
+        <button id="btnExportarExcel" type="button" class="apple-button primary">
+          <i class="fas fa-download"></i>&nbsp; Generar Excel F-OPESEG-045
+        </button>
+        <span class="helper">La descarga conserva el formato corporativo histórico del módulo.</span>
+      </div>
     </div>
   </section>
 </main>
 
-<div id="feedbackModal" class="hidden fixed inset-0 bg-black/40 items-center justify-center z-[6000]">
-  <div class="bg-white rounded-2xl shadow-2xl w-72 p-5 text-center space-y-3 modal-inner">
-    <div id="loadingAnimation" class="mx-auto h-10 w-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-    <p id="feedbackMessage" class="message text-sm font-medium"></p>
+<div id="feedbackModal" class="modal-overlay hidden items-center justify-center z-[6000]">
+  <div class="modal-card bg-white w-80 p-5 text-center">
+    <div id="loadingAnimation" class="mx-auto h-9 w-9 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+    <p id="feedbackMessage" class="message text-sm font-medium" style="margin-top:12px"></p>
   </div>
 </div>
 
