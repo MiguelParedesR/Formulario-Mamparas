@@ -1,174 +1,171 @@
-<main class="p-6 space-y-6">
+<link rel="stylesheet" href="../CSS/apple-system.css" />
 
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                <i class="fas fa-clipboard-list text-indigo-600"></i>
-                Registros de Incidencias
-            </h1>
-            <p class="text-sm text-gray-500">Consulta y gestiona los informes guardados.</p>
-        </div>
+<main class="app-layout">
+  <div class="app-layout-inner">
+    <header class="tpp-topbar">
+      <div class="tpp-title-group">
+        <p class="tpp-eyebrow">Incidencias · Histórico</p>
+        <h1 class="tpp-page-title">Registros de incidencias</h1>
+        <p class="tpp-page-subtitle">
+          Busca por placa o contenedor, revisa el avance del informe y abre el documento para editarlo o exportarlo.
+        </p>
+      </div>
 
-        <div class="w-full md:w-80">
-            <label for="buscarPlaca" class="text-xs font-semibold text-gray-600">Buscar por placa</label>
-            <div class="mt-1 relative rounded-md shadow-sm">
-                <input id="buscarPlaca" type="text" placeholder="Placa..."
-                    class="block w-full rounded-lg border-gray-300 pl-10 pr-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                    <i class="fas fa-search"></i>
-                </span>
-            </div>
-        </div>
-    </div>
+      <div class="tpp-field" style="width:min(340px,100%)">
+        <label for="buscarPlaca">Buscar</label>
+        <input id="buscarPlaca" type="search" placeholder="Placa o contenedor…" autocomplete="off" />
+      </div>
+    </header>
 
-    <section class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table id="tabla-registros" class="w-full text-left text-sm">
-                <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
-                    <tr>
-                        <th class="px-3 py-2">Fecha</th>
-                        <th class="px-3 py-2">Tipo</th>
-                        <th class="px-3 py-2">Placa</th>
-                        <th class="px-3 py-2">Contenedor</th>
-                        <th class="px-3 py-2">Progreso</th>
-                        <th class="px-3 py-2">Estado</th>
-                        <th class="px-3 py-2">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- JS pinta los registros -->
-                </tbody>
-            </table>
-        </div>
+    <section class="table-shell">
+      <table id="tabla-registros">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Placa</th>
+            <th>Contenedor</th>
+            <th>Progreso</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </section>
+  </div>
 
-    <!-- Modal Ver/Editar -->
-    <div id="verEditarModal"
-        class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden opacity-0 items-center justify-center z-50 transition-opacity duration-200">
-        <div id="verEditarPanel"
-            class="bg-white max-w-4xl w-full mx-4 rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-200 scale-95 opacity-0">
+  <!-- EDITOR -->
+  <div id="verEditarModal"
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden opacity-0 items-center justify-center z-[6500] transition-opacity duration-200">
+    <div id="verEditarPanel"
+      class="bg-[#e7e8eb] w-[min(1500px,96vw)] max-h-[94vh] rounded-[20px] shadow-2xl overflow-hidden transform transition-all duration-200 scale-95 opacity-0">
 
-            <div class="flex items-start justify-between px-6 py-4 border-b">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800">Ver / Editar incidencia</h3>
-                    <p class="text-xs text-gray-500">Actualiza los datos sin salir del modulo de registros.</p>
-                </div>
-                <button id="modalClose"
-                    class="text-gray-500 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div class="px-6 pt-4 pb-2 space-y-3">
-                <div class="flex items-center justify-between gap-3">
-                    <span class="text-xs font-semibold text-gray-600">Avance del informe</span>
-                    <span id="modalProgressLabel" class="text-xs font-semibold text-gray-700">0%</span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                    <div id="modalProgressBar"
-                        class="h-2 w-0 bg-red-500 rounded-full transition-all duration-300 ease-out"></div>
-                </div>
-            </div>
-
-            <form id="formModalIncidencia" class="px-6 pb-6 space-y-6 max-h-[75vh] overflow-y-auto">
-
-                <div id="modalFeedback" class="hidden">
-                    <p id="modalFeedbackText"></p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-gray-700">Tipo</label>
-                        <input id="modalTipo" readonly
-                            class="w-full rounded-xl border-gray-200 bg-gray-50 shadow-sm text-sm px-3 py-2" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-gray-700">Asunto</label>
-                        <input id="modalAsunto"
-                            class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-                    </div>
-                </div>
-
-                <div id="modalCampoExtra" class="space-y-2">
-                    <!-- JS pinta campos extra -->
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-gray-700">A:</label>
-                        <input id="modalDirigidoA"
-                            class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-gray-700">De:</label>
-                        <input id="modalRemitente"
-                            class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm font-semibold text-gray-700">Fecha</label>
-                        <input id="modalFecha" type="date"
-                            class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">Hechos</label>
-                    <textarea id="modalHechos" rows="4"
-                        class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                        placeholder="1. Describa el primer hecho..."></textarea>
-                    <p class="text-[11px] text-gray-500">Al presionar Enter se insertara el siguiente numero
-                        automaticamente.</p>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">Analisis</label>
-                    <textarea id="modalAnalisis" rows="3"
-                        class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></textarea>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">Conclusiones</label>
-                    <textarea id="modalConclusiones" rows="3"
-                        class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></textarea>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">Recomendaciones</label>
-                    <textarea id="modalRecomendaciones" rows="3"
-                        class="w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></textarea>
-                </div>
-
-                <div class="space-y-3">
-                    <div class="space-y-1">
-                        <label class="text-sm font-semibold text-gray-700">Anexos</label>
-                        <input id="modalAnexos" type="file" multiple
-                            class="w-full file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 file:font-semibold file:px-4 file:py-2 text-sm hover:file:bg-indigo-100 transition" />
-                    </div>
-                    <div id="modalListaAnexos" class="space-y-2"></div>
-                </div>
-
-                <div class="flex flex-col sm:flex-row justify-between gap-3 pt-2">
-                    <button id="modalGuardarCambios" type="button"
-                        class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold shadow hover:bg-indigo-700 transition">
-                        Guardar cambios
-                    </button>
-                    <button id="modalExportarWord" type="button"
-                        class="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-600 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition">
-                        Exportar Word
-                    </button>
-                </div>
-
-            </form>
+      <header class="bg-white border-b border-gray-200 px-5 py-4 flex items-start justify-between gap-4">
+        <div>
+          <p class="tpp-eyebrow">Editor de informe</p>
+          <h3 style="font-size:20px;font-weight:750;margin:2px 0">Ver / editar incidencia</h3>
+          <p class="tpp-help">La información se presenta con la misma estructura del informe Word.</p>
         </div>
-    </div>
 
+        <div class="flex items-center gap-2">
+          <button id="modalExportarWord" type="button" class="tpp-btn tpp-btn--success">
+            <i class="fa-regular fa-file-word"></i> Exportar Word
+          </button>
+          <button id="modalGuardarCambios" type="button" class="tpp-btn tpp-btn--primary">
+            <i class="fa-regular fa-floppy-disk"></i> Guardar
+          </button>
+          <button id="modalClose" type="button" class="tpp-btn" aria-label="Cerrar">×</button>
+        </div>
+      </header>
+
+      <div class="px-5 py-3 bg-white border-b border-gray-200">
+        <div class="report-progress">
+          <span class="report-progress__label">Avance</span>
+          <div class="report-progress__track"><div id="modalProgressBar" style="width:0%"></div></div>
+          <span id="modalProgressLabel">0%</span>
+        </div>
+        <div id="modalFeedback" class="hidden" style="margin-top:10px">
+          <p id="modalFeedbackText"></p>
+        </div>
+      </div>
+
+      <form id="formModalIncidencia" class="word-workspace p-5 max-h-[78vh] overflow-y-auto">
+        <!-- DATOS -->
+        <aside class="word-outline" style="position:static;max-height:none">
+          <div class="word-outline__head">
+            <p class="tpp-eyebrow">Datos</p>
+            <h2>Información del informe</h2>
+          </div>
+
+          <div class="word-outline__fields">
+            <div class="tpp-field">
+              <label for="modalTipo">Tipo</label>
+              <input id="modalTipo" readonly />
+            </div>
+            <div class="tpp-field">
+              <label for="modalAsunto">Asunto</label>
+              <input id="modalAsunto" />
+            </div>
+            <div class="tpp-field">
+              <label for="modalDirigidoA">Dirigido a</label>
+              <input id="modalDirigidoA" />
+            </div>
+            <div class="tpp-field">
+              <label for="modalRemitente">Remitente</label>
+              <input id="modalRemitente" />
+            </div>
+            <div class="tpp-field">
+              <label for="modalFecha">Fecha</label>
+              <input id="modalFecha" type="date" />
+            </div>
+            <div id="modalCampoExtra" class="word-outline__fields"></div>
+          </div>
+        </aside>
+
+        <!-- DOCUMENTO -->
+        <section class="word-stage">
+          <div class="word-stage__bar"><span>Documento · edición</span><span>A4</span></div>
+          <article class="word-paper" style="min-height:900px">
+            <div class="word-paper__header">
+              <div>
+                <div class="word-paper__brand">TPP</div>
+                <p class="tpp-help">Terminales Portuarios Peruanos S.A.</p>
+              </div>
+              <div class="word-paper__meta"><strong>INFORME DE SEGURIDAD</strong><br/>Registro existente</div>
+            </div>
+
+            <section class="word-section">
+              <h2 class="word-section__title">I. Introducción</h2>
+              <textarea id="modalIntroduccion" rows="6" placeholder="1. Introducción…"></textarea>
+            </section>
+
+            <section class="word-section">
+              <h2 class="word-section__title">II. Hechos</h2>
+              <textarea id="modalHechos" rows="10" placeholder="1. Describa el primer hecho…"></textarea>
+            </section>
+
+            <section class="word-section">
+              <h2 class="word-section__title">III. Análisis</h2>
+              <textarea id="modalAnalisis" rows="6"></textarea>
+            </section>
+
+            <section class="word-section">
+              <h2 class="word-section__title">IV. Conclusiones</h2>
+              <textarea id="modalConclusiones" rows="6"></textarea>
+            </section>
+
+            <section class="word-section">
+              <h2 class="word-section__title">V. Recomendaciones</h2>
+              <textarea id="modalRecomendaciones" rows="6"></textarea>
+            </section>
+          </article>
+        </section>
+
+        <!-- EVIDENCIAS -->
+        <aside class="evidence-inspector" style="position:static;max-height:none">
+          <div class="evidence-inspector__head">
+            <p class="tpp-eyebrow">Anexos</p>
+            <h2>Evidencias</h2>
+            <p class="tpp-help">Revisa las evidencias existentes o agrega nuevas.</p>
+          </div>
+
+          <label class="evidence-drop" for="modalAnexos" style="cursor:pointer">
+            <span>
+              <i class="fa-solid fa-paperclip" style="font-size:20px;margin-bottom:6px"></i>
+              <strong>Agregar anexos</strong>
+              <span>JPG, PNG, WebP o PDF</span>
+            </span>
+          </label>
+          <input id="modalAnexos" type="file" multiple accept="image/*,.pdf" class="sr-only" />
+          <div id="modalListaAnexos" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px"></div>
+        </aside>
+      </form>
+    </div>
+  </div>
 </main>
 
-<!-- Dependencias para exportar DOCX -->
 <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.6/dist/pizzip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.38.0/build/docxtemplater.js"></script>
 <script src="../js/libs/docxtemplater-image-module.js"></script>
-
 <script type="module" src="../js/registros/registros.js"></script>
-
-
