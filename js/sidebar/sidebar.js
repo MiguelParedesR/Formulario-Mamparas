@@ -545,6 +545,11 @@ export async function initSidebar(
       const scripts = [...dom.querySelectorAll("script")];
       scripts.forEach((s) => s.remove());
 
+      // Preserve the view root class. Several views intentionally scope their
+      // layout under the <main> class (e.g. .report-editor, .v3-ops).
+      // Injecting only innerHTML used to discard that class and silently break
+      // the production layout when views were loaded through the SPA router.
+      mainContainer.className = main.className || "";
       mainContainer.innerHTML = main.innerHTML;
       mainContainer.scrollTo(0, 0);
 
