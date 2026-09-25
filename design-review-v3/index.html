@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Seguridad · Diseño V3</title>
+<style>
+:root{
+  --nav:#14263e; --nav-2:#1b3353; --nav-muted:#9fb1c9;
+  --bg:#f4f6f9; --paper:#ffffff; --ink:#152033; --muted:#667085;
+  --line:#d9e0e8; --line-2:#e9edf2; --blue:#2f6fed; --blue-soft:#edf3ff;
+  --teal:#2d8b7e; --teal-soft:#eaf7f4; --amber:#c9861a; --amber-soft:#fff7e7;
+  --red:#c94d4d; --red-soft:#fff0f0; --violet:#6c63d8; --shadow:0 18px 45px rgba(23,39,63,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh;display:grid;grid-template-columns:236px minmax(0,1fr)}
+.sidebar{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,var(--nav),#102137);color:white;padding:24px 16px 18px;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.06)}
+.brand{padding:4px 6px 24px;border-bottom:1px solid rgba(255,255,255,.09)}
+.brand strong{display:block;font-size:18px;letter-spacing:-.02em}
+.brand span{display:block;margin-top:4px;color:var(--nav-muted);font-size:12px}
+.nav-label{margin:22px 8px 8px;color:#70839c;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.nav{display:grid;gap:5px}
+.nav button{width:100%;border:0;background:transparent;color:#c1cede;min-height:44px;border-radius:10px;padding:0 12px;display:flex;align-items:center;gap:11px;text-align:left;font-size:13px;font-weight:650}
+.nav button:hover{background:rgba(255,255,255,.06);color:white}
+.nav button.active{background:#23446c;color:#fff;box-shadow:inset 3px 0 0 #73a8ff}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:#6d83a0;flex:0 0 auto}
+.nav button.active .nav-dot{background:#8cb6ff}
+.sidebar-note{margin-top:auto;padding:15px 12px;border-top:1px solid rgba(255,255,255,.08);color:#8ea1ba;font-size:11px;line-height:1.5}
+.main{min-width:0;padding:34px clamp(26px,4vw,62px) 70px}
+.view{display:none;max-width:1480px;margin:0 auto}
+.view.active{display:block}
+.eyebrow{margin:0 0 7px;color:#5d6f86;font-size:10px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}
+.title-row{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.title h1{margin:0;font-size:clamp(34px,3.4vw,52px);line-height:1;letter-spacing:-.055em;font-weight:720}
+.title p{margin:11px 0 0;max-width:720px;color:var(--muted);font-size:14px;line-height:1.5}
+.status{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:white;color:#475467;font-size:11px;font-weight:700;white-space:nowrap}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--teal)}
+.statbar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);margin-top:2px}
+.stat{padding:18px 22px 18px 0;position:relative}
+.stat:not(:last-child):after{content:"";position:absolute;right:22px;top:17px;bottom:17px;width:1px;background:var(--line)}
+.stat span{display:block;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.stat strong{display:block;margin-top:5px;font-size:22px;letter-spacing:-.03em}
+.stat small{display:block;margin-top:2px;color:#8992a0;font-size:10px}
+.section{margin-top:30px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:8px}
+.section-head h2{margin:0;font-size:14px;letter-spacing:-.015em}
+.section-head span{color:var(--muted);font-size:11px}
+.directory{border-top:1px solid var(--line)}
+.dir-row{width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;padding:17px 4px;display:grid;grid-template-columns:10px 1.05fr 1.4fr auto;gap:18px;align-items:center;text-align:left;color:var(--ink)}
+.dir-row:hover{background:linear-gradient(90deg,rgba(47,111,237,.035),transparent)}
+.dir-accent{width:4px;height:34px;border-radius:999px;background:var(--blue)}
+.dir-row.teal .dir-accent{background:var(--teal)}
+.dir-row.amber .dir-accent{background:var(--amber)}
+.dir-row.red .dir-accent{background:var(--red)}
+.dir-row strong{font-size:14px}
+.dir-row p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
+.dir-action{display:flex;align-items:center;gap:12px;color:#516175;font-size:11px;font-weight:700}
+.dir-action b{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:white;border:1px solid var(--line);font-size:17px;font-weight:400}
+
+/* Document workspace */
+.doc-shell{margin-top:18px;border:1px solid var(--line);background:#e9edf3;box-shadow:var(--shadow)}
+.doc-top{background:#fff;border-bottom:1px solid var(--line)}
+.doc-ribbon{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:13px 17px}
+.doc-meta{min-width:0}
+.doc-meta strong{display:block;font-size:14px}
+.doc-meta span{display:block;margin-top:3px;color:var(--muted);font-size:10px}
+.ribbon-tabs{display:flex;gap:2px;margin-left:24px}
+.ribbon-tabs button{border:0;background:transparent;padding:7px 10px;border-radius:7px;color:#667085;font-size:11px;font-weight:700}
+.ribbon-tabs button.active{background:var(--blue-soft);color:var(--blue)}
+.doc-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.btn{min-height:36px;border:1px solid var(--line);border-radius:8px;background:white;color:#344054;padding:0 12px;font-size:11px;font-weight:750}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:white}
+.btn.soft{background:var(--amber-soft);border-color:#edd49b;color:#7f5a11}
+.btn.teal{background:var(--teal-soft);border-color:#bddfd8;color:#246d64}
+.progressline{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:9px 17px;border-top:1px solid var(--line-2);color:#667085;font-size:10px}
+.progress{height:5px;border-radius:999px;background:#e6ebf1;overflow:hidden}
+.progress>span{display:block;height:100%;width:62%;background:linear-gradient(90deg,var(--blue),#6b91f3)}
+.doc-pages{display:grid;grid-template-columns:1fr 1fr .76fr;gap:14px;padding:18px;align-items:start}
+.page{background:white;min-height:690px;padding:27px 28px;box-shadow:0 7px 24px rgba(34,49,72,.08)}
+.page-head{padding-bottom:10px;border-bottom:2px solid var(--blue);margin-bottom:18px}
+.page:nth-child(2) .page-head{border-color:var(--violet)}
+.page:nth-child(3) .page-head{border-color:var(--teal)}
+.page-head span{display:block;color:#667085;font-size:9px;font-weight:850;letter-spacing:.13em;text-transform:uppercase}
+.page-head h3{margin:5px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:18px}
+.form-section{padding:0 0 19px;margin:0 0 19px;border-bottom:1px solid var(--line-2)}
+.form-section:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.form-section h4{margin:0 0 12px;color:#344054;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field.full{grid-column:1/-1}
+.field label{display:block;margin-bottom:5px;color:#667085;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
+.field input,.field select,.field textarea{width:100%;border:1px solid #d2d9e2;background:#fbfcfe;border-radius:7px;padding:9px 10px;color:#253149;font-size:11.5px;outline:none}
+.field textarea{min-height:128px;line-height:1.65;resize:vertical;background-image:linear-gradient(to bottom,transparent 27px,#eef1f5 28px);background-size:100% 28px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#8babe6;box-shadow:0 0 0 3px rgba(47,111,237,.09);background:white}
+.evidence-uploader{border:1px dashed #aebed0;background:#f7fafd;border-radius:9px;padding:15px;text-align:center}
+.evidence-uploader strong{display:block;color:#2d5d93;font-size:11px}
+.evidence-uploader span{display:block;margin-top:4px;color:#7b8797;font-size:9px}
+.thumb-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.thumb{overflow:hidden;border:1px solid var(--line);background:white;border-radius:8px}
+.thumb .mock-photo{height:86px}
+.thumb span{display:block;padding:6px;color:#667085;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Mamparas */
+.stepbar{display:grid;grid-template-columns:repeat(4,1fr);margin-top:20px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.step{padding:14px 0;position:relative;color:#7a8697;font-size:10px;font-weight:750}
+.step b{display:inline-grid;place-items:center;width:21px;height:21px;margin-right:7px;border-radius:50%;border:1px solid #cbd4df;background:white;font-size:9px}
+.step.active{color:var(--teal)}
+.step.active:after{content:"";position:absolute;left:0;right:25%;bottom:-1px;height:2px;background:var(--teal)}
+.step.active b{background:var(--teal);border-color:var(--teal);color:white}
+.ops-surface{margin-top:18px;border:1px solid var(--line);background:white;display:grid;grid-template-columns:minmax(0,1fr) 330px}
+.ops-main{min-width:0}
+.ops-band{padding:21px 24px;border-bottom:1px solid var(--line-2)}
+.ops-band:last-child{border-bottom:0}
+.ops-band-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.band-no{width:25px;height:25px;display:grid;place-items:center;border-radius:7px;background:var(--blue-soft);color:var(--blue);font-size:9px;font-weight:900}
+.ops-band:nth-child(2) .band-no{background:var(--teal-soft);color:var(--teal)}
+.ops-band:nth-child(3) .band-no{background:var(--amber-soft);color:var(--amber)}
+.ops-band-head strong{font-size:12px}
+.ops-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.ops-side{border-left:1px solid var(--line);background:#f8fafc}
+.side-section{padding:20px;border-bottom:1px solid var(--line)}
+.side-section:last-child{border-bottom:0}
+.side-section .eyebrow{color:#7d8998}
+.side-section h3{margin:0;font-size:15px}
+.side-section p{margin:6px 0 0;color:var(--muted);font-size:10.5px;line-height:1.45}
+.measure-list{margin-top:15px;border-top:1px solid var(--line)}
+.measure{display:flex;justify-content:space-between;gap:15px;padding:10px 0;border-bottom:1px solid var(--line);font-size:10px}
+.measure span{color:var(--muted)}
+.measure strong{font-size:11px}
+.photo-strip{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}
+.photo-mini{border:1px solid var(--line);background:white;border-radius:7px;overflow:hidden}
+.photo-mini .mock-photo{height:76px}
+.photo-mini span{display:block;padding:6px;color:#667085;font-size:8.5px}
+.ops-footer{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:13px 20px;border-top:1px solid var(--line);background:#fbfcfe}
+.ops-footer p{margin:0;color:#667085;font-size:10px}
+
+/* Records */
+.filterbar{margin-top:20px;display:grid;grid-template-columns:minmax(250px,1.2fr) repeat(3,minmax(140px,.55fr)) auto;gap:9px;align-items:center;padding:11px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.searchbox,.filterbar select{min-height:38px;border:1px solid #d1d9e3;background:white;border-radius:8px;padding:0 11px;font-size:11px;color:#344054;outline:none}
+.searchbox:focus,.filterbar select:focus{border-color:#91afe4;box-shadow:0 0 0 3px rgba(47,111,237,.08)}
+.table-wrap{margin-top:14px;border:1px solid var(--line);background:white;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{padding:11px 13px;background:#f4f7fa;color:#667085;font-size:9px;font-weight:850;letter-spacing:.08em;text-transform:uppercase;text-align:left;border-bottom:1px solid var(--line)}
+td{padding:12px 13px;border-bottom:1px solid var(--line-2);color:#344054;font-size:10.5px}
+tbody tr:hover{background:#f9fbfd}
+tbody tr:last-child td{border-bottom:0}
+.rowkey{display:flex;align-items:center;gap:8px;font-weight:750}
+.rowkey:before{content:"";width:3px;height:25px;border-radius:999px;background:var(--teal)}
+.tag{display:inline-flex;align-items:center;min-height:23px;padding:0 8px;border-radius:999px;font-size:9px;font-weight:750}
+.tag.teal{background:var(--teal-soft);color:#256d65}
+.tag.amber{background:var(--amber-soft);color:#7d5b16}
+.tag.red{background:var(--red-soft);color:#963c3c}
+.linkbtn{border:0;background:transparent;color:var(--blue);font-size:10px;font-weight:800;padding:4px 0}
+
+/* Photo mock */
+.mock-photo{position:relative;overflow:hidden;background:linear-gradient(150deg,#1f344b 0%,#4f6478 36%,#1d2732 37%,#141c24 100%)}
+.mock-photo:before{content:"";position:absolute;left:9%;bottom:0;width:42%;height:55%;background:linear-gradient(160deg,#5f6f7c,#2d3741);clip-path:polygon(0 22%,70% 0,100% 46%,90% 100%,0 100%)}
+.mock-photo:after{content:"";position:absolute;right:6%;top:14%;width:36%;height:68%;background:linear-gradient(90deg,#6f4c3d,#2b2524);box-shadow:-12px 0 0 rgba(255,255,255,.05)}
+.mock-light{position:absolute;left:32%;top:14%;width:18px;height:18px;border-radius:50%;background:#fff7cf;box-shadow:0 0 30px 14px rgba(255,239,168,.42);z-index:3}
+.mock-line{position:absolute;left:55%;bottom:0;width:4px;height:72%;background:#445a69;z-index:2}
+
+/* Viewer */
+.viewer{position:fixed;inset:0;z-index:2000;background:rgba(10,20,34,.93);display:none;grid-template-columns:minmax(0,1fr) 310px;color:white}
+.viewer.open{display:grid}
+.viewer-stage{min-width:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:18px 22px 16px}
+.viewer-top{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-bottom:11px;border-bottom:1px solid rgba(255,255,255,.1)}
+.viewer-title strong{display:block;font-size:12px}
+.viewer-title span{display:block;margin-top:3px;color:#8fa2b9;font-size:9.5px}
+.viewer-close{width:34px;height:34px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:white;border-radius:9px;font-size:18px}
+.viewer-image{position:relative;margin:14px 0;border-radius:10px;overflow:hidden;background:#0e1723}
+.viewer-image .mock-photo{width:100%;height:100%;min-height:420px}
+.viewer-nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border:1px solid rgba(255,255,255,.15);background:rgba(17,29,46,.8);color:white;border-radius:50%;z-index:5}
+.viewer-nav.prev{left:13px}.viewer-nav.next{right:13px}
+.viewer-thumbs{display:flex;gap:7px;justify-content:center}
+.viewer-thumb{width:74px;height:48px;border:2px solid transparent;border-radius:7px;overflow:hidden;padding:0;background:#1d2b3e}
+.viewer-thumb.active{border-color:#75a8ff}
+.viewer-thumb .mock-photo{width:100%;height:100%}
+.viewer-info{background:#132239;border-left:1px solid rgba(255,255,255,.08);padding:23px 21px;overflow:auto}
+.viewer-info .eyebrow{color:#7f96b2}
+.viewer-info h2{margin:0;font-size:20px;letter-spacing:-.03em}
+.viewer-info p{color:#9eb0c7;font-size:10.5px;line-height:1.55}
+.info-group{margin-top:22px;border-top:1px solid rgba(255,255,255,.1)}
+.info-row{display:flex;justify-content:space-between;gap:18px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:10px}
+.info-row span{color:#8296af}.info-row strong{font-size:10.5px;text-align:right}
+.viewer-info .btn{width:100%;margin-top:18px;background:#2f6fed;border-color:#2f6fed;color:white}
+
+/* review badge */
+.review-badge{position:fixed;right:14px;bottom:14px;z-index:1000;background:#132239;color:white;border:1px solid rgba(255,255,255,.1);padding:8px 11px;border-radius:999px;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+
+@media(max-width:1150px){
+  .app{grid-template-columns:200px minmax(0,1fr)}
+  .doc-pages{grid-template-columns:1fr 1fr}.doc-pages .page:last-child{grid-column:1/-1;min-height:auto}
+  .ops-surface{grid-template-columns:1fr}.ops-side{border-left:0;border-top:1px solid var(--line)}
+  .statbar{grid-template-columns:1fr 1fr}.stat:nth-child(2):after{display:none}
+}
+@media(max-width:760px){
+  .app{grid-template-columns:1fr}.sidebar{position:static;height:auto}.sidebar-note{display:none}.main{padding:24px 16px 55px}
+  .title-row{align-items:flex-start;flex-direction:column}.statbar{grid-template-columns:1fr 1fr}
+  .dir-row{grid-template-columns:8px 1fr auto}.dir-row p{display:none}
+  .doc-ribbon{align-items:flex-start;flex-direction:column}.ribbon-tabs{margin-left:0}.doc-actions{justify-content:flex-start}
+  .doc-pages{grid-template-columns:1fr;padding:10px}.doc-pages .page:last-child{grid-column:auto}
+  .ops-grid{grid-template-columns:1fr}.stepbar{grid-template-columns:1fr 1fr}
+  .filterbar{grid-template-columns:1fr 1fr}.filterbar .searchbox{grid-column:1/-1}
+  .table-wrap{overflow:auto}table{min-width:900px}
+  .viewer{grid-template-columns:1fr}.viewer-info{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><strong>Seguridad</strong><span>Control operativo</span></div>
+    <div class="nav-label">Espacios</div>
+    <nav class="nav">
+      <button class="active" data-view="home"><span class="nav-dot"></span>Resumen</button>
+      <button data-view="incident"><span class="nav-dot"></span>Informe de incidencia</button>
+      <button data-view="mamparas"><span class="nav-dot"></span>Inspección Mamparas</button>
+      <button data-view="records"><span class="nav-dot"></span>Registros</button>
+    </nav>
+    <div class="nav-label">Revisión</div>
+    <nav class="nav">
+      <button id="openViewerNav"><span class="nav-dot"></span>Visor de evidencias</button>
+    </nav>
+    <div class="sidebar-note">Preview visual V3. No modifica formularios ni datos productivos.</div>
+  </aside>
+
+  <main class="main">
+    <section class="view active" id="view-home">
+      <header class="title-row">
+        <div class="title">
+          <p class="eyebrow">Centro de control</p>
+          <h1>Seguridad operacional</h1>
+          <p>Una vista con jerarquía clara para registrar, revisar y cerrar documentación de seguridad.</p>
+        </div>
+        <div class="status"><i></i> Operación disponible</div>
+      </header>
+
+      <div class="statbar">
+        <div class="stat"><span>Incidencias abiertas</span><strong>7</strong><small>2 requieren evidencia</small></div>
+        <div class="stat"><span>Inspecciones del mes</span><strong>186</strong><small>+14 frente al mes anterior</small></div>
+        <div class="stat"><span>Informes en borrador</span><strong>12</strong><small>4 con avance &gt; 80%</small></div>
+        <div class="stat"><span>Última actualización</span><strong>16:52</strong><small>25 set 2026</small></div>
+      </div>
+
+      <section class="section">
+        <div class="section-head"><h2>Informes de incidencias</h2><span>Documentación operativa</span></div>
+        <div class="directory">
+          <button class="dir-row" data-go="incident"><span class="dir-accent"></span><strong>Cable RH</strong><p>Sustracción de cable en unidades Reefer. Plantilla documental con evidencias.</p><span class="dir-action">Crear informe <b>›</b></span></button>
+          <button class="dir-row amber" data-go="incident"><span class="dir-accent"></span><strong>Mercadería</strong><p>Registro de pérdida de carga, hechos, análisis, conclusiones y anexos.</p><span class="dir-action">Crear informe <b>›</b></span></button>
+          <button class="dir-row red" data-go="incident"><span class="dir-accent"></span><strong>Choque</strong><p>Informe de colisión con datos de unidad, secuencia de hechos y evidencias.</p><span class="dir-action">Crear informe <b>›</b></span></button>
+          <button class="dir-row red" data-go="incident"><span class="dir-accent"></span><strong>Siniestro</strong><p>Eventos extraordinarios con trazabilidad documental completa.</p><span class="dir-action">Crear informe <b>›</b></span></button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Mamparas</h2><span>Inspección y evidencia</span></div>
+        <div class="directory">
+          <button class="dir-row teal" data-go="mamparas"><span class="dir-accent"></span><strong>Nueva inspección</strong><p>Unidad, operación, hallazgo, medidas y fotografía en un solo flujo.</p><span class="dir-action">Registrar <b>›</b></span></button>
+          <button class="dir-row teal" data-go="records"><span class="dir-accent"></span><strong>Registros</strong><p>Histórico filtrable con acceso directo al detalle y a la evidencia.</p><span class="dir-action">Consultar <b>›</b></span></button>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" id="view-incident">
+      <header class="title-row">
+        <div class="title"><p class="eyebrow">Incidencias · Cable RH</p><h1>Informe de incidencia</h1><p>Editor documental en tres columnas con lectura secuencial, evidencia y acciones separadas del contenido.</p></div>
+        <div class="status"><i></i> Borrador guardado</div>
+      </header>
+
+      <div class="doc-shell">
+        <div class="doc-top">
+          <div class="doc-ribbon">
+            <div class="doc-meta"><strong>Sustracción de Cable RH</strong><span>Informe de Seguridad · 25/09/2026</span></div>
+            <div class="ribbon-tabs"><button class="active">Documento</button><button>Evidencias</button><button>Historial</button></div>
+            <div class="doc-actions"><button class="btn">Volver</button><button class="btn soft">Guardar borrador</button><button class="btn primary">Cerrar informe</button><button class="btn teal">Exportar Word</button></div>
+          </div>
+          <div class="progressline"><span>Avance del documento</span><div class="progress"><span></span></div><strong>62%</strong></div>
+        </div>
+
+        <div class="doc-pages">
+          <article class="page">
+            <div class="page-head"><span>Documento · 01</span><h3>Contexto y cabecera</h3></div>
+            <div class="form-section">
+              <h4>Datos del informe</h4>
+              <div class="field-grid">
+                <div class="field full"><label>Asunto</label><input value="SUSTRACCIÓN DE CABLE RH"></div>
+                <div class="field full"><label>Dirigido a</label><input value="GERENCIA SSOMA Y PROTECCIÓN"></div>
+                <div class="field"><label>Remitente</label><input value="SUPERVISOR DE SEGURIDAD"></div>
+                <div class="field"><label>Fecha</label><input value="25/09/2026"></div>
+                <div class="field full"><label>Serie del contenedor</label><input placeholder="Ej. TCLU1234567"></div>
+              </div>
+            </div>
+            <div class="form-section">
+              <h4>Introducción</h4>
+              <div class="field"><textarea placeholder="1. Describe el contexto y el motivo del informe..."></textarea></div>
+            </div>
+            <div class="form-section">
+              <h4>Análisis</h4>
+              <div class="field"><textarea placeholder="1. Analiza las circunstancias y la secuencia del evento..."></textarea></div>
+            </div>
+          </article>
+
+          <article class="page">
+            <div class="page-head"><span>Documento · 02</span><h3>Desarrollo y cierre</h3></div>
+            <div class="form-section">
+              <h4>Hechos</h4>
+              <div class="field"><textarea style="min-height:250px" placeholder="1. Registra los hechos en orden cronológico..."></textarea></div>
+            </div>
+            <div class="form-section">
+              <h4>Conclusiones</h4>
+              <div class="field"><textarea placeholder="1. Resume los hallazgos principales..."></textarea></div>
+            </div>
+            <div class="form-section">
+              <h4>Recomendaciones</h4>
+              <div class="field"><textarea placeholder="1. Registra acciones y medidas recomendadas..."></textarea></div>
+            </div>
+          </article>
+
+          <aside class="page">
+            <div class="page-head"><span>Documento · 03</span><h3>Evidencias</h3></div>
+            <div class="evidence-uploader"><strong>Agregar fotografías o PDF</strong><span>Arrastra archivos aquí o selecciona desde el equipo · 12 MB máx.</span></div>
+            <div class="thumb-grid">
+              <button class="thumb open-viewer"><div class="mock-photo"><i class="mock-light"></i><i class="mock-line"></i></div><span>Panorámica · 20:15</span></button>
+              <button class="thumb open-viewer"><div class="mock-photo"><i class="mock-light"></i><i class="mock-line"></i></div><span>Lateral · 20:16</span></button>
+            </div>
+            <div class="form-section" style="margin-top:18px"><h4>Control documental</h4>
+              <div class="measure-list">
+                <div class="measure"><span>Evidencias</span><strong>2 / 30</strong></div>
+                <div class="measure"><span>Campos completos</span><strong>8 / 12</strong></div>
+                <div class="measure"><span>Estado</span><strong style="color:var(--amber)">Borrador</strong></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-mamparas">
+      <header class="title-row">
+        <div class="title"><p class="eyebrow">Mamparas</p><h1>Nueva inspección</h1><p>Flujo operativo por etapas, con tres campos por línea y evidencia integrada en el mismo contexto.</p></div>
+        <div class="status"><i></i> Lista para registrar</div>
+      </header>
+
+      <div class="stepbar">
+        <div class="step active"><b>1</b>Unidad</div><div class="step"><b>2</b>Operación</div><div class="step"><b>3</b>Hallazgo</div><div class="step"><b>4</b>Evidencias</div>
+      </div>
+
+      <div class="ops-surface">
+        <div class="ops-main">
+          <section class="ops-band">
+            <div class="ops-band-head"><span class="band-no">01</span><strong>Identificación de la unidad</strong></div>
+            <div class="ops-grid">
+              <div class="field"><label>Fecha</label><input value="25/09/2026"></div>
+              <div class="field"><label>Hora</label><input value="16:50"></div>
+              <div class="field"><label>Placa</label><input placeholder="ABC123"></div>
+            </div>
+          </section>
+          <section class="ops-band">
+            <div class="ops-band-head"><span class="band-no">02</span><strong>Datos de operación</strong></div>
+            <div class="ops-grid">
+              <div class="field"><label>Empresa</label><select><option>TEAL</option></select></div>
+              <div class="field"><label>Chofer</label><input placeholder="Nombre completo"></div>
+              <div class="field"><label>Lugar</label><select><option>Tracciones</option></select></div>
+            </div>
+          </section>
+          <section class="ops-band">
+            <div class="ops-band-head"><span class="band-no">03</span><strong>Clasificación del hallazgo</strong></div>
+            <div class="ops-grid">
+              <div class="field"><label>Incorrección</label><select><option>Mampara</option></select></div>
+              <div class="field"><label>Responsable</label><select><option>Miguel Paredes</option></select></div>
+              <div class="field"><label>Operación observada</label><select><option>Descarga</option></select></div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="ops-side">
+          <section class="side-section">
+            <p class="eyebrow">Detalle de control</p><h3>Medidas</h3><p>Los valores se leen junto a la evidencia, no en un modal separado.</p>
+            <div class="measure-list">
+              <div class="measure"><span>Altura mampara</span><strong>1.80 m</strong></div>
+              <div class="measure"><span>Separación lateral</span><strong>0.15 m</strong></div>
+              <div class="measure"><span>Resultado</span><strong style="color:var(--teal)">Conforme</strong></div>
+            </div>
+          </section>
+          <section class="side-section">
+            <p class="eyebrow">Evidencias</p><h3>Fotografías</h3><p>Miniaturas visibles desde el formulario; clic para inspeccionar.</p>
+            <div class="photo-strip">
+              <button class="photo-mini open-viewer"><div class="mock-photo"><i class="mock-light"></i><i class="mock-line"></i></div><span>Panorámica</span></button>
+              <button class="photo-mini open-viewer"><div class="mock-photo"><i class="mock-light"></i><i class="mock-line"></i></div><span>Lateral</span></button>
+            </div>
+          </section>
+        </aside>
+        <footer class="ops-footer"><p>Los campos críticos se validan antes del registro final.</p><button class="btn primary">Registrar inspección</button></footer>
+      </div>
+    </section>
+
+    <section class="view" id="view-records">
+      <header class="title-row">
+        <div class="title"><p class="eyebrow">Mamparas · Histórico</p><h1>Registros de inspección</h1><p>Consulta rápida con filtros visibles y acceso directo a cada evidencia.</p></div>
+        <div class="status"><i></i> 186 registros</div>
+      </header>
+      <div class="filterbar">
+        <input class="searchbox" placeholder="Buscar placa, empresa o chofer">
+        <select><option>Septiembre 2026</option></select>
+        <select><option>Todas las empresas</option></select>
+        <select><option>Mampara</option></select>
+        <button class="btn">Exportar</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fecha</th><th>Placa</th><th>Empresa</th><th>Chofer</th><th>Lugar</th><th>Hallazgo</th><th>Responsable</th><th>Evidencias</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>25/09/2026 · 20:15</td><td><span class="rowkey">D8S832</span></td><td>TEAL</td><td>Marcos Yesquen Carmen</td><td>Tracciones</td><td><span class="tag teal">Mampara</span></td><td>Miguel Paredes</td><td>3 fotos</td><td><button class="linkbtn open-viewer">Ver detalle</button></td></tr>
+            <tr><td>24/09/2026 · 19:48</td><td><span class="rowkey">F1I904</span></td><td>MOTRIL</td><td>PENDIENTE</td><td>Tracciones</td><td><span class="tag amber">Pernos</span></td><td>Miguel Paredes</td><td>1 foto</td><td><button class="linkbtn open-viewer">Ver detalle</button></td></tr>
+            <tr><td>24/09/2026 · 18:42</td><td><span class="rowkey">D1S805</span></td><td>TURICAR</td><td>PENDIENTE</td><td>Tracciones</td><td><span class="tag red">Cola de Pato</span></td><td>Roger Castro</td><td>2 fotos</td><td><button class="linkbtn open-viewer">Ver detalle</button></td></tr>
+            <tr><td>23/09/2026 · 17:39</td><td><span class="rowkey">AVO765</span></td><td>RYM</td><td>Iván Berru Torres</td><td>Tracciones</td><td><span class="tag teal">Mampara</span></td><td>Carlos Sanchez</td><td>3 fotos</td><td><button class="linkbtn open-viewer">Ver detalle</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="viewer" id="viewer">
+  <div class="viewer-stage">
+    <div class="viewer-top"><div class="viewer-title"><strong>Foto panorámica</strong><span>Evidencia 01 · Inspección D8S832</span></div><button class="viewer-close" id="viewerClose">×</button></div>
+    <div class="viewer-image"><div class="mock-photo"><i class="mock-light"></i><i class="mock-line"></i></div><button class="viewer-nav prev">‹</button><button class="viewer-nav next">›</button></div>
+    <div class="viewer-thumbs"><button class="viewer-thumb active"><div class="mock-photo"><i class="mock-light"></i></div></button><button class="viewer-thumb"><div class="mock-photo"><i class="mock-light"></i></div></button><button class="viewer-thumb"><div class="mock-photo"><i class="mock-light"></i></div></button></div>
+  </div>
+  <aside class="viewer-info">
+    <p class="eyebrow">Evidencia fotográfica</p><h2>D8S832</h2><p>La información de la inspección permanece visible mientras se revisa la fotografía.</p>
+    <div class="info-group">
+      <div class="info-row"><span>Empresa</span><strong>TEAL</strong></div>
+      <div class="info-row"><span>Fecha / hora</span><strong>25/09/2026 · 20:15</strong></div>
+      <div class="info-row"><span>Hallazgo</span><strong>Mampara</strong></div>
+      <div class="info-row"><span>Altura</span><strong>1.80 m</strong></div>
+      <div class="info-row"><span>Separación</span><strong>0.15 m</strong></div>
+      <div class="info-row"><span>Responsable</span><strong>Miguel Paredes</strong></div>
+    </div>
+    <button class="btn">Abrir archivo original</button>
+  </aside>
+</div>
+
+<div class="review-badge">Preview V3 · no producción</div>
+<script>
+const views = ["home","incident","mamparas","records"];
+function showView(name){
+  views.forEach(function(v){
+    document.getElementById("view-"+v).classList.toggle("active",v===name);
+  });
+  document.querySelectorAll(".nav button[data-view]").forEach(function(btn){
+    btn.classList.toggle("active",btn.dataset.view===name);
+  });
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("[data-view]").forEach(function(btn){btn.addEventListener("click",function(){showView(btn.dataset.view);});});
+document.querySelectorAll("[data-go]").forEach(function(btn){btn.addEventListener("click",function(){showView(btn.dataset.go);});});
+const viewer=document.getElementById("viewer");
+function openViewer(){viewer.classList.add("open");document.body.style.overflow="hidden";}
+function closeViewer(){viewer.classList.remove("open");document.body.style.overflow="";}
+document.querySelectorAll(".open-viewer").forEach(function(btn){btn.addEventListener("click",openViewer);});
+document.getElementById("openViewerNav").addEventListener("click",openViewer);
+document.getElementById("viewerClose").addEventListener("click",closeViewer);
+viewer.addEventListener("click",function(e){if(e.target===viewer)closeViewer();});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeViewer();});
+</script>
+</body>
+</html>
