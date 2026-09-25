@@ -3,6 +3,7 @@ import { mostrarDetalleMampara } from "./detalle-modal.js";
 
 const TABLA_ID = "tabla-registros";
 const BUSCAR_PLACA_ID = "buscarPlaca";
+let registrosCache = [];
 
 const normalizarUrl = (valor) => {
   if (valor === null || valor === undefined) return null;
@@ -32,12 +33,14 @@ const construirPayloadDetalle = (registro) => {
     normalizarUrl(detalleObj.foto_panoramica_unidad) ||
     normalizarUrl(imagenesDetalle.foto_panoramica_unidad) ||
     normalizarUrl(detalleObj.foto_unidad);
+
   const fotoAltura =
     normalizarUrl(registro?.foto_observacion) ||
     normalizarUrl(detalleObj.foto_altura_mampara) ||
     normalizarUrl(imagenesDetalle.foto_altura_mampara) ||
     normalizarUrl(detalleObj.foto_observacion) ||
     normalizarUrl(imagenesDetalle.foto_observacion);
+
   const fotoLateral =
     normalizarUrl(detalleObj.foto_lateral_central) ||
     normalizarUrl(imagenesDetalle.foto_lateral_central) ||
@@ -58,91 +61,74 @@ const construirPayloadDetalle = (registro) => {
       detalleObj.altura_mampara ??
       datos.altura_mampara ??
       null,
+    meta: {
+      placa: registro?.placa || "—",
+      empresa: registro?.empresa || "—",
+      fecha: registro?.fecha || "—",
+      hora: registro?.hora || "—",
+      chofer: registro?.chofer || "—",
+      lugar: registro?.lugar || "—",
+      responsable: registro?.responsable || "—",
+      observaciones: registro?.observaciones || "—",
+    },
     imagenes: [
-      {
-        key: "panoramica",
-        label: "Foto panoramica",
-        labelHtml: "Foto panor&aacute;mica",
-        url: fotoPanoramica,
-      },
-      {
-        key: "altura",
-        label: "Foto altura",
-        labelHtml: "Foto altura",
-        url: fotoAltura,
-      },
-      {
-        key: "lateral",
-        label: "Foto lateral",
-        labelHtml: "Foto lateral",
-        url: fotoLateral,
-      },
+      { key: "panoramica", label: "Foto panorámica", url: fotoPanoramica },
+      { key: "altura", label: "Foto altura", url: fotoAltura },
+      { key: "lateral", label: "Foto lateral", url: fotoLateral },
     ],
   };
 };
 
-const renderFila = (registro) => {
-  const registroDataString = JSON.stringify(registro || {}).replace(
-    /"/g,
-    "&quot;"
-  );
-  return `
-    <tr class="odd:bg-gray-50 even:bg-white text-gray-700 text-sm leading-relaxed">
-      <td class="px-3 py-2">${registro.fecha || "-"}</td>
-      <td class="px-3 py-2">${registro.hora || "-"}</td>
-      <td class="px-3 py-2">${registro.empresa || "-"}</td>
-      <td class="px-3 py-2 font-semibold text-gray-900">${
-        registro.placa || "-"
-      }</td>
-      <td class="px-3 py-2">${registro.chofer || "-"}</td>
-      <td class="px-3 py-2">${registro.lugar || "-"}</td>
-      <td class="px-3 py-2">${registro.incorreccion || "-"}</td>
-      <td class="px-3 py-2">${registro.responsable || "-"}</td>
-      <td class="px-3 py-2 text-center">
-        <button
-          type="button"
-          class="btn-ver-detalle flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md ring-1 ring-black/10 focus-visible:outline-none focus-visible:ring-2 transition hover:opacity-90"
-          data-registro="${registroDataString}"
-          title="Ver detalle"
-          aria-label="Ver detalle"
-          style="background-color: #0b1a2a; border: 1px solid rgba(15,23,42,0.35);"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 5.5C7.5 5.5 3.73 8.11 2 12c1.73 3.89 5.5 6.5 10 6.5s8.27-2.61 10-6.5c-1.73-3.89-5.5-6.5-10-6.5Zm0 10.44A3.94 3.94 0 1 1 15.94 12 3.94 3.94 0 0 1 12 15.94Zm0-6.38A2.44 2.44 0 1 0 14.44 12 2.44 2.44 0 0 0 12 9.56Z" fill="currentColor"/>
-          </svg>
-        </button>
-      </td>
-    </tr>
-  `;
-};
+const escapeHtml = (value) =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+const renderFila = (registro, index) =>
+  '<tr>' +
+    '<td>' + escapeHtml(registro.fecha || "-") + '</td>' +
+    '<td>' + escapeHtml(registro.hora || "-") + '</td>' +
+    '<td>' + escapeHtml(registro.empresa || "-") + '</td>' +
+    '<td><strong>' + escapeHtml(registro.placa || "-") + '</strong></td>' +
+    '<td>' + escapeHtml(registro.chofer || "-") + '</td>' +
+    '<td>' + escapeHtml(registro.lugar || "-") + '</td>' +
+    '<td>' + escapeHtml(registro.incorreccion || "-") + '</td>' +
+    '<td>' + escapeHtml(registro.responsable || "-") + '</td>' +
+    '<td><button type="button" class="btn-ver-detalle" data-index="' + index + '" title="Ver detalle" aria-label="Ver detalle"><i class="fas fa-eye"></i></button></td>' +
+  '</tr>';
 
 const cargarRegistros = async () => {
   const cuerpo = document.getElementById(TABLA_ID);
   if (!cuerpo) return;
 
   cuerpo.innerHTML =
-    '<tr><td colspan="9" class="text-center py-4 text-gray-500">Cargando registros...</td></tr>';
+    '<tr><td colspan="9" style="text-align:center;padding:22px;color:#667085">Cargando registros...</td></tr>';
 
   const { data, error } = await supabase
     .from("inspecciones")
-    .select("*")
+    .select("id,fecha,hora,empresa,placa,chofer,lugar,incorreccion,responsable,observaciones,separacion_central,altura_mampara,foto_unidad,foto_observacion,detalle")
     .order("fecha", { ascending: false })
     .order("hora", { ascending: false });
 
   if (error) {
     console.error("Error al cargar registros:", error.message);
+    registrosCache = [];
     cuerpo.innerHTML =
-      '<tr><td colspan="9" class="py-3 text-center text-red-600">Error al cargar los datos.</td></tr>';
+      '<tr><td colspan="9" style="text-align:center;padding:22px;color:#963c3c">No se pudieron cargar los registros.</td></tr>';
     return;
   }
 
-  if (!data || !data.length) {
+  registrosCache = Array.isArray(data) ? data : [];
+  if (!registrosCache.length) {
     cuerpo.innerHTML =
-      '<tr><td colspan="9" class="py-3 text-center text-gray-500">No hay registros disponibles.</td></tr>';
+      '<tr><td colspan="9" style="text-align:center;padding:22px;color:#667085">No hay registros disponibles.</td></tr>';
     return;
   }
 
-  cuerpo.innerHTML = data.map(renderFila).join("");
+  cuerpo.innerHTML = registrosCache.map(renderFila).join("");
 };
 
 const activarFiltroPlaca = () => {
@@ -151,7 +137,7 @@ const activarFiltroPlaca = () => {
 
   input.addEventListener("input", function () {
     const filtro = this.value.trim().toUpperCase();
-    const filas = document.querySelectorAll(`#${TABLA_ID} tr`);
+    const filas = document.querySelectorAll("#" + TABLA_ID + " tr");
 
     filas.forEach((fila) => {
       const celdaPlaca = fila.cells?.[3];
@@ -166,22 +152,18 @@ const initRegistros = () => {
   const tabla = document.getElementById(TABLA_ID);
   if (!tabla) return;
 
-  cargarRegistros();
+  void cargarRegistros();
   activarFiltroPlaca();
 
   document.body.addEventListener("click", (event) => {
     const boton = event.target.closest(".btn-ver-detalle");
-    if (!boton?.dataset?.registro) return;
+    if (!boton) return;
 
-    try {
-      const registro = JSON.parse(
-        boton.dataset.registro.replace(/&quot;/g, '"')
-      );
-      const payload = construirPayloadDetalle(registro);
-      mostrarDetalleMampara(payload);
-    } catch (error) {
-      console.error("Error parsing registro data from button:", error);
-    }
+    const index = Number(boton.dataset.index);
+    const registro = registrosCache[index];
+    if (!registro) return;
+
+    mostrarDetalleMampara(construirPayloadDetalle(registro));
   });
 };
 
