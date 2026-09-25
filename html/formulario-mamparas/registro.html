@@ -1,11 +1,11 @@
 <link rel="stylesheet" href="../../CSS/apple-redesign.css" />
 
 <main class="v3-ops">
-  <div class="v3-stepbar" aria-label="Etapas de inspección">
-    <div class="v3-step active"><b>1</b>Unidad</div>
-    <div class="v3-step"><b>2</b>Operación</div>
-    <div class="v3-step"><b>3</b>Hallazgo</div>
-    <div class="v3-step"><b>4</b>Evidencias</div>
+  <div class="v3-stepbar" id="inspectionStepper" aria-label="Progreso de la inspección">
+    <div class="v3-step is-current" data-step="unit" aria-current="step"><b>1</b><span>Unidad</span></div>
+    <div class="v3-step" data-step="operation"><b>2</b><span>Operación</span></div>
+    <div class="v3-step" data-step="finding"><b>3</b><span>Hallazgo</span></div>
+    <div class="v3-step" data-step="evidence"><b>4</b><span>Evidencias</span></div>
   </div>
 
   <div id="mamparasFeedback" class="form-feedback" data-tone="info" role="status" aria-live="polite"></div>
@@ -13,40 +13,54 @@
   <form id="form-inspeccion" novalidate>
     <div class="v3-ops-surface">
       <div class="v3-ops-main">
-        <section class="v3-ops-band">
+        <section class="v3-ops-band band-unit" data-section="unit">
           <div class="v3-ops-band-head">
-            <span class="v3-band-no">01</span>
             <strong>Identificación de la unidad</strong>
+            <span>Datos automáticos y placa</span>
           </div>
+
           <div class="v3-ops-grid">
-            <div>
+            <div class="v3-field is-readonly">
               <label for="fecha">Fecha</label>
               <input type="date" id="fecha" name="fecha" required readonly />
-              <p class="helper">Automática</p>
+              <small class="field-message">Automática</small>
             </div>
-            <div>
+
+            <div class="v3-field is-readonly">
               <label for="hora">Hora</label>
               <input type="time" id="hora" name="hora" required readonly />
-              <p class="helper">Automática</p>
+              <small class="field-message">Automática</small>
             </div>
-            <div>
-              <label for="placa">Placa</label>
-              <input type="text" id="placa" name="placa" placeholder="ABC123" required maxlength="6" pattern="[A-Za-z0-9]{6}" autocomplete="off" />
-              <p class="helper">6 caracteres alfanuméricos</p>
+
+            <div class="v3-field" data-required-field="placa">
+              <label for="placa">Placa <span class="required-mark">*</span></label>
+              <input
+                type="text"
+                id="placa"
+                name="placa"
+                placeholder="ABC123"
+                required
+                maxlength="6"
+                pattern="[A-Za-z0-9]{6}"
+                autocomplete="off"
+                aria-describedby="placaFieldMessage"
+              />
+              <small id="placaFieldMessage" class="field-message">6 caracteres alfanuméricos</small>
             </div>
           </div>
         </section>
 
-        <section class="v3-ops-band">
+        <section class="v3-ops-band band-operation" data-section="operation">
           <div class="v3-ops-band-head">
-            <span class="v3-band-no">02</span>
             <strong>Datos de operación</strong>
+            <span>Empresa, conductor y ubicación</span>
           </div>
+
           <div class="v3-ops-grid">
-            <div>
-              <label for="empresa">Empresa</label>
-              <select id="empresa" name="empresa" required>
-                <option value="">Seleccione</option>
+            <div class="v3-field" data-required-field="empresa">
+              <label for="empresa">Empresa <span class="required-mark">*</span></label>
+              <select id="empresa" name="empresa" required aria-describedby="empresaFieldMessage">
+                <option value="">Seleccione una empresa</option>
                 <option value="otra">Agregar otra empresa</option>
                 <option value="RYM">RYM</option>
                 <option value="TURICAR">TURICAR</option>
@@ -68,44 +82,65 @@
                 <option value="V&B">V&B</option>
                 <option value="GAMARRA BERRENECHEA">GAMARRA BERRENECHEA</option>
               </select>
-              <input type="text" id="nueva_empresa" name="nueva_empresa" placeholder="Nombre de la empresa" class="hidden" style="margin-top:8px" />
+              <input
+                type="text"
+                id="nueva_empresa"
+                name="nueva_empresa"
+                placeholder="Nombre de la empresa"
+                class="hidden"
+                style="margin-top:8px"
+              />
+              <small id="empresaFieldMessage" class="field-message">Selecciona la empresa transportista</small>
             </div>
-            <div>
-              <label for="chofer">Chofer</label>
-              <input type="text" id="chofer" name="chofer" placeholder="Nombre completo" required />
+
+            <div class="v3-field" data-required-field="chofer">
+              <label for="chofer">Chofer <span class="required-mark">*</span></label>
+              <input
+                type="text"
+                id="chofer"
+                name="chofer"
+                placeholder="Nombre completo"
+                required
+                aria-describedby="choferFieldMessage"
+              />
+              <small id="choferFieldMessage" class="field-message">Nombre del conductor</small>
             </div>
-            <div>
-              <label for="lugar">Lugar</label>
-              <select id="lugar" name="lugar" required>
-                <option value="">Seleccione</option>
+
+            <div class="v3-field" data-required-field="lugar">
+              <label for="lugar">Lugar <span class="required-mark">*</span></label>
+              <select id="lugar" name="lugar" required aria-describedby="lugarFieldMessage">
+                <option value="">Seleccione un lugar</option>
                 <option value="Tracciones">Tracciones</option>
                 <option value="Calle">Calle</option>
               </select>
+              <small id="lugarFieldMessage" class="field-message">Ubicación de la inspección</small>
             </div>
           </div>
         </section>
 
-        <section class="v3-ops-band">
+        <section class="v3-ops-band band-finding" data-section="finding">
           <div class="v3-ops-band-head">
-            <span class="v3-band-no">03</span>
             <strong>Clasificación del hallazgo</strong>
+            <span>Define el detalle y la evidencia requerida</span>
           </div>
+
           <div class="v3-ops-grid">
-            <div>
-              <label for="incorreccion">Incorrección</label>
-              <select id="incorreccion" name="incorreccion" required>
-                <option value="">Seleccione</option>
+            <div class="v3-field" data-required-field="incorreccion">
+              <label for="incorreccion">Incorrección <span class="required-mark">*</span></label>
+              <select id="incorreccion" name="incorreccion" required aria-describedby="incorreccionFieldMessage">
+                <option value="">Seleccione una incorrección</option>
                 <option value="Mampara">Mampara</option>
                 <option value="Cola de Pato">Cola de Pato</option>
                 <option value="Pernos">Pernos</option>
                 <option value="Otros">Otros</option>
               </select>
-              <p class="helper">Habilita medidas y fotografías requeridas</p>
+              <small id="incorreccionFieldMessage" class="field-message">Al seleccionar se habilitan medidas y fotografías</small>
             </div>
-            <div>
-              <label for="responsable">Responsable</label>
-              <select id="responsable" name="responsable" required>
-                <option value="">Seleccione</option>
+
+            <div class="v3-field" data-required-field="responsable">
+              <label for="responsable">Responsable <span class="required-mark">*</span></label>
+              <select id="responsable" name="responsable" required aria-describedby="responsableFieldMessage">
+                <option value="">Seleccione un responsable</option>
                 <option value="Carlos Sanchez">Carlos Sanchez</option>
                 <option value="Francisco Elescano">Francisco Elescano</option>
                 <option value="Hernan Luna">Hernan Luna</option>
@@ -117,80 +152,97 @@
                 <option value="Grover Munguia">Grover Munguia</option>
                 <option value="Ernesto Alfaro">Ernesto Alfaro</option>
               </select>
+              <small id="responsableFieldMessage" class="field-message">Responsable de la inspección</small>
             </div>
-            <div>
-              <label for="observaciones">Operación observada</label>
-              <select id="observaciones" name="observaciones" required>
-                <option value="">Seleccione</option>
+
+            <div class="v3-field" data-required-field="observaciones">
+              <label for="observaciones">Operación observada <span class="required-mark">*</span></label>
+              <select id="observaciones" name="observaciones" required aria-describedby="observacionesFieldMessage">
+                <option value="">Seleccione una operación</option>
                 <option value="Descarga">Descarga</option>
                 <option value="Embarque">Embarque</option>
                 <option value="Otros">Otros</option>
               </select>
+              <small id="observacionesFieldMessage" class="field-message">Contexto operativo observado</small>
             </div>
           </div>
         </section>
       </div>
 
-      <aside class="v3-ops-side">
-        <section class="v3-side-section">
-          <p class="section-kicker">Detalle obligatorio</p>
-          <h3>Medidas</h3>
-          <p>Completa las medidas y la evidencia sin salir del flujo de inspección.</p>
+      <aside class="v3-ops-side" aria-label="Detalle y evidencias">
+        <section class="v3-side-section detail-inline-section">
+          <div class="side-section-head">
+            <div>
+              <p class="section-kicker">Detalle obligatorio</p>
+              <h3 id="detalleInlineTitle">Medidas y evidencia</h3>
+            </div>
+            <span id="detalleStateBadge" class="detail-state-badge is-pending">Pendiente</span>
+          </div>
+
+          <p id="detalleInlineHint">Selecciona una incorrección para mostrar los campos requeridos.</p>
+
           <input type="hidden" id="detalle" name="detalle" />
-          <div id="detalleGuardadoAviso" class="form-feedback" data-tone="success" style="margin-top:12px">
+
+          <div id="detalleAlert" class="form-feedback hidden" data-tone="warning">
+            Completa los campos obligatorios antes de guardar el detalle.
+          </div>
+
+          <div id="contenidoDetalle" class="inline-detail-content">
+            <div class="inline-detail-empty">
+              <span>Selecciona una incorrección</span>
+              <small>Las medidas y fotografías aparecerán aquí.</small>
+            </div>
+          </div>
+
+          <div id="detalleGuardadoAviso" class="form-feedback hidden" data-tone="success">
             Detalle guardado y listo para registrar.
           </div>
-          <button type="button" id="btnAgregarDetalle" class="v3-btn primary hidden" style="width:100%;margin-top:13px">
-            Completar detalle
-          </button>
+
+          <div id="detalleActions" class="inline-detail-actions hidden">
+            <button id="btnLimpiarDetalle" type="button" class="v3-btn">Limpiar</button>
+            <button id="btnGuardarDetalle" type="button" class="v3-btn teal">Guardar detalle</button>
+          </div>
         </section>
 
-        <section class="v3-side-section">
-          <p class="section-kicker">Evidencias</p>
-          <h3>Fotografías</h3>
-          <p>Las fotografías guardadas aparecerán aquí y podrán ampliarse.</p>
+        <section class="v3-side-section evidence-inline-section">
+          <div class="side-section-head">
+            <div>
+              <p class="section-kicker">Evidencias</p>
+              <h3>Vista previa</h3>
+            </div>
+            <span id="evidenceStateCount" class="evidence-state-count">0</span>
+          </div>
+
           <div id="galeriaMamparas">
-            <div class="evidence-empty">
+            <div class="evidence-empty compact">
               <strong>Sin evidencias</strong>
-              <span>Completa el detalle para agregar fotografías.</span>
+              <span>Las fotografías guardadas aparecerán aquí.</span>
             </div>
           </div>
         </section>
       </aside>
 
       <footer class="v3-ops-footer">
-        <p>Los campos obligatorios y la evidencia se validan antes del registro final.</p>
-        <button id="btnRegistrarInspeccion" type="submit" class="v3-btn primary">Registrar inspección</button>
+        <div id="validationSummary" class="v3-validation-summary" role="status" aria-live="polite">
+          <strong id="validationCount">0 de 8 requisitos completos</strong>
+          <span id="validationText">Completa los campos para habilitar el registro.</span>
+        </div>
+
+        <button id="btnRegistrarInspeccion" type="submit" class="v3-btn primary" disabled>
+          Registrar inspección
+        </button>
       </footer>
     </div>
   </form>
-
-  <div id="detalleModal" class="modal-overlay hidden items-center justify-center px-4 py-4 z-50" role="dialog" aria-modal="true">
-    <div class="modal-card bg-white w-full max-w-3xl flex flex-col overflow-hidden" style="width:min(900px,94vw);max-height:86vh">
-      <div class="flex items-start justify-between gap-4 px-6 pt-6 pb-4 border-b border-gray-100">
-        <div>
-          <p class="section-kicker">Detalle de inspección</p>
-          <h3 class="text-lg font-semibold text-gray-800">Medidas y fotografías</h3>
-        </div>
-        <button id="cerrarDetalleModal" type="button" class="v3-btn" aria-label="Cerrar">Cerrar</button>
-      </div>
-      <div class="px-6 py-4 overflow-y-auto" style="flex:1 1 auto;min-height:0">
-        <div id="detalleAlert" class="form-feedback" data-tone="warning">Completa los campos obligatorios antes de guardar el detalle.</div>
-        <div id="contenidoDetalle" class="space-y-4"></div>
-      </div>
-      <div class="flex justify-end gap-2 px-6 py-4 border-t border-gray-100">
-        <button id="btnLimpiarDetalle" type="button" class="v3-btn">Limpiar</button>
-        <button id="btnGuardarDetalle" type="button" class="v3-btn primary">Guardar detalle</button>
-      </div>
-    </div>
-  </div>
 
   <div id="modalPlacaExistente" class="modal-overlay hidden items-center justify-center px-4 z-50" role="dialog" aria-modal="true">
     <div class="modal-card bg-white w-full max-w-lg p-6 relative">
       <button id="cerrarModalPlaca" type="button" class="absolute top-3 right-3 v3-btn" aria-label="Cerrar">Cerrar</button>
       <p class="section-kicker">Registro encontrado</p>
       <h3 class="text-lg font-semibold text-gray-800">Esta placa ya tiene antecedentes</h3>
-      <p class="text-sm text-gray-700" style="margin-top:12px">La placa <strong id="placaDuplicada"></strong> fue registrada con la incorrección <strong id="tipoIncorreccion"></strong>.</p>
+      <p class="text-sm text-gray-700" style="margin-top:12px">
+        La placa <strong id="placaDuplicada"></strong> fue registrada con la incorrección <strong id="tipoIncorreccion"></strong>.
+      </p>
       <div class="flex flex-wrap justify-end gap-3" style="margin-top:18px">
         <button id="btnCancelarPlaca" type="button" class="v3-btn">Crear nuevo</button>
         <button id="btnContinuarPlaca" type="button" class="v3-btn primary">Reutilizar datos</button>
@@ -207,7 +259,12 @@
 
   <div id="modalPreview" class="fixed inset-0 z-[12000] hidden items-center justify-center" role="dialog" aria-modal="true">
     <div class="relative">
-      <button type="button" onclick="cerrarModalPreview()" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-black/70 text-white" aria-label="Cerrar">×</button>
+      <button
+        type="button"
+        onclick="cerrarModalPreview()"
+        class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-black/70 text-white"
+        aria-label="Cerrar"
+      >×</button>
       <img id="previewImagen" src="" alt="Previsualización de evidencia" />
     </div>
   </div>
