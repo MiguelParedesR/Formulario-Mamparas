@@ -78,6 +78,7 @@ button{cursor:pointer}
 .report-editor input,.report-editor select,.report-editor textarea,
 .v3-ops input,.v3-ops select,.v3-ops textarea,
 .v3-filterbar input,.v3-filterbar select,
+.v3-report input,.v3-report select,
 #verEditarPanel input,#verEditarPanel select,#verEditarPanel textarea{
   width:100%!important;min-width:0!important;display:block!important;
   border:1px solid #d2d9e2!important;border-radius:7px!important;
@@ -85,7 +86,7 @@ button{cursor:pointer}
   box-shadow:none!important;transition:border-color .14s ease,box-shadow .14s ease,background .14s ease!important
 }
 .report-editor input,.report-editor select,.v3-ops input,.v3-ops select,
-.v3-filterbar input,.v3-filterbar select,#verEditarPanel input,#verEditarPanel select{
+.v3-filterbar input,.v3-filterbar select,.v3-report input,.v3-report select,#verEditarPanel input,#verEditarPanel select{
   min-height:39px!important;padding:8px 10px!important;font-size:11.5px!important
 }
 .report-editor textarea,.v3-ops textarea,#verEditarPanel textarea{
@@ -94,10 +95,11 @@ button{cursor:pointer}
 .report-editor input:focus,.report-editor select:focus,.report-editor textarea:focus,
 .v3-ops input:focus,.v3-ops select:focus,.v3-ops textarea:focus,
 .v3-filterbar input:focus,.v3-filterbar select:focus,
+.v3-report input:focus,.v3-report select:focus,
 #verEditarPanel input:focus,#verEditarPanel select:focus,#verEditarPanel textarea:focus{
   border-color:#8babe6!important;box-shadow:0 0 0 3px rgba(47,111,237,.09)!important;background:#fff!important
 }
-.report-editor label,.v3-ops label,.v3-filterbar label,#verEditarPanel label{
+.report-editor label,.v3-ops label,.v3-filterbar label,.v3-report label,#verEditarPanel label{
   display:block!important;margin:0 0 5px!important;color:#667085!important;
   font-size:9px!important;font-weight:820!important;letter-spacing:.07em!important;text-transform:uppercase!important
 }
@@ -307,25 +309,92 @@ button{cursor:pointer}
 #modalPreview #previewImagen{display:block!important;width:100%!important;max-height:82vh!important;object-fit:contain!important;background:#0e1723!important;border-radius:8px!important}
 
 /* Existing Mamparas detail viewer integration */
-.mampara-detail-overlay{position:fixed!important;inset:0!important;z-index:10000!important;display:grid!important;place-items:center!important;padding:22px!important;background:rgba(10,20,34,.66)!important;backdrop-filter:blur(14px)!important}
-.mampara-detail-panel{width:min(1050px,95vw)!important;max-height:91vh!important;overflow:auto!important;border:1px solid var(--v3-line)!important;border-radius:10px!important;background:#f8fafc!important;box-shadow:0 30px 95px rgba(0,0,0,.24)!important}
-.mampara-detail-header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:18px 20px;border-bottom:1px solid var(--v3-line)!important;background:#fff!important}
+.mampara-detail-overlay{
+  position:fixed!important;inset:0!important;z-index:10000!important;
+  display:grid!important;place-items:center!important;padding:22px!important;
+  background:rgba(10,20,34,.66)!important;backdrop-filter:blur(14px)!important
+}
+.mampara-detail-panel{
+  width:min(1050px,95vw)!important;max-height:91vh!important;overflow:auto!important;
+  border:1px solid var(--v3-line)!important;border-radius:10px!important;background:#f8fafc!important;
+  box-shadow:0 30px 95px rgba(0,0,0,.24)!important
+}
+.mampara-detail-header{
+  display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:20px!important;
+  padding:18px 20px!important;border-bottom:1px solid var(--v3-line)!important;background:#fff!important
+}
 .mampara-detail-header h2{margin:4px 0 0!important;font-size:20px!important;color:var(--v3-ink)!important}
+.mampara-detail-close,.mampara-viewer-close{
+  min-width:34px!important;height:34px!important;border:1px solid var(--v3-line)!important;border-radius:8px!important;
+  background:#fff!important;color:#344054!important;font-size:10px!important;font-weight:750!important;padding:0 10px!important
+}
 .mampara-detail-metrics{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:10px!important;padding:16px 20px 0!important}
 .mampara-detail-metric{padding:12px!important;border:1px solid var(--v3-line)!important;background:#fff!important;border-radius:8px!important}
+.mampara-detail-metric span{display:block!important;color:var(--v3-muted)!important;font-size:9px!important;font-weight:800!important;text-transform:uppercase!important;letter-spacing:.08em!important}
+.mampara-detail-metric strong{display:block!important;margin-top:4px!important;color:var(--v3-ink)!important;font-size:12px!important}
 .mampara-detail-gallery{padding:16px 20px 20px!important}
+.mampara-detail-gallery-head{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:12px!important;margin-bottom:9px!important}
+.mampara-detail-gallery-head h3{margin:0!important;font-size:12px!important}.mampara-detail-gallery-head span{color:var(--v3-muted)!important;font-size:9.5px!important}
 .mampara-photo-grid{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:10px!important}
-.mampara-photo-card{overflow:hidden!important;border:1px solid var(--v3-line)!important;border-radius:8px!important;background:#fff!important}
-.mampara-photo-media{aspect-ratio:16/10!important;background:#e8edf3!important}.mampara-photo-media img{width:100%!important;height:100%!important;object-fit:cover!important}
+.mampara-photo-card{overflow:hidden!important;border:1px solid var(--v3-line)!important;border-radius:8px!important;background:#fff!important;padding:0!important;text-align:left!important}
+.mampara-photo-media{aspect-ratio:16/10!important;background:#e8edf3!important;display:grid!important;place-items:center!important;color:#8492a6!important;font-size:10px!important}
+.mampara-photo-media img{width:100%!important;height:100%!important;object-fit:cover!important}
 .mampara-photo-caption{padding:7px!important;color:var(--v3-muted)!important;font-size:9.5px!important}
-.mampara-viewer{position:fixed!important;inset:0!important;z-index:11000!important;background:rgba(10,20,34,.95)!important;color:#fff!important;display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;padding:14px 18px!important}
-.mampara-viewer-stage{position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;min-height:0!important}
-.mampara-viewer-stage>img{max-width:100%!important;max-height:calc(100vh - 145px)!important;object-fit:contain!important;border-radius:8px!important}
-.mampara-viewer-nav{position:absolute!important;top:50%!important;transform:translateY(-50%)!important;width:40px!important;height:40px!important;border-radius:50%!important;border:1px solid rgba(255,255,255,.15)!important;background:rgba(17,29,46,.8)!important;color:#fff!important}
+
+/* V3 fullscreen evidence viewer */
+.mampara-viewer{
+  position:fixed!important;inset:0!important;z-index:11000!important;
+  display:grid!important;grid-template-columns:minmax(0,1fr) 310px!important;
+  padding:0!important;background:rgba(10,20,34,.96)!important;color:#fff!important
+}
+.mampara-viewer-stage-wrap{
+  min-width:0!important;display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;
+  padding:16px 20px 14px!important
+}
+.mampara-viewer-top{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:18px!important;
+  padding-bottom:10px!important;border-bottom:1px solid rgba(255,255,255,.1)!important
+}
+.mampara-viewer-top>div{display:flex!important;align-items:baseline!important;gap:10px!important;min-width:0!important}
+.mampara-viewer-top strong{color:#f3f5f8!important;font-size:11px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.mampara-viewer-top span{color:#8fa2b9!important;font-size:9.5px!important;white-space:nowrap!important}
+.mampara-viewer-close{
+  border-color:rgba(255,255,255,.14)!important;background:rgba(255,255,255,.08)!important;color:#fff!important;
+  width:34px!important;min-width:34px!important;padding:0!important;font-size:18px!important
+}
+.mampara-viewer-stage{
+  position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;min-height:0!important;margin:12px 0!important
+}
+.mampara-viewer-stage>img{
+  display:block!important;max-width:100%!important;max-height:calc(100vh - 140px)!important;
+  width:auto!important;height:auto!important;object-fit:contain!important;border-radius:8px!important;background:#0d1724!important;
+  box-shadow:0 18px 60px rgba(0,0,0,.38)!important
+}
+.mampara-viewer-nav{
+  position:absolute!important;top:50%!important;transform:translateY(-50%)!important;
+  width:40px!important;height:40px!important;border:1px solid rgba(255,255,255,.15)!important;border-radius:50%!important;
+  background:rgba(17,29,46,.82)!important;color:#fff!important;font-size:22px!important
+}
 .mampara-viewer-nav.is-prev{left:12px!important}.mampara-viewer-nav.is-next{right:12px!important}
-.mampara-viewer-strip{display:flex!important;justify-content:center!important;gap:7px!important;padding-top:8px!important}
-.mampara-viewer-thumb{width:74px!important;height:48px!important;border:2px solid transparent!important;border-radius:7px!important;overflow:hidden!important;padding:0!important;background:#1d2b3e!important}
-.mampara-viewer-thumb.is-active{border-color:#75a8ff!important}.mampara-viewer-thumb img{width:100%!important;height:100%!important;object-fit:cover!important}
+.mampara-viewer-strip{display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;min-height:50px!important;overflow-x:auto!important}
+.mampara-viewer-thumb{
+  width:72px!important;height:46px!important;flex:0 0 auto!important;padding:2px!important;
+  border:2px solid transparent!important;border-radius:7px!important;overflow:hidden!important;background:#1d2b3e!important;opacity:.55!important
+}
+.mampara-viewer-thumb.is-active{border-color:#75a8ff!important;opacity:1!important}
+.mampara-viewer-thumb img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;border-radius:4px!important}
+.mampara-viewer-info{
+  padding:22px 20px!important;overflow:auto!important;background:#132239!important;border-left:1px solid rgba(255,255,255,.08)!important
+}
+.mampara-viewer-info .section-kicker{color:#7f96b2!important}
+.mampara-viewer-info h2{margin:0!important;color:#fff!important;font-size:20px!important;letter-spacing:-.03em!important}
+.mampara-viewer-info-group{margin-top:20px!important;border-top:1px solid rgba(255,255,255,.1)!important}
+.mampara-viewer-info-row{
+  display:flex!important;justify-content:space-between!important;gap:16px!important;
+  padding:10px 0!important;border-bottom:1px solid rgba(255,255,255,.08)!important;font-size:9.5px!important
+}
+.mampara-viewer-info-row span{color:#8296af!important}
+.mampara-viewer-info-row strong{color:#e8edf3!important;font-size:10px!important;text-align:right!important;max-width:58%!important}
 
 /* responsive */
 @media(max-width:1200px){
