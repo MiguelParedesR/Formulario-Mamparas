@@ -3,6 +3,24 @@ import { mostrarDetalleMampara } from "./detalle-modal.js";
 
 const TABLA_ID = "tabla-registros";
 const BUSCAR_PLACA_ID = "buscarPlaca";
+let registros = [];
+let filtroActual = "";
+
+const statusEl = () => document.getElementById("mamparasRecordsStatus");
+
+function mostrarEstado(tipo, mensaje) {
+  const el = statusEl();
+  if (!el) return;
+  el.className = `form-status form-status--${tipo} is-visible`;
+  el.textContent = mensaje;
+}
+
+function ocultarEstado() {
+  const el = statusEl();
+  if (!el) return;
+  el.className = "form-status";
+  el.textContent = "";
+}
 
 const normalizarUrl = (valor) => {
   if (valor === null || valor === undefined) return null;
@@ -26,102 +44,128 @@ const construirPayloadDetalle = (registro) => {
   const detalleObj = parseDetalle(registro?.detalle) || {};
   const datos = detalleObj?.datos || {};
   const imagenesDetalle = detalleObj?.imagenes || {};
+  const tipo = registro?.incorreccion || detalleObj?.tipo || "Mampara";
+  const esMampara = String(tipo).toUpperCase() === "MAMPARA";
 
   const fotoPanoramica =
     normalizarUrl(registro?.foto_unidad) ||
     normalizarUrl(detalleObj.foto_panoramica_unidad) ||
     normalizarUrl(imagenesDetalle.foto_panoramica_unidad) ||
     normalizarUrl(detalleObj.foto_unidad);
+
   const fotoAltura =
-    normalizarUrl(registro?.foto_observacion) ||
     normalizarUrl(detalleObj.foto_altura_mampara) ||
     normalizarUrl(imagenesDetalle.foto_altura_mampara) ||
-    normalizarUrl(detalleObj.foto_observacion) ||
-    normalizarUrl(imagenesDetalle.foto_observacion);
+    (esMampara ? normalizarUrl(registro?.foto_observacion) : null);
+
   const fotoLateral =
     normalizarUrl(detalleObj.foto_lateral_central) ||
     normalizarUrl(imagenesDetalle.foto_lateral_central) ||
     normalizarUrl(detalleObj.foto_lateral) ||
     normalizarUrl(imagenesDetalle.foto_lateral);
 
+  const fotoObservacion =
+    normalizarUrl(detalleObj.foto_observacion) ||
+    normalizarUrl(imagenesDetalle.foto_observacion) ||
+    (!esMampara ? normalizarUrl(registro?.foto_observacion) : null);
+
+  const imagenes = esMampara
+    ? [
+        { key: "panoramica", label: "Foto panorámica", url: fotoPanoramica },
+        { key: "altura", label: "Foto de altura", url: fotoAltura },
+        { key: "lateral", label: "Foto lateral", url: fotoLateral },
+      ]
+    : [{ key: "observacion", label: "Foto de observación", url: fotoObservacion }];
+
   return {
-    tipo: registro?.incorreccion || detalleObj?.tipo || "Mampara",
-    separacion:
-      registro?.separacion_central ??
-      detalleObj.separacion_lateral_central ??
-      detalleObj.separacion_central ??
-      datos.separacion_lateral_central ??
-      datos.separacion_central ??
-      null,
-    altura:
-      registro?.altura_mampara ??
-      detalleObj.altura_mampara ??
-      datos.altura_mampara ??
-      null,
-    imagenes: [
-      {
-        key: "panoramica",
-        label: "Foto panoramica",
-        labelHtml: "Foto panor&aacute;mica",
-        url: fotoPanoramica,
-      },
-      {
-        key: "altura",
-        label: "Foto altura",
-        labelHtml: "Foto altura",
-        url: fotoAltura,
-      },
-      {
-        key: "lateral",
-        label: "Foto lateral",
-        labelHtml: "Foto lateral",
-        url: fotoLateral,
-      },
-    ],
+    tipo,
+    separacion: esMampara
+      ? registro?.separacion_central ??
+        detalleObj.separacion_lateral_central ??
+        detalleObj.separacion_central ??
+        datos.separacion_lateral_central ??
+        datos.separacion_central ??
+        null
+      : null,
+    altura: esMampara
+      ? registro?.altura_mampara ??
+        detalleObj.altura_mampara ??
+        datos.altura_mampara ??
+        null
+      : null,
+    observacion: !esMampara
+      ? datos.observacion_texto ?? detalleObj.observacion_texto ?? registro?.observaciones ?? ""
+      : "",
+    imagenes,
   };
 };
 
+function escapeHtml(valor) {
+  return String(valor ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 const renderFila = (registro) => {
-  const registroDataString = JSON.stringify(registro || {}).replace(
-    /"/g,
-    "&quot;"
-  );
+  const id = String(registro?.id ?? "");
   return `
-    <tr class="odd:bg-gray-50 even:bg-white text-gray-700 text-sm leading-relaxed">
-      <td class="px-3 py-2">${registro.fecha || "-"}</td>
-      <td class="px-3 py-2">${registro.hora || "-"}</td>
-      <td class="px-3 py-2">${registro.empresa || "-"}</td>
-      <td class="px-3 py-2 font-semibold text-gray-900">${
-        registro.placa || "-"
-      }</td>
-      <td class="px-3 py-2">${registro.chofer || "-"}</td>
-      <td class="px-3 py-2">${registro.lugar || "-"}</td>
-      <td class="px-3 py-2">${registro.incorreccion || "-"}</td>
-      <td class="px-3 py-2">${registro.responsable || "-"}</td>
-      <td class="px-3 py-2 text-center">
-        <button
-          type="button"
-          class="btn-ver-detalle flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md ring-1 ring-black/10 focus-visible:outline-none focus-visible:ring-2 transition hover:opacity-90"
-          data-registro="${registroDataString}"
-          title="Ver detalle"
-          aria-label="Ver detalle"
-          style="background-color: #0b1a2a; border: 1px solid rgba(15,23,42,0.35);"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 5.5C7.5 5.5 3.73 8.11 2 12c1.73 3.89 5.5 6.5 10 6.5s8.27-2.61 10-6.5c-1.73-3.89-5.5-6.5-10-6.5Zm0 10.44A3.94 3.94 0 1 1 15.94 12 3.94 3.94 0 0 1 12 15.94Zm0-6.38A2.44 2.44 0 1 0 14.44 12 2.44 2.44 0 0 0 12 9.56Z" fill="currentColor"/>
-          </svg>
+    <tr>
+      <td>${escapeHtml(registro.fecha || "-")}</td>
+      <td>${escapeHtml(registro.hora || "-")}</td>
+      <td>${escapeHtml(registro.empresa || "-")}</td>
+      <td><strong>${escapeHtml(registro.placa || "-")}</strong></td>
+      <td>${escapeHtml(registro.chofer || "-")}</td>
+      <td>${escapeHtml(registro.lugar || "-")}</td>
+      <td>${escapeHtml(registro.incorreccion || "-")}</td>
+      <td>${escapeHtml(registro.responsable || "-")}</td>
+      <td>
+        <button type="button" class="btn-ver-detalle tpp-btn" data-id="${escapeHtml(id)}">
+          <i class="fa-regular fa-eye" aria-hidden="true"></i>
+          Ver detalle
         </button>
       </td>
     </tr>
   `;
 };
 
+function filtrarRegistros() {
+  const filtro = filtroActual.trim().toUpperCase();
+  const lista = filtro
+    ? registros.filter((registro) => String(registro?.placa || "").toUpperCase().includes(filtro))
+    : registros;
+
+  renderRegistros(lista);
+
+  if (filtro && !lista.length) {
+    mostrarEstado("warning", `No se encontraron inspecciones para la placa “${filtroActual}”.`);
+  } else {
+    ocultarEstado();
+  }
+}
+
+function renderRegistros(lista) {
+  const cuerpo = document.getElementById(TABLA_ID);
+  if (!cuerpo) return;
+
+  if (!lista.length) {
+    cuerpo.innerHTML =
+      '<tr><td colspan="9" style="padding:28px;text-align:center;color:#6e6e73">No hay registros disponibles.</td></tr>';
+    return;
+  }
+
+  cuerpo.innerHTML = lista.map(renderFila).join("");
+}
+
 const cargarRegistros = async () => {
   const cuerpo = document.getElementById(TABLA_ID);
   if (!cuerpo) return;
 
   cuerpo.innerHTML =
-    '<tr><td colspan="9" class="text-center py-4 text-gray-500">Cargando registros...</td></tr>';
+    '<tr><td colspan="9" style="padding:28px;text-align:center;color:#6e6e73">Cargando registros…</td></tr>';
+  mostrarEstado("info", "Consultando inspecciones…");
 
   const { data, error } = await supabase
     .from("inspecciones")
@@ -131,57 +175,51 @@ const cargarRegistros = async () => {
 
   if (error) {
     console.error("Error al cargar registros:", error.message);
-    cuerpo.innerHTML =
-      '<tr><td colspan="9" class="py-3 text-center text-red-600">Error al cargar los datos.</td></tr>';
+    registros = [];
+    renderRegistros([]);
+    mostrarEstado("error", "No se pudieron cargar los registros. Revisa la conexión e inténtalo nuevamente.");
     return;
   }
 
-  if (!data || !data.length) {
-    cuerpo.innerHTML =
-      '<tr><td colspan="9" class="py-3 text-center text-gray-500">No hay registros disponibles.</td></tr>';
-    return;
-  }
+  registros = Array.isArray(data) ? data : [];
+  filtrarRegistros();
 
-  cuerpo.innerHTML = data.map(renderFila).join("");
+  if (!registros.length) {
+    mostrarEstado("info", "Aún no existen inspecciones registradas.");
+  }
 };
 
 const activarFiltroPlaca = () => {
   const input = document.getElementById(BUSCAR_PLACA_ID);
   if (!input) return;
 
-  input.addEventListener("input", function () {
-    const filtro = this.value.trim().toUpperCase();
-    const filas = document.querySelectorAll(`#${TABLA_ID} tr`);
-
-    filas.forEach((fila) => {
-      const celdaPlaca = fila.cells?.[3];
-      if (!celdaPlaca) return;
-      const coincide = celdaPlaca.textContent.toUpperCase().includes(filtro);
-      fila.style.display = coincide ? "" : "none";
-    });
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase();
+    filtroActual = input.value;
+    filtrarRegistros();
   });
 };
 
 const initRegistros = () => {
   const tabla = document.getElementById(TABLA_ID);
-  if (!tabla) return;
+  if (!tabla || tabla.dataset.bound === "1") return;
+  tabla.dataset.bound = "1";
 
-  cargarRegistros();
+  void cargarRegistros();
   activarFiltroPlaca();
 
-  document.body.addEventListener("click", (event) => {
+  tabla.addEventListener("click", (event) => {
     const boton = event.target.closest(".btn-ver-detalle");
-    if (!boton?.dataset?.registro) return;
+    const id = boton?.dataset?.id;
+    if (!id) return;
 
-    try {
-      const registro = JSON.parse(
-        boton.dataset.registro.replace(/&quot;/g, '"')
-      );
-      const payload = construirPayloadDetalle(registro);
-      mostrarDetalleMampara(payload);
-    } catch (error) {
-      console.error("Error parsing registro data from button:", error);
+    const registro = registros.find((item) => String(item?.id ?? "") === String(id));
+    if (!registro) {
+      mostrarEstado("error", "No se pudo encontrar el registro seleccionado.");
+      return;
     }
+
+    mostrarDetalleMampara(construirPayloadDetalle(registro));
   });
 };
 
