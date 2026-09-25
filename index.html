@@ -3,15 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TPP — Seguridad</title>
-
+  <title>Seguridad</title>
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" href="./favicon.ico" />
-  <meta name="theme-color" content="#202124" />
-
+  <meta name="theme-color" content="#14263e" />
   <link rel="stylesheet" href="./CSS/tailwind.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="./CSS/dashboard/dashboard.css" />
   <link rel="stylesheet" href="./CSS/apple-redesign.css" />
 </head>
@@ -19,122 +16,73 @@
   <div id="sidebar-container"></div>
 
   <main id="dashboardContent">
-    <section id="dashboardView">
-      <header class="dashboard-hero">
-        <div class="dashboard-hero-copy">
-          <p class="ui-eyebrow">Terminales Portuarios Peruanos</p>
-          <h1>Control de Seguridad</h1>
-          <p>Registra incidencias, inspecciona unidades y revisa evidencias desde un único espacio operativo.</p>
+    <div class="v3-shell">
+      <section class="v3-section">
+        <div class="v3-section-head">
+          <h2>Informes de incidencias</h2>
+          <span>Documentación operativa</span>
         </div>
-        <div class="health-pill"><span></span> Sistema operativo</div>
-      </header>
+        <div class="v3-directory">
+          <button class="v3-dir-row" type="button" onclick="navigateToFormulario('CABLE')">
+            <span class="v3-dir-accent"></span>
+            <strong>Cable RH</strong>
+            <p>Sustracción de cable en unidades Reefer. Plantilla documental con evidencias.</p>
+            <span class="v3-dir-action">Crear informe <b>›</b></span>
+          </button>
+          <button class="v3-dir-row amber" type="button" onclick="navigateToFormulario('MERCADERIA')">
+            <span class="v3-dir-accent"></span>
+            <strong>Mercadería</strong>
+            <p>Registro de pérdida de carga, hechos, análisis, conclusiones y anexos.</p>
+            <span class="v3-dir-action">Crear informe <b>›</b></span>
+          </button>
+          <button class="v3-dir-row red" type="button" onclick="navigateToFormulario('CHOQUE')">
+            <span class="v3-dir-accent"></span>
+            <strong>Choque</strong>
+            <p>Informe de colisión con datos de unidad, secuencia de hechos y evidencia.</p>
+            <span class="v3-dir-action">Crear informe <b>›</b></span>
+          </button>
+          <button class="v3-dir-row red" type="button" onclick="navigateToFormulario('SINIESTRO')">
+            <span class="v3-dir-accent"></span>
+            <strong>Siniestro</strong>
+            <p>Eventos extraordinarios con trazabilidad documental completa.</p>
+            <span class="v3-dir-action">Crear informe <b>›</b></span>
+          </button>
+        </div>
+      </section>
 
-      <div class="dashboard-groups">
-        <section>
-          <div class="dashboard-group-head">
-            <h2>Informes de incidencias</h2>
-            <span>Crear y consultar documentación operativa</span>
-          </div>
-          <div class="module-grid">
-            <button class="module-tile primary" type="button" onclick="navigateToFormulario('CABLE')">
-              <div class="module-tile-top">
-                <span class="module-icon"><i class="fas fa-bolt"></i></span>
-                <span class="module-arrow">›</span>
-              </div>
-              <div>
-                <strong>Cable RH</strong>
-                <p>Sustracción de cable en unidades Reefer.</p>
-              </div>
-            </button>
-
-            <button class="module-tile" type="button" onclick="navigateToFormulario('MERCADERIA')">
-              <div class="module-tile-top">
-                <span class="module-icon"><i class="fas fa-box-open"></i></span>
-                <span class="module-arrow">›</span>
-              </div>
-              <div>
-                <strong>Mercadería</strong>
-                <p>Registro documental de sustracción de carga.</p>
-              </div>
-            </button>
-
-            <button class="module-tile" type="button" onclick="navigateToFormulario('CHOQUE')">
-              <div class="module-tile-top">
-                <span class="module-icon"><i class="fas fa-car-burst"></i></span>
-                <span class="module-arrow">›</span>
-              </div>
-              <div>
-                <strong>Choque</strong>
-                <p>Informe de colisiones e incidentes vehiculares.</p>
-              </div>
-            </button>
-
-            <button class="module-tile" type="button" onclick="navigateToFormulario('SINIESTRO')">
-              <div class="module-tile-top">
-                <span class="module-icon"><i class="fas fa-fire"></i></span>
-                <span class="module-arrow">›</span>
-              </div>
-              <div>
-                <strong>Siniestro</strong>
-                <p>Registro de eventos no contemplados o extraordinarios.</p>
-              </div>
-            </button>
-          </div>
-        </section>
-
-        <section>
-          <div class="dashboard-group-head">
-            <h2>Inspecciones de Mamparas</h2>
-            <span>Registro, histórico y exportación</span>
-          </div>
-          <div class="module-grid">
-            <button class="module-tile accent" type="button" onclick="navigateToMamparasView('registro')">
-              <div class="module-tile-top">
-                <span class="module-icon"><i class="fas fa-warehouse"></i></span>
-                <span class="module-arrow">›</span>
-              </div>
-              <div>
-                <strong>Nueva inspección</strong>
-                <p>Registra unidad, medidas, incorrección y evidencia fotográfica.</p>
-              </div>
-            </button>
-
-            <button class="module-tile" type="button" onclick="navigateToMamparasView('registros')">
-              <div class="module-tile-top">
-                <span class="module-icon"><i class="fas fa-list"></i></span>
-                <span class="module-arrow">›</span>
-              </div>
-              <div>
-                <strong>Registros</strong>
-                <p>Consulta inspecciones y abre su evidencia completa.</p>
-              </div>
-            </button>
-
-            <button class="module-tile" type="button" onclick="navigateToMamparasView('reportes')">
-              <div class="module-tile-top">
-                <span class="module-icon"><i class="fas fa-file-export"></i></span>
-                <span class="module-arrow">›</span>
-              </div>
-              <div>
-                <strong>Reportes</strong>
-                <p>Genera el formato corporativo F-OPESEG-045.</p>
-              </div>
-            </button>
-
-            <button class="module-tile" type="button" onclick="navigateToRegistrosGenerales()">
-              <div class="module-tile-top">
-                <span class="module-icon"><i class="fas fa-folder-open"></i></span>
-                <span class="module-arrow">›</span>
-              </div>
-              <div>
-                <strong>Todos los informes</strong>
-                <p>Revisa incidencias guardadas sin filtrar por tipo.</p>
-              </div>
-            </button>
-          </div>
-        </section>
-      </div>
-    </section>
+      <section class="v3-section">
+        <div class="v3-section-head">
+          <h2>Inspecciones de Mamparas</h2>
+          <span>Registro, histórico y exportación</span>
+        </div>
+        <div class="v3-directory">
+          <button class="v3-dir-row teal" type="button" onclick="navigateToMamparasView('registro')">
+            <span class="v3-dir-accent"></span>
+            <strong>Nueva inspección</strong>
+            <p>Unidad, operación, hallazgo, medidas y fotografía en un solo flujo.</p>
+            <span class="v3-dir-action">Registrar <b>›</b></span>
+          </button>
+          <button class="v3-dir-row teal" type="button" onclick="navigateToMamparasView('registros')">
+            <span class="v3-dir-accent"></span>
+            <strong>Registros</strong>
+            <p>Histórico filtrable con acceso directo al detalle y evidencia.</p>
+            <span class="v3-dir-action">Consultar <b>›</b></span>
+          </button>
+          <button class="v3-dir-row" type="button" onclick="navigateToMamparasView('reportes')">
+            <span class="v3-dir-accent"></span>
+            <strong>Reportes</strong>
+            <p>Genera el formato corporativo F-OPESEG-045.</p>
+            <span class="v3-dir-action">Exportar <b>›</b></span>
+          </button>
+          <button class="v3-dir-row" type="button" onclick="navigateToRegistrosGenerales()">
+            <span class="v3-dir-accent"></span>
+            <strong>Todos los informes</strong>
+            <p>Consulta incidencias guardadas sin filtrar por tipo.</p>
+            <span class="v3-dir-action">Abrir <b>›</b></span>
+          </button>
+        </div>
+      </section>
+    </div>
   </main>
 
   <script type="module">
@@ -144,15 +92,10 @@
     initializeSidebarState();
 
     const navigate = (path) => {
-      window.dispatchEvent(
-        new CustomEvent("sidebar:navigate", { detail: withBase(path) })
-      );
+      window.dispatchEvent(new CustomEvent("sidebar:navigate", { detail: withBase(path) }));
     };
 
-    window.navigateToFormulario = (tipo) => {
-      if (tipo) navigate(`html/formulario.html?tipo=${tipo}`);
-    };
-
+    window.navigateToFormulario = (tipo) => tipo && navigate(`html/formulario.html?tipo=${tipo}`);
     window.navigateToMamparasView = (view) => {
       const map = {
         registro: "html/formulario-mamparas/registro.html",
@@ -161,13 +104,11 @@
       };
       if (map[view]) navigate(map[view]);
     };
-
     window.navigateToRegistrosGenerales = () => navigate("html/registros.html");
 
     if ("serviceWorker" in navigator) {
       const scope = BASE_PATH ? `${BASE_PATH}/` : "./";
-      navigator.serviceWorker
-        .register(withBase("service-worker.js"), { scope })
+      navigator.serviceWorker.register(withBase("service-worker.js"), { scope })
         .catch((err) => console.error("Error registrando SW", err));
     }
 
