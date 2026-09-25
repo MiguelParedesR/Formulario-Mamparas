@@ -1,8 +1,19 @@
 // =============================================================
 // progreso.js
-// Calculo estandarizado del avance de un informe de incidencia
-// Compatible con formulario.js, registros.js, dashboard y DOCX.
+// Regla canónica de avance para informes de incidencia.
+// Un informe completo exige contenido real en todas sus secciones,
+// datos específicos por tipo y al menos una evidencia.
 // =============================================================
+
+function tieneContenidoReal(valor) {
+  if (valor === null || valor === undefined) return false;
+
+  const texto = String(valor);
+  return texto
+    .split("\n")
+    .map((linea) => linea.replace(/^\s*\d+[.)-]?\s*/, "").trim())
+    .some(Boolean);
+}
 
 export function calcularProgresoInforme(datos = {}) {
   if (!datos) return progresoVacio();
@@ -16,43 +27,45 @@ export function calcularProgresoInforme(datos = {}) {
   };
 
   const basicos = [
-    { key: "asunto", valor: datos.asunto },
-    { key: "dirigidoA", valor: datos.dirigido_a ?? datos.dirigidoA },
-    { key: "remitente", valor: datos.remitente },
-    { key: "fechaInforme", valor: datos.fecha_informe ?? datos.fechaInforme },
-    { key: "hechos", valor: campos.hechos },
-    { key: "analisis", valor: datos.analisis },
-    { key: "conclusiones", valor: datos.conclusiones },
-    { key: "recomendaciones", valor: datos.recomendaciones },
+    { key: "asunto", valor: datos.asunto, texto: false },
+    { key: "dirigidoA", valor: datos.dirigido_a ?? datos.dirigidoA, texto: false },
+    { key: "remitente", valor: datos.remitente, texto: false },
+    { key: "fechaInforme", valor: datos.fecha_informe ?? datos.fechaInforme, texto: false },
+    { key: "introduccion", valor: campos.introduccion ?? datos.introduccion, texto: true },
+    { key: "hechos", valor: campos.hechos, texto: true },
+    { key: "analisis", valor: datos.analisis, texto: true },
+    { key: "conclusiones", valor: datos.conclusiones, texto: true },
+    { key: "recomendaciones", valor: datos.recomendaciones, texto: true },
   ];
 
   if (tipo === "CABLE" || tipo === "MERCADERIA") {
-    basicos.push({ key: "contenedor", valor: valorExtra.contenedor });
+    basicos.push({ key: "contenedor", valor: valorExtra.contenedor, texto: false });
   } else if (tipo === "CHOQUE") {
-    basicos.push({ key: "placa", valor: valorExtra.placa });
+    basicos.push({ key: "placa", valor: valorExtra.placa, texto: false });
   } else if (tipo === "SINIESTRO") {
-    basicos.push({ key: "contenedor", valor: valorExtra.contenedor });
-    basicos.push({ key: "placa", valor: valorExtra.placa });
+    basicos.push({ key: "contenedor", valor: valorExtra.contenedor, texto: false });
+    basicos.push({ key: "placa", valor: valorExtra.placa, texto: false });
   }
 
   let completados = 0;
   const faltantes = [];
 
-  basicos.forEach(({ key, valor }) => {
-    if (valor !== null && valor !== undefined && String(valor).trim() !== "") {
-      completados++;
-    } else {
-      faltantes.push(key);
-    }
+  basicos.forEach(({ key, valor, texto }) => {
+    const completo = texto
+      ? tieneContenidoReal(valor)
+      : valor !== null && valor !== undefined && String(valor).trim() !== "";
+
+    if (completo) completados += 1;
+    else faltantes.push(key);
   });
 
-  let total = basicos.length;
+  // Evidencias forman parte de la regla de completitud.
+  const anexos = Array.isArray(datos.anexos) ? datos.anexos : [];
+  const tieneAnexos = anexos.length > 0;
+  const total = basicos.length + 1;
 
-  const anexos = datos.anexos;
-  if (Array.isArray(anexos) && anexos.length > 0) {
-    total += 1;
-    completados += 1;
-  }
+  if (tieneAnexos) completados += 1;
+  else faltantes.push("anexos");
 
   const porcentaje = total === 0 ? 0 : Math.round((completados / total) * 100);
   const estado = porcentaje === 100 ? "COMPLETO" : "BORRADOR";
@@ -81,24 +94,17 @@ export function actualizarBarraProgreso(porcentaje) {
   const label = document.getElementById("progressLabel");
   const status = document.getElementById("progressStatus");
 
-  if (!barra || !label || !status) return;
+  if (barra) barra.style.width = `${porcentaje}%`;
+  if (label) label.textContent = `${porcentaje}%`;
 
-  barra.style.width = `${porcentaje}%`;
-
-  if (porcentaje < 50)
-    barra.className = "h-2 bg-red-500 rounded-full transition-all duration-300";
-  else if (porcentaje < 99)
-    barra.className = "h-2 bg-amber-500 rounded-full transition-all duration-300";
-  else barra.className = "h-2 bg-green-600 rounded-full transition-all duration-300";
-
-  label.textContent = `${porcentaje}%`;
-
-  if (porcentaje === 100) {
-    status.textContent = "Informe completo. Puedes exportar o finalizar.";
-    status.className = "mt-1 text-[11px] text-green-700 font-semibold";
-  } else {
-    status.textContent = "Puedes guardar como borrador. Campos pendientes.";
-    status.className = "mt-1 text-[11px] text-gray-500";
+  if (status) {
+    if (porcentaje === 100) {
+      status.textContent = "Informe completo. Puedes exportar o finalizar.";
+      status.className = "form-status form-status--success is-visible";
+    } else {
+      status.textContent = "Puedes guardar como borrador. Aún hay campos pendientes.";
+      status.className = "form-status form-status--info is-visible";
+    }
   }
 }
 
@@ -114,17 +120,15 @@ export function activarAutoProgreso(obtenerDatos) {
 
   form.addEventListener("input", recalcular);
   form.addEventListener("change", recalcular);
-
   setTimeout(recalcular, 150);
 }
 
 export function obtenerEstadoListado(informe) {
   const progreso = calcularProgresoInforme(informe);
 
-  let color = "bg-red-500";
-  if (progreso.porcentaje >= 50 && progreso.porcentaje < 100)
-    color = "bg-amber-500";
-  if (progreso.porcentaje === 100) color = "bg-green-600";
+  let color = "red";
+  if (progreso.porcentaje >= 50 && progreso.porcentaje < 100) color = "amber";
+  if (progreso.porcentaje === 100) color = "green";
 
   return {
     porcentaje: progreso.porcentaje,
