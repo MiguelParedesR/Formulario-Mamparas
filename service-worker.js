@@ -1,26 +1,21 @@
-﻿const detectBasePath = () => {
+const detectBasePath = () => {
   const segments = self.location.pathname.split("/").filter(Boolean);
   if (!segments.length) return "";
   const last = segments[segments.length - 1];
   const isFile = /\.[a-z0-9]+$/i.test(last);
   const baseSegments = isFile ? segments.slice(0, -1) : segments;
-  if (!baseSegments.length) return "";
-  return `/${baseSegments[0]}`;
+  return baseSegments.length ? `/${baseSegments[0]}` : "";
 };
 
 const BASE_PATH = detectBasePath();
-
 const asset = (path = "") => {
   const cleaned = path.replace(/^\/+/, "");
-  if (!BASE_PATH) return cleaned;
-  return `${BASE_PATH}/${cleaned}`;
+  return BASE_PATH ? `${BASE_PATH}/${cleaned}` : cleaned;
 };
 
-// Incremento de versión para forzar actualización del cache
-const VERSION = "v7.138";
+const VERSION = "v7.139";
 const CACHE_NAME = `CCTV-${VERSION}${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
-// Archivos que intentaremos cachear si existen:
 const STATIC_ASSETS = [
   "CSS/global.css",
   "CSS/tailwind.css",
@@ -29,6 +24,7 @@ const STATIC_ASSETS = [
   "CSS/styles.css",
   "js/sidebar/sidebar-loader.js",
   "js/sidebar/sidebar.js",
+  "js/mamparas/reportes.js",
   "js/libs/docxtemplater-image-module.js",
   "js/dashboard/dashboard.js",
   "manifest.json",
@@ -37,133 +33,79 @@ const STATIC_ASSETS = [
 
 const STATIC_FILE_REGEX = /\.(css|js|png|jpg|jpeg|svg|webp|ico)$/i;
 
-// ============================================================================
-// INSTALL - Cachea solo los archivos que EXISTEN (modo seguro)
-// ============================================================================
 self.addEventListener("install", (event) => {
-  console.log("[SW] Instalando...");
-
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE_NAME);
-
       for (const url of STATIC_ASSETS) {
         try {
           const res = await fetch(url, { cache: "no-cache" });
-          if (res.ok) {
-            await cache.put(url, res.clone());
-            console.log("[SW] Cacheado:", url);
-          } else {
-            console.warn("[SW] Archivo no existe, omitido:", url);
-          }
-        } catch (err) {
-          console.warn("[SW] Error cacheando (omitido):", url);
+          if (res.ok) await cache.put(url, res.clone());
+        } catch {
+          // Los assets opcionales no bloquean la instalación.
         }
       }
-
       await self.skipWaiting();
     })()
   );
 });
 
-// ============================================================================
-// ACTIVATE - Limpieza de caches antiguos
-// ============================================================================
 self.addEventListener("activate", (event) => {
-  console.log("[SW] Activado");
-
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
-      await Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => {
-            console.log("[SW] Eliminando cache viejo:", key);
-            return caches.delete(key);
-          })
-      );
-
+      await Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)));
       await self.clients.claim();
     })()
   );
 });
 
-// ============================================================================
-// FETCH - Estrategia combinada
-// ============================================================================
-// - Network-first para HTML (SPA nunca se rompe)
-// - Cache-first para CSS/JS/IMG
-// - Ignoramos Supabase
-// ============================================================================
+async function networkFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  try {
+    const response = await fetch(request, { cache: "no-cache" });
+    if (response.ok) await cache.put(request, response.clone());
+    return response;
+  } catch {
+    return (await cache.match(request)) || Response.error();
+  }
+}
+
+async function cacheFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+
+  try {
+    const response = await fetch(request);
+    if (response.ok) await cache.put(request, response.clone());
+    return response;
+  } catch {
+    return Response.error();
+  }
+}
 
 self.addEventListener("fetch", (event) => {
-  const req = event.request;
-  const url = new URL(req.url);
+  const request = event.request;
+  if (request.method !== "GET") return;
 
-  if (
-    req.method !== "GET" ||
-    url.protocol !== "http:" && url.protocol !== "https:" ||
-    url.origin !== self.location.origin ||
-    url.href.includes("supabase.co")
-  ) {
+  const url = new URL(request.url);
+  if (!["http:", "https:"].includes(url.protocol)) return;
+  if (url.origin !== self.location.origin) return;
+  if (url.href.includes("supabase.co")) return;
+
+  const isHtml =
+    request.mode === "navigate" ||
+    request.headers.get("accept")?.includes("text/html");
+
+  if (isHtml || /\.(js|css)$/i.test(url.pathname)) {
+    event.respondWith(networkFirst(request));
     return;
   }
 
-  // Vista SPA: siempre desde red
-  if (req.headers.get("accept")?.includes("text/html")) {
-    event.respondWith(fetch(req).catch(() => caches.match(req)));
-    return;
-  }
-
-  event.respondWith(
-    (async () => {
-      const cached = await caches.match(req);
-      if (cached) return cached;
-
-      try {
-        const networkRes = await fetch(req);
-
-        if (networkRes.ok && STATIC_FILE_REGEX.test(url.pathname)) {
-          const cache = await caches.open(CACHE_NAME);
-          await cache.put(req, networkRes.clone());
-        }
-
-        return networkRes;
-      } catch (err) {
-        return cached || Response.error();
-      }
-    })()
-  );
-});
-
-// Forzar actualización de archivos críticos
-self.addEventListener("fetch", (event) => {
-  const req = event.request;
-
-  if (STATIC_FILE_REGEX.test(req.url)) {
-    event.respondWith(
-      (async () => {
-        const cache = await caches.open(CACHE_NAME);
-        const cachedResponse = await cache.match(req);
-
-        if (cachedResponse) {
-          // Forzar actualización desde la red
-          const networkResponse = await fetch(req);
-          if (networkResponse.ok) {
-            cache.put(req, networkResponse.clone());
-            return networkResponse;
-          }
-          return cachedResponse;
-        }
-
-        return fetch(req);
-      })()
-    );
+  if (STATIC_FILE_REGEX.test(url.pathname)) {
+    event.respondWith(cacheFirst(request));
   }
 });
 
-// ============================================================================
-// LOG
-// ============================================================================
-console.log("[SW] Modo Seguro TPP activo");
+console.log("[SW] TPP cache strategy v7.139 active");
