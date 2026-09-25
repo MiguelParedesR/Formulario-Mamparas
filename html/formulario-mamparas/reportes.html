@@ -1,4 +1,4 @@
-<!-- 🚫 NO BORRAR — Bloque restaurado/corregido del m&oacute;dulo Mamparas -->
+<!-- MÓDULO MAMPARAS — REPORTES -->
 <main class="mamparas-root p-6 space-y-6 text-gray-800">
   <div class="space-y-1">
     <h1 class="text-2xl font-bold flex items-center gap-3 text-slate-900">
@@ -6,68 +6,59 @@
       Reportes
     </h1>
     <p class="text-sm text-gray-600">
-      Exporta los registros filtrando por mes y operador. Puedes usar la opci&oacute;n &ldquo;Todos&rdquo; para
-      descargar el hist&oacute;rico.
+      Exporta el registro de faltas o incorrecciones por mes y operador usando el formato corporativo F-OPESEG-045.
     </p>
   </div>
 
   <section class="mamparas-panel bg-white border border-gray-100 rounded-2xl shadow-xl p-6 sm:p-8 space-y-6">
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <div class="space-y-2">
-        <label class="block text-sm font-semibold text-gray-700" for="mes">
-          Seleccionar mes
-        </label>
+        <label class="block text-sm font-semibold text-gray-700" for="mes">Seleccionar mes</label>
         <div class="input-icon-wrapper">
-          <span class="input-icon">
-            <i class="far fa-calendar-alt"></i>
-          </span>
+          <span class="input-icon"><i class="far fa-calendar-alt"></i></span>
           <input
             class="w-full rounded-xl border border-gray-200 bg-white pr-4 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-            type="month" id="mes" />
+            type="month"
+            id="mes"
+          />
         </div>
-        <p class="text-xs text-gray-500">El per&iacute;odo se aplica sobre los registros de Supabase.</p>
+        <p class="text-xs text-gray-500">El período se aplica sobre los registros de inspecciones.</p>
       </div>
 
       <div class="space-y-2">
-        <label class="block text-sm font-semibold text-gray-700" for="operador">
-          Seleccionar operador
-        </label>
+        <label class="block text-sm font-semibold text-gray-700" for="operador">Seleccionar operador</label>
         <div class="input-icon-wrapper">
-          <span class="input-icon">
-            <i class="fas fa-user-check"></i>
-          </span>
+          <span class="input-icon"><i class="fas fa-user-check"></i></span>
           <select
             class="w-full rounded-xl border border-gray-200 bg-white py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 appearance-none has-right-icon"
-            id="operador">
+            id="operador"
+          >
             <option value="Todos">Todos (sin filtro)</option>
           </select>
-
         </div>
+      </div>
+    </div>
 
-        <button id="btnExportarExcel"
-          class="px-6 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold shadow-lg hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 flex items-center gap-2 w-fit">
-          <i class="fas fa-download text-xs"></i>
-          <span>Exportar a Excel</span>
-        </button>
+    <div class="flex flex-wrap items-center gap-3">
+      <button
+        id="btnExportarExcel"
+        type="button"
+        class="px-6 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold shadow-lg hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 flex items-center gap-2 w-fit"
+      >
+        <i class="fas fa-download text-xs"></i>
+        <span>Generar Excel F-OPESEG-045</span>
+      </button>
+      <span class="text-xs text-gray-500">Se genera un archivo .xlsx con el formato histórico del módulo.</span>
+    </div>
   </section>
 </main>
 
-<!-- MODAL FEEDBACK -->
 <div id="feedbackModal" class="fixed inset-0 bg-black/40 items-center justify-center" style="display:none;">
   <div class="bg-white rounded-2xl shadow-2xl w-72 p-5 text-center space-y-3 modal-inner">
-    <div id="loadingAnimation"
-      class="mx-auto h-10 w-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+    <div id="loadingAnimation" class="mx-auto h-10 w-10 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
     <p id="feedbackMessage" class="message text-sm font-medium"></p>
   </div>
 </div>
 
-<!-- LIBRER&Iacute;AS NECESARIAS -->
-<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
-<!-- SCRIPT PRINCIPAL DEL M&Oacute;DULO -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script type="module" src="../../js/mamparas/reportes.js"></script>
-<script>
-  // 🚫 NO BORRAR — QA Mamparas
-  console.log("QA Mamparas: archivo restaurado");
-</script>
