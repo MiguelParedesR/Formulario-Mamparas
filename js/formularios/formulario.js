@@ -31,6 +31,43 @@ const VALID_ANEXO_FORMATS = [
 
 const VALID_ANEXO_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "pdf"];
 const MAX_ANEXOS = 30;
+const MAX_ANEXO_SIZE_BYTES = 12 * 1024 * 1024;
+const formFeedback = document.getElementById("formFeedback");
+const evidenceCount = document.getElementById("evidenceCount");
+let guardandoIncidencia = false;
+
+function mostrarFeedbackFormulario(mensaje, tono = "info") {
+  if (!formFeedback) return;
+  formFeedback.textContent = mensaje;
+  formFeedback.dataset.tone = tono;
+  formFeedback.classList.add("is-visible");
+}
+
+function limpiarFeedbackFormulario() {
+  if (!formFeedback) return;
+  formFeedback.textContent = "";
+  formFeedback.classList.remove("is-visible");
+}
+
+function tieneContenidoReal(input) {
+  if (!input) return false;
+  const raw = String(input.value || "").trim();
+  if (!raw) return false;
+  if (input.tagName === "TEXTAREA") {
+    return raw
+      .split("\n")
+      .some((linea) => linea.replace(/^\s*\d+[.)-]?\s*/, "").trim().length > 0);
+  }
+  return true;
+}
+
+function setGuardando(guardando) {
+  guardandoIncidencia = guardando;
+  ["btnGuardarBorrador", "btnGuardarCompleto", "btnExportarWord"].forEach((id) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = guardando;
+  });
+}
 
 /* ---------------------------------------------------------------------------
    REFERENCIAS A ELEMENTOS DEL DOM
@@ -243,9 +280,7 @@ function recalcularProgreso() {
   if (extraRefs.placa) camposRequired.push(extraRefs.placa);
 
   const total = camposRequired.length;
-  let llenos = camposRequired.filter(
-    (el) => el && el.value.trim() !== ""
-  ).length;
+  let llenos = camposRequired.filter((el) => tieneContenidoReal(el)).length;
 
   if (anexosArchivos.length > 0) llenos++;
 
@@ -257,7 +292,10 @@ function recalcularProgreso() {
   else if (progreso >= 50) color = "bg-amber-500";
 
   progressBar.style.width = progreso + "%";
-  progressBar.className = `h-2 rounded-full transition-all ${color}`;
+  progressBar.style.background =
+    progreso >= 100 ? "#147d64" : progreso >= 50 ? "#9a6700" : "#c9342f";
+  progressBar.className = "";
+  if (evidenceCount) evidenceCount.textContent = `${anexosArchivos.length} / ${MAX_ANEXOS}`;
 }
 /* ---------------------------------------------------------------------------
    VALIDAR FORMATO DE ARCHIVO
@@ -355,35 +393,37 @@ function renderizarAnexosPreview() {
 function agregarAnexos(files) {
   if (!files?.length) return;
 
+  limpiarFeedbackFormulario();
   const disponibles = MAX_ANEXOS - anexosArchivos.length;
   if (disponibles <= 0) {
-    return alert(`Solo se permiten ${MAX_ANEXOS} evidencias por informe.`);
+    mostrarFeedbackFormulario(`Solo se permiten ${MAX_ANEXOS} evidencias por informe.`, "warning");
+    return;
   }
 
   const permitidos = [];
   const rechazados = [];
+  const demasiadoGrandes = [];
 
   files.forEach((file) => {
-    if (esFormatoPermitido(file)) permitidos.push(file);
-    else rechazados.push(file.name);
+    if (!esFormatoPermitido(file)) rechazados.push(file.name);
+    else if (file.size > MAX_ANEXO_SIZE_BYTES) demasiadoGrandes.push(file.name);
+    else permitidos.push(file);
   });
 
-  if (rechazados.length) {
-    alert(`Formato no permitido: ${rechazados.join(", ")}`);
-  }
+  const avisos = [];
+  if (rechazados.length) avisos.push(`Formato no permitido: ${rechazados.join(", ")}`);
+  if (demasiadoGrandes.length) avisos.push(`Superan 12 MB: ${demasiadoGrandes.join(", ")}`);
+  if (avisos.length) mostrarFeedbackFormulario(avisos.join(" · "), "warning");
 
-  const seleccion = permitidos.slice(0, disponibles);
-
-  seleccion.forEach((file) => {
-    const entry = {
-      id: crypto.randomUUID?.() || "anexo-" + Date.now(),
+  permitidos.slice(0, disponibles).forEach((file) => {
+    anexosArchivos.push({
+      id: crypto.randomUUID?.() || "anexo-" + Date.now() + "-" + Math.random().toString(16).slice(2),
       file,
       name: file.name,
       type: file.type,
       url: URL.createObjectURL(file),
       descripcion: "",
-    };
-    anexosArchivos.push(entry);
+    });
   });
 
   sincronizarInputAnexos();
@@ -553,20 +593,21 @@ window.cerrarModalPreview = cerrarModalPreview;
 function validarCamposExtra() {
   const extra = obtenerValorExtra();
 
-  if ((tipoSeleccionado === "CABLE" || tipoSeleccionado === "MERCADERIA") &&
-      !extra.contenedor) {
-    alert("Completa la serie del contenedor.");
+  if ((tipoSeleccionado === "CABLE" || tipoSeleccionado === "MERCADERIA") && !extra.contenedor) {
+    mostrarFeedbackFormulario("Completa la serie del contenedor.", "warning");
+    extraRefs.contenedor?.focus();
     return false;
   }
 
   if (tipoSeleccionado === "CHOQUE" && !extra.placa) {
-    alert("Completa la placa de la unidad.");
+    mostrarFeedbackFormulario("Completa la placa de la unidad.", "warning");
+    extraRefs.placa?.focus();
     return false;
   }
 
-  if (tipoSeleccionado === "SINIESTRO" &&
-      (!extra.contenedor || !extra.placa)) {
-    alert("Completa contenedor y placa.");
+  if (tipoSeleccionado === "SINIESTRO" && (!extra.contenedor || !extra.placa)) {
+    mostrarFeedbackFormulario("Completa contenedor y placa antes de guardar el informe final.", "warning");
+    (!extra.contenedor ? extraRefs.contenedor : extraRefs.placa)?.focus();
     return false;
   }
 
@@ -591,7 +632,7 @@ async function procesarAnexos(idRegistro) {
     }));
   } catch (err) {
     console.error(err);
-    alert("Error al subir anexos.");
+    mostrarFeedbackFormulario("No se pudieron subir las evidencias.", "error");
     return [];
   }
 }
@@ -600,15 +641,22 @@ async function procesarAnexos(idRegistro) {
    GUARDAR INCIDENCIA (BORRADOR O COMPLETO)
 ============================================================================ */
 async function guardarIncidencia(estado = "BORRADOR") {
+  if (guardandoIncidencia) return;
+  limpiarFeedbackFormulario();
+
   if (!tipoSeleccionado) {
-    alert("No se detectÃ³ el tipo de incidencia.");
+    mostrarFeedbackFormulario("No se detectó el tipo de incidencia. Vuelve al dashboard y selecciona una plantilla.", "error");
     return;
   }
 
-  if (!validarCamposExtra()) return;
+  const esCompleto = estado === "COMPLETO";
+  if (esCompleto && !validarCamposExtra()) return;
+  if (esCompleto && obtenerProgresoActual() < 100) {
+    mostrarFeedbackFormulario("Completa todos los campos y agrega al menos una evidencia antes de guardar el informe final.", "warning");
+    return;
+  }
 
   const valorExtra = obtenerValorExtra();
-
   const payload = {
     tipo_incidencia: tipoSeleccionado,
     asunto: obtenerValorInput(asuntoInput),
@@ -627,31 +675,35 @@ async function guardarIncidencia(estado = "BORRADOR") {
     estado,
   };
 
-  console.log("Supabase payload:", payload);
-
-  const { data, error } = await supabase
-    .from("incidencias")
-    .insert([payload])
-    .select()
-    .single();
-
-  if (error) {
-    console.error("Supabase insert error:", error);
-    alert(error?.message || "Error guardando incidencia.");
-    return;
-  }
-
-  // Subir anexos a Storage
-  const anexos = await procesarAnexos(data.id);
-
-  if (anexos.length > 0) {
-    await supabase
+  setGuardando(true);
+  try {
+    const { data, error } = await supabase
       .from("incidencias")
-      .update({ anexos })
-      .eq("id", data.id);
-  }
+      .insert([payload])
+      .select()
+      .single();
 
-  alert("Informe guardado correctamente.");
+    if (error) throw error;
+
+    const anexos = await procesarAnexos(data.id);
+    if (anexos.length > 0) {
+      const { error: anexosError } = await supabase
+        .from("incidencias")
+        .update({ anexos })
+        .eq("id", data.id);
+      if (anexosError) throw anexosError;
+    }
+
+    mostrarFeedbackFormulario(
+      estado === "BORRADOR" ? "Borrador guardado correctamente." : "Informe guardado correctamente.",
+      "success"
+    );
+  } catch (error) {
+    console.error("Error guardando incidencia:", error);
+    mostrarFeedbackFormulario(error?.message || "No se pudo guardar el informe.", "error");
+  } finally {
+    setGuardando(false);
+  }
 }
 
 /* ============================================================================
@@ -874,7 +926,7 @@ document.getElementById("btnExportarWord")
       await generateWordFinal(payload);
     } catch (err) {
       console.error("âŒ Error exportando Word:", err);
-      alert("No se pudo generar el documento Word.");
+      mostrarFeedbackFormulario("No se pudo generar el documento Word.", "error");
     }
   });
 
