@@ -138,7 +138,9 @@ function setFieldVisualState(id, { marcarInvalido = false } = {}) {
   wrapper.classList.remove("is-error", "is-warning", "is-complete");
 
   if (id === "placa" && valid && estadoPlacaExterno?.message) {
-    wrapper.classList.add(estadoPlacaExterno.tone === "warning" ? "is-warning" : "is-complete");
+    if (estadoPlacaExterno.tone === "warning") wrapper.classList.add("is-warning");
+    else if (estadoPlacaExterno.tone === "error") wrapper.classList.add("is-error");
+    else wrapper.classList.add("is-complete");
     if (message) message.textContent = estadoPlacaExterno.message;
     return valid;
   }
@@ -1897,10 +1899,20 @@ function initValidacionPlaca() {
     }
 
     if (debounceId) clearTimeout(debounceId);
-    debounceId = setTimeout(() => {
-      if (valorNormalizado === ultimoValorConsultado) return;
+    debounceId = setTimeout(async () => {
+      if (
+        valorNormalizado === ultimoValorConsultado &&
+        estadoPlacaExterno?.tone !== "error"
+      ) {
+        return;
+      }
+
       ultimoValorConsultado = valorNormalizado;
-      consultarPlacaExistente(valorNormalizado);
+      await consultarPlacaExistente(valorNormalizado);
+
+      if (estadoPlacaExterno?.tone === "error") {
+        ultimoValorConsultado = "";
+      }
     }, VALIDACION_PLACA_DELAY);
   });
 }
