@@ -1,29 +1,29 @@
 {
   "name": "formulario-mamparas",
-  "version": "1.0.0",
-  "main": "service-worker.js",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:css": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind.css --minify",
-    "dev:css": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind.css --watch"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MiguelParedesR/Formulario-Mamparas.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/MiguelParedesR/Formulario-Mamparas/issues"
-  },
-  "homepage": "https://github.com/MiguelParedesR/Formulario-Mamparas#readme",
-  "description": "",
-  "devDependencies": {
-    "tailwindcss": "^3.4.14"
+    "dev": "vite",
+    "build": "npm run typecheck && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "build:css:legacy": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind.css --minify",
+    "dev:css:legacy": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind.css --watch"
   },
   "dependencies": {
     "docxtemplater": "^3.67.5",
-    "pizzip": "^3.2.0"
+    "exceljs": "^4.4.0",
+    "pizzip": "^3.2.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
   }
 }
