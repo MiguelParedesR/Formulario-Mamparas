@@ -1,167 +1,147 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TPP &mdash; Dashboard</title>
+  <title>TPP — Centro de Seguridad</title>
 
-  <!-- PWA -->
-  <link rel="manifest" href="./manifest.json" />\n  <link rel="icon" href="./favicon.ico" />
-  <meta name="theme-color" content="#2f3b52" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./favicon.ico" />
+  <meta name="theme-color" content="#f5f5f7" />
 
-  <!-- Tailwind -->
   <link rel="stylesheet" href="./CSS/tailwind.css" />
-
-  <!-- Font Awesome -->
+  <link rel="stylesheet" href="./CSS/global.css" />
+  <link rel="stylesheet" href="./CSS/apple-system.css" />
+  <link rel="stylesheet" href="./CSS/estilos-sidebar/sidebar.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  <!-- Dashboard CSS -->
-  <link rel="stylesheet" href="./CSS/dashboard/dashboard.css" />
-
-  <style>
-    body {
-      background-color: #f4f6f8;
-    }
-  </style>
 </head>
 
 <body>
-
-  <!-- SIDEBAR -->
   <div id="sidebar-container"></div>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <main id="dashboardContent" class="relative transition-all duration-300 ease-in-out lg:ml-[250px] p-4 sm:p-6 md:p-8">
-
-    <!-- =======================
-             DASHBOARD INTEGRADO
-        ======================= -->
-    <section id="dashboardView">
-
-      <!-- TITULO -->
-      <div class="fade-up">
-        <h1 class="text-3xl font-bold text-tpp-dark flex items-center gap-3">
-          <i class="fas fa-layer-group text-indigo-600"></i>
-          Dashboard de Incidencias
-        </h1>
-        <p class="text-sm text-gray-500 mt-1">
-          Seleccione el tipo de informe que desea generar o gestionar.
-        </p>
-      </div>
-
-      <!-- GRID -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 fade-up-delayed">
-
-        <!-- CABLE -->
-        <div onclick="navigateToFormulario('CABLE')"
-          class="dashboard-card bg-white border border-gray-200 shadow-md p-7 rounded-2xl relative cursor-pointer">
-          <div class="dashboard-icon-bg"><i class="fas fa-bolt"></i></div>
-
-          <div>
-            <div
-              class="w-12 h-12 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 text-2xl mb-4">
-              <i class="fas fa-bolt"></i>
-            </div>
-            <h2 class="text-xl font-semibold text-gray-800">Sustracci&oacute;n de Cable RH</h2>
-            <p class="text-sm text-gray-500 mt-1">Informe oficial para incidentes en Reefers.</p>
-          </div>
+  <main id="dashboardContent" class="transition-all duration-300 ease-in-out lg:ml-[250px]">
+    <section class="dashboard-modern">
+      <header class="dashboard-modern__hero">
+        <div>
+          <p class="tpp-eyebrow">Terminales Portuarios Peruanos · Seguridad</p>
+          <h1>Centro de Seguridad</h1>
+          <p>
+            Registra incidencias, inspecciona unidades y genera documentos operativos desde una sola plataforma.
+            Elige una tarea para comenzar.
+          </p>
         </div>
+        <div class="dashboard-modern__status"><span></span> Plataforma operativa</div>
+      </header>
 
-        <!-- MERCADERIA -->
-        <div onclick="navigateToFormulario('MERCADERIA')"
-          class="dashboard-card bg-white border border-gray-200 shadow-md p-7 rounded-2xl relative cursor-pointer">
-          <div class="dashboard-icon-bg"><i class="fas fa-box-open"></i></div>
-
-          <div>
-            <div
-              class="w-12 h-12 flex items-center justify-center rounded-full bg-yellow-50 text-yellow-600 text-2xl mb-4">
-              <i class="fas fa-box-open"></i>
+      <div class="dashboard-groups">
+        <section class="dashboard-group">
+          <div class="dashboard-group__head">
+            <div>
+              <p class="tpp-eyebrow">Informes</p>
+              <h2>Crear informe de incidencia</h2>
             </div>
-            <h2 class="text-xl font-semibold text-gray-800">Sustracci&oacute;n de Mercader&iacute;a</h2>
-            <p class="text-sm text-gray-500 mt-1">Informe detallado de p&eacute;rdida de carga.</p>
+            <p>Plantillas con exportación Word</p>
           </div>
-        </div>
 
-        <!-- CHOQUE -->
-        <div onclick="navigateToFormulario('CHOQUE')"
-          class="dashboard-card bg-white border border-gray-200 shadow-md p-7 rounded-2xl relative cursor-pointer">
-          <div class="dashboard-icon-bg"><i class="fas fa-car-crash"></i></div>
+          <div class="module-grid">
+            <button type="button" class="module-card" onclick="navigateToFormulario('CABLE')">
+              <div class="module-card__icon"><i class="fa-solid fa-bolt"></i></div>
+              <div>
+                <h3>Sustracción de Cable RH</h3>
+                <p>Informe de eventos asociados a reefers, cableado y ruta.</p>
+              </div>
+              <div class="module-card__meta"><span>Documento Word</span><span>›</span></div>
+            </button>
 
-          <div>
-            <div class="w-12 h-12 flex items-center justify-center rounded-full bg-red-50 text-red-600 text-2xl mb-4">
-              <i class="fas fa-car-crash"></i>
+            <button type="button" class="module-card" onclick="navigateToFormulario('MERCADERIA')">
+              <div class="module-card__icon"><i class="fa-solid fa-box-open"></i></div>
+              <div>
+                <h3>Sustracción de Mercadería</h3>
+                <p>Registro estructurado de pérdida o sustracción de carga.</p>
+              </div>
+              <div class="module-card__meta"><span>Documento Word</span><span>›</span></div>
+            </button>
+
+            <button type="button" class="module-card" onclick="navigateToFormulario('CHOQUE')">
+              <div class="module-card__icon"><i class="fa-solid fa-car-burst"></i></div>
+              <div>
+                <h3>Choque de Unidad</h3>
+                <p>Hechos, análisis, unidades involucradas y evidencias.</p>
+              </div>
+              <div class="module-card__meta"><span>Documento Word</span><span>›</span></div>
+            </button>
+
+            <button type="button" class="module-card" onclick="navigateToFormulario('SINIESTRO')">
+              <div class="module-card__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <div>
+                <h3>Siniestro</h3>
+                <p>Informe para eventos operativos no clasificados en los tipos anteriores.</p>
+              </div>
+              <div class="module-card__meta"><span>Documento Word</span><span>›</span></div>
+            </button>
+          </div>
+        </section>
+
+        <section class="dashboard-group">
+          <div class="dashboard-group__head">
+            <div>
+              <p class="tpp-eyebrow">Inspecciones</p>
+              <h2>Mamparas</h2>
             </div>
-            <h2 class="text-xl font-semibold text-gray-800">Choque de Unidad</h2>
-            <p class="text-sm text-gray-500 mt-1">Registro de incidentes vehiculares.</p>
+            <p>Control de unidades</p>
           </div>
-        </div>
 
-        <!-- SINIESTRO -->
-        <div onclick="navigateToFormulario('SINIESTRO')"
-          class="dashboard-card bg-white border border-gray-200 shadow-md p-7 rounded-2xl relative cursor-pointer">
-          <div class="dashboard-icon-bg"><i class="fas fa-fire"></i></div>
-
-          <div>
-            <div
-              class="w-12 h-12 flex items-center justify-center rounded-full bg-orange-50 text-orange-600 text-2xl mb-4">
-              <i class="fas fa-fire"></i>
+          <button type="button" class="module-card module-card--feature" onclick="navigateToMamparas()">
+            <div class="module-card__icon"><i class="fa-solid fa-truck"></i></div>
+            <div>
+              <h3>Registrar inspección</h3>
+              <p>Placa, empresa, hallazgo, medidas y proyección fotográfica en un flujo guiado.</p>
             </div>
-            <h2 class="text-xl font-semibold text-gray-800">Siniestro</h2>
-            <p class="text-sm text-gray-500 mt-1">Incidentes inesperados o de causa no determinada.</p>
+            <div class="module-card__meta"><span>Inspección + evidencias</span><span>›</span></div>
+          </button>
+
+          <div class="module-grid" style="margin-top:12px">
+            <button type="button" class="module-card" onclick="navigateToRegistros()">
+              <div class="module-card__icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+              <div><h3>Registros</h3><p>Consulta el histórico de inspecciones e incidencias.</p></div>
+              <div class="module-card__meta"><span>Histórico</span><span>›</span></div>
+            </button>
+
+            <button type="button" class="module-card" onclick="navigateToReportesMamparas()">
+              <div class="module-card__icon"><i class="fa-regular fa-file-excel"></i></div>
+              <div><h3>Reportes</h3><p>Genera el formato Excel corporativo F-OPESEG-045.</p></div>
+              <div class="module-card__meta"><span>Excel</span><span>›</span></div>
+            </button>
           </div>
-        </div>
-
-        <!-- MAMPARAS -->
-        <div onclick="navigateToMamparas()"
-          class="dashboard-card bg-white border border-gray-200 shadow-md p-7 rounded-2xl relative cursor-pointer">
-          <div class="dashboard-icon-bg"><i class="fas fa-warehouse"></i></div>
-
-          <div>
-            <div
-              class="w-12 h-12 flex items-center justify-center rounded-full bg-green-50 text-green-600 text-2xl mb-4">
-              <i class="fas fa-warehouse"></i>
-            </div>
-            <h2 class="text-xl font-semibold text-gray-800">Formulario Mamparas</h2>
-            <p class="text-sm text-gray-500 mt-1">Registro y reportes del m&oacute;dulo existente.</p>
-          </div>
-        </div>
-
+        </section>
       </div>
     </section>
   </main>
 
-  <!-- Navegacion SPA -->
   <script type="module">
     import { BASE_PATH, withBase } from "./js/config.js";
     import { initializeSidebarState } from "./js/sidebar/sidebar-state.js";
 
     initializeSidebarState();
 
-    window.navigateToFormulario = (tipo) => {
-      if (!tipo) return;
-      window.dispatchEvent(
-        new CustomEvent("sidebar:navigate", {
-          detail: withBase(`html/formulario.html?tipo=${tipo}`),
-        })
-      );
+    const navigate = (path) => {
+      window.dispatchEvent(new CustomEvent("sidebar:navigate", { detail: withBase(path) }));
     };
 
-    window.navigateToMamparas = () => {
-      window.dispatchEvent(
-        new CustomEvent("sidebar:navigate", {
-          detail: withBase("html/formulario-mamparas/registro.html"),
-        })
-      );
+    window.navigateToFormulario = (tipo) => {
+      if (!tipo) return;
+      navigate(`html/formulario.html?tipo=${tipo}`);
     };
+
+    window.navigateToMamparas = () => navigate("html/formulario-mamparas/registro.html");
+    window.navigateToRegistros = () => navigate("html/registros.html");
+    window.navigateToReportesMamparas = () => navigate("html/formulario-mamparas/reportes.html");
 
     if ("serviceWorker" in navigator) {
       const scope = BASE_PATH ? `${BASE_PATH}/` : "./";
       navigator.serviceWorker
-        .register(withBase("service-worker.js"), {
-          scope,
-        })
+        .register(withBase("service-worker.js"), { scope })
         .then((reg) => console.log("SW registrado", reg.scope))
         .catch((err) => console.error("Error registrando SW", err));
     }
@@ -169,12 +149,5 @@
     import(withBase("js/sidebar/sidebar-loader.js"));
     console.log("BASE_PATH activo:", BASE_PATH || "(raiz)");
   </script>
-
 </body>
-
 </html>
-
-
-
-
-
