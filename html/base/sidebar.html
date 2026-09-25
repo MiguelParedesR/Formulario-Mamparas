@@ -1,75 +1,69 @@
-﻿<!-- ====================================================
-     SIDEBAR SPA (NO REMOVER - DEPENDE EL LAYOUT)
-     ==================================================== -->
-<aside id="sidebar" class="sidebar ui-sidebar ui-sidebar-left ui-sidebar-active" aria-label="Sidebar principal">
-  <div class="logo sidebar-header">
-    <span class="logo-text">INCIDENCIAS</span>
+<aside id="sidebar" class="sidebar ui-sidebar ui-sidebar-left ui-sidebar-active" aria-label="Navegación principal">
+  <div class="sidebar-header">
+    <div class="brand-lockup">
+      <div class="brand-symbol">TPP</div>
+      <div class="brand-copy">
+        <strong>Seguridad</strong>
+        <span>Control operativo</span>
+      </div>
+    </div>
   </div>
 
   <div class="sidebar-body">
+    <div class="sidebar-section-label">Principal</div>
     <ul class="menu" role="menu">
-      <!-- DASHBOARD -->
       <li>
         <a class="menu-link" href="./index.html">
-          <i class="fas fa-home"></i><span>Dashboard</span>
+          <i class="fas fa-grid-2"></i><span>Inicio</span>
         </a>
       </li>
 
-      <!-- ========================== INCIDENCIAS ========================== -->
       <li class="has-submenu" data-submenu="incidencias">
         <a class="menu-link" href="#">
-          <i class="fas fa-exclamation-triangle"></i>
+          <i class="fas fa-file-shield"></i>
           <span>Incidencias</span>
-          <i class="fas arrow"></i>
+          <i class="fas fa-chevron-right arrow"></i>
         </a>
 
         <ul class="submenu">
-          <!-- Cable RH -->
           <li class="has-submenu" data-submenu="cable">
             <a class="menu-link" href="#">
               <i class="fas fa-bolt"></i><span>Cable RH</span>
-              <i class="fas arrow"></i>
+              <i class="fas fa-chevron-right arrow"></i>
             </a>
-
             <ul class="submenu">
               <li><a class="submenu-link" href="./html/formulario.html?tipo=CABLE">Nuevo informe</a></li>
               <li><a class="submenu-link" href="./html/registros.html?tipo=CABLE">Registros</a></li>
             </ul>
           </li>
 
-          <!-- Mercaderia -->
           <li class="has-submenu" data-submenu="mercaderia">
             <a class="menu-link" href="#">
-              <i class="fas fa-box-open"></i><span>Mercader&iacute;a</span>
-              <i class="fas arrow"></i>
+              <i class="fas fa-box"></i><span>Mercadería</span>
+              <i class="fas fa-chevron-right arrow"></i>
             </a>
-
             <ul class="submenu">
               <li><a class="submenu-link" href="./html/formulario.html?tipo=MERCADERIA">Nuevo informe</a></li>
               <li><a class="submenu-link" href="./html/registros.html?tipo=MERCADERIA">Registros</a></li>
             </ul>
           </li>
 
-          <!-- Choque -->
           <li class="has-submenu" data-submenu="choque">
             <a class="menu-link" href="#">
-              <i class="fas fa-car-crash"></i><span>Choque</span>
-              <i class="fas arrow"></i>
+              <i class="fas fa-car-burst"></i><span>Choque</span>
+              <i class="fas fa-chevron-right arrow"></i>
             </a>
-
             <ul class="submenu">
               <li><a class="submenu-link" href="./html/formulario.html?tipo=CHOQUE">Nuevo informe</a></li>
               <li><a class="submenu-link" href="./html/registros.html?tipo=CHOQUE">Registros</a></li>
             </ul>
           </li>
 
-          <!-- Siniestro -->
           <li class="has-submenu" data-submenu="siniestro">
             <a class="menu-link" href="#">
-              <i class="fas fa-fire"></i><span>Siniestro</span>
-              <i class="fas arrow"></i>
+              <i class="fas fa-fire-flame-curved"></i><span>Siniestro</span>
+              <i class="fas fa-chevron-right arrow"></i>
             </a>
-
             <ul class="submenu">
               <li><a class="submenu-link" href="./html/formulario.html?tipo=SINIESTRO">Nuevo informe</a></li>
               <li><a class="submenu-link" href="./html/registros.html?tipo=SINIESTRO">Registros</a></li>
@@ -78,44 +72,39 @@
         </ul>
       </li>
 
-      <!-- ========================== MAMPARAS ========================== -->
       <li class="has-submenu" data-submenu="mamparas">
         <a class="menu-link" href="#">
-          <i class="fas fa-warehouse"></i>
+          <i class="fas fa-truck-ramp-box"></i>
           <span>Mamparas</span>
-          <i class="fas arrow"></i>
+          <i class="fas fa-chevron-right arrow"></i>
         </a>
-
         <ul class="submenu">
-          <li><a class="submenu-link" href="./html/formulario-mamparas/registro.html">Nueva Inspecci&oacute;n</a></li>
+          <li><a class="submenu-link" href="./html/formulario-mamparas/registro.html">Nueva inspección</a></li>
           <li><a class="submenu-link" href="./html/formulario-mamparas/registros.html">Registros</a></li>
           <li><a class="submenu-link" href="./html/formulario-mamparas/reportes.html">Reportes</a></li>
         </ul>
       </li>
+    </ul>
 
-      <!-- LOGIN -->
+    <div class="sidebar-section-label">Cuenta</div>
+    <ul class="menu menu-secondary">
       <li>
         <a class="menu-link" href="./html/login-general/login.html">
-          <i class="fas fa-sign-in-alt"></i><span>Login</span>
+          <i class="fas fa-user-shield"></i><span>Acceso</span>
         </a>
       </li>
     </ul>
   </div>
 
   <div class="sidebar-footer">
-    <a
-      class="menu-link sidebar-return"
-      href="https://miguelparedesr.github.io/Dashboard-Seguridad/"
-    >
-      <i class="fas fa-arrow-left"></i><span>Retornar al menu</span>
+    <a class="sidebar-return" href="https://miguelparedesr.github.io/Dashboard-Seguridad/">
+      <i class="fas fa-arrow-left"></i>
+      <span>Volver a Seguridad</span>
     </a>
   </div>
 </aside>
 
-<!-- Sidebar toggle unico (no duplicar) -->
-<button id="sidebarToggle" class="sidebar-toggle" aria-label="Mostrar menu">
+<button id="sidebarToggle" class="sidebar-toggle" aria-label="Alternar menú">
   <i class="fas fa-bars"></i>
 </button>
-
-<!-- Backdrop para mobile -->
 <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
