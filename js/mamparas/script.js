@@ -975,9 +975,8 @@ function renderGaleriaMamparas(detalle) {
   const imagenes = detalle?.imagenes;
   if (!imagenes || !Object.keys(imagenes).length) {
     const empty = document.createElement("div");
-    empty.className = "form-feedback is-visible";
-    empty.dataset.tone = "info";
-    empty.textContent = "Aún no hay evidencias. Abre el detalle para agregar fotografías.";
+    empty.className = "evidence-empty";
+    empty.innerHTML = '<i class="fas fa-images"></i><strong>Sin evidencias</strong><span>Completa el detalle para agregar fotografías.</span>';
     cont.appendChild(empty);
     return;
   }
