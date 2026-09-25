@@ -1,299 +1,290 @@
-import { positionModal, watchModalPosition } from "../utils/helpers.js";
+let gallery = [];
+let activeIndex = 0;
+let keyHandlerBound = false;
 
-let carruselImagenes = [];
-let carruselIndice = 0;
-let limpiarDetalleOffset = null;
-let limpiarCarruselOffset = null;
-let escListenerActivo = false;
+const DETAIL_ID = "mampara-modal";
+const VIEWER_ID = "mampara-carrusel";
 
-const MODAL_ID = "mampara-modal";
-const CARRUSEL_ID = "mampara-carrusel";
-const DARK_BUTTON_BASE =
-  "rounded-full text-white shadow-lg flex items-center justify-center transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-white/60";
-const DARK_BUTTON_STYLE =
-  "background-color: #0b1a2a; border: 1px solid rgba(255,255,255,0.22);";
-
-const textoSeguro = (valor, fallback = "--") => {
-  if (valor === null || valor === undefined || valor === "") return fallback;
-  return String(valor);
+const safeText = (value, fallback = "—") => {
+  if (value === null || value === undefined || value === "") return fallback;
+  return String(value);
 };
 
-const formatearNumero = (valor, unidad) => {
-  if (valor === null || valor === undefined || valor === "") return "--";
-  const numero = Number.parseFloat(valor);
-  if (Number.isFinite(numero)) {
-    return unidad ? `${numero} ${unidad}` : `${numero}`;
-  }
-  return String(valor);
+const formatMeasure = (value, unit = "cm") => {
+  if (value === null || value === undefined || value === "") return "—";
+  const n = Number.parseFloat(value);
+  return Number.isFinite(n) ? `${n} ${unit}` : String(value);
 };
 
-const aplicarOffsetSidebar = (overlay) => {
-  if (!overlay) return () => {};
-  // Keep overlay aligned with sidebar open/collapsed state (avoid SPA overlap).
-  positionModal(overlay);
-  const cleanup = watchModalPosition(overlay);
-  return typeof cleanup === "function" ? cleanup : () => {};
-};
-
-const normalizarImagenes = (imagenes) => {
-  if (!Array.isArray(imagenes)) return [];
-  return imagenes.map((img) => ({
+const normalizeImages = (images) =>
+  (Array.isArray(images) ? images : []).map((img) => ({
     key: img?.key || "",
-    label: img?.label || "Foto",
-    labelHtml: img?.labelHtml || img?.label || "Foto",
-    url: img?.url || "",
+    label: safeText(img?.label, "Foto"),
+    url: img?.url ? String(img.url) : "",
   }));
-};
 
-const construirMiniaturas = (imagenes) => {
-  const disponibles = [];
-  const indices = imagenes.map((img) => {
-    if (img.url) {
-      disponibles.push(img);
-      return disponibles.length - 1;
-    }
-    return -1;
-  });
+function closeViewer() {
+  document.getElementById(VIEWER_ID)?.remove();
+}
 
-  const html = imagenes
-    .map((img, idx) => {
-      const habilitada = Boolean(img.url);
-      const carouselIndex = indices[idx];
-      const dataAttr = `data-carousel-index="${carouselIndex}"`;
-      const disabledAttr = habilitada ? "" : 'disabled aria-disabled="true"';
-      const claseBase =
-        "w-full h-28 rounded-xl border border-gray-200 shadow-sm overflow-hidden transition";
-      const claseHover = habilitada
-        ? "cursor-pointer hover:shadow-md hover:ring-2 hover:ring-blue-500"
-        : "cursor-not-allowed opacity-60";
-      const contenido = habilitada
-        ? `<img src="${img.url}" alt="${textoSeguro(
-            img.label
-          )}" class="w-full h-full object-cover" loading="lazy" />`
-        : `<div class="w-full h-full flex items-center justify-center text-xs text-gray-400">Sin foto</div>`;
+function closeDetail() {
+  closeViewer();
+  document.getElementById(DETAIL_ID)?.remove();
+  unbindKeyboard();
+}
 
-      return `
-        <div class="text-center" style="flex: 1 1 0; min-width: 180px;">
-          <button type="button" class="${claseBase} ${claseHover}" ${dataAttr} ${disabledAttr}>
-            ${contenido}
-          </button>
-          <p class="text-xs font-semibold text-gray-600 mt-2">${img.labelHtml}</p>
-        </div>
-      `;
-    })
-    .join("");
+function bindKeyboard() {
+  if (keyHandlerBound) return;
+  document.addEventListener("keydown", onKeydown);
+  keyHandlerBound = true;
+}
 
-  return { html, disponibles };
-};
+function unbindKeyboard() {
+  if (!keyHandlerBound) return;
+  document.removeEventListener("keydown", onKeydown);
+  keyHandlerBound = false;
+}
 
-export function mostrarDetalleMampara(payload) {
-  cerrarModales();
+function onKeydown(event) {
+  const viewer = document.getElementById(VIEWER_ID);
+  if (event.key === "Escape") {
+    if (viewer) closeViewer();
+    else closeDetail();
+    return;
+  }
+  if (!viewer || gallery.length < 2) return;
+  if (event.key === "ArrowLeft") move(-1);
+  if (event.key === "ArrowRight") move(1);
+}
 
-  const tipo = textoSeguro(payload?.tipo, "Mampara");
-  const separacion = formatearNumero(payload?.separacion, "cm");
-  const altura = formatearNumero(payload?.altura, "cm");
-  const imagenes = normalizarImagenes(payload?.imagenes);
-  const { html: miniaturasHtml, disponibles } = construirMiniaturas(imagenes);
+function createMetric(label, value) {
+  const wrap = document.createElement("div");
+  wrap.className = "mampara-detail-metric";
 
-  carruselImagenes = disponibles;
-  carruselIndice = 0;
+  const k = document.createElement("span");
+  k.textContent = label;
+  const v = document.createElement("strong");
+  v.textContent = value;
 
+  wrap.append(k, v);
+  return wrap;
+}
+
+function createThumbnail(img, index) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = img.url ? "mampara-photo-card" : "mampara-photo-card is-empty";
+  button.disabled = !img.url;
+
+  const media = document.createElement("div");
+  media.className = "mampara-photo-media";
+
+  if (img.url) {
+    const image = document.createElement("img");
+    image.src = img.url;
+    image.alt = img.label;
+    image.loading = "lazy";
+    media.appendChild(image);
+  } else {
+    const empty = document.createElement("span");
+    empty.innerHTML = '<i class="fas fa-image"></i>';
+    media.appendChild(empty);
+  }
+
+  const caption = document.createElement("div");
+  caption.className = "mampara-photo-caption";
+  caption.textContent = img.url ? img.label : `${img.label} · sin foto`;
+
+  button.append(media, caption);
+  if (img.url) button.addEventListener("click", () => openViewer(index));
+  return button;
+}
+
+function buildDetail(payload) {
   const overlay = document.createElement("div");
-  overlay.id = MODAL_ID;
-  overlay.className =
-    "fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-6 animate-fade";
-  overlay.style.zIndex = "1800";
+  overlay.id = DETAIL_ID;
+  overlay.className = "mampara-detail-overlay";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
 
-  overlay.innerHTML = `
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl p-6 sm:p-8 relative animate-grow" style="overflow: visible;">
-      <button
-        type="button"
-        class="${DARK_BUTTON_BASE} absolute w-10 h-10 text-xl leading-none z-10"
-        data-close
-        aria-label="Cerrar"
-        style="${DARK_BUTTON_STYLE} top: -16px; right: -16px;"
-      >&times;</button>
+  const panel = document.createElement("section");
+  panel.className = "mampara-detail-panel";
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-          <p class="text-[11px] uppercase tracking-[0.2em] text-gray-500">Tipo</p>
-          <p class="text-lg font-semibold text-gray-900">${tipo}</p>
-        </div>
-        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-          <p class="text-[11px] uppercase tracking-[0.2em] text-gray-500">Separaci&oacute;n lateral central</p>
-          <p class="text-lg font-semibold text-gray-900">${separacion}</p>
-        </div>
-        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-          <p class="text-[11px] uppercase tracking-[0.2em] text-gray-500">Altura de mampara</p>
-          <p class="text-lg font-semibold text-gray-900">${altura}</p>
-        </div>
-      </div>
+  const header = document.createElement("header");
+  header.className = "mampara-detail-header";
 
-      <div class="mt-6">
-        <div class="flex flex-nowrap gap-4 overflow-x-auto pb-2">
-          ${miniaturasHtml}
-        </div>
-      </div>
-    </div>
-  `;
+  const copy = document.createElement("div");
+  const eyebrow = document.createElement("p");
+  eyebrow.className = "ui-eyebrow";
+  eyebrow.textContent = "Detalle de inspección";
+  const title = document.createElement("h2");
+  title.textContent = safeText(payload?.tipo, "Mampara");
+  const subtitle = document.createElement("p");
+  subtitle.textContent = "Medidas registradas y evidencia fotográfica asociada.";
+  copy.append(eyebrow, title, subtitle);
 
-  const container =
-    document.getElementById("mampara-detalle-modal-container") || document.body;
-  container.appendChild(overlay);
-  limpiarDetalleOffset = aplicarOffsetSidebar(overlay);
-  registrarEscape();
+  const close = document.createElement("button");
+  close.type = "button";
+  close.className = "mampara-detail-close";
+  close.setAttribute("aria-label", "Cerrar detalle");
+  close.innerHTML = '<i class="fas fa-xmark"></i>';
+  close.addEventListener("click", closeDetail);
+
+  header.append(copy, close);
+
+  const metrics = document.createElement("div");
+  metrics.className = "mampara-detail-metrics";
+  metrics.append(
+    createMetric("Tipo", safeText(payload?.tipo, "Mampara")),
+    createMetric("Separación lateral", formatMeasure(payload?.separacion)),
+    createMetric("Altura de mampara", formatMeasure(payload?.altura))
+  );
+
+  const gallerySection = document.createElement("section");
+  gallerySection.className = "mampara-detail-gallery";
+
+  const galleryHead = document.createElement("div");
+  galleryHead.className = "mampara-detail-gallery-head";
+  const ghTitle = document.createElement("h3");
+  ghTitle.textContent = "Evidencias";
+  const ghCount = document.createElement("span");
+  const available = gallery.filter((item) => item.url).length;
+  ghCount.textContent = `${available} de ${gallery.length} disponibles`;
+  galleryHead.append(ghTitle, ghCount);
+
+  const grid = document.createElement("div");
+  grid.className = "mampara-photo-grid";
+  gallery.forEach((img, index) => grid.appendChild(createThumbnail(img, index)));
+
+  gallerySection.append(galleryHead, grid);
+  panel.append(header, metrics, gallerySection);
+  overlay.appendChild(panel);
 
   overlay.addEventListener("click", (event) => {
-    if (event.target.closest("[data-close]") || event.target === overlay) {
-      cerrarModales();
-      return;
-    }
+    if (event.target === overlay) closeDetail();
+  });
 
-    const btn = event.target.closest("[data-carousel-index]");
-    if (!btn) return;
-    const nextIndex = Number(btn.dataset.carouselIndex);
-    if (Number.isFinite(nextIndex) && nextIndex >= 0) {
-      abrirCarrusel(nextIndex);
-    }
+  return overlay;
+}
+
+function openViewer(index) {
+  if (!gallery[index]?.url) return;
+  activeIndex = index;
+  closeViewer();
+
+  const overlay = document.createElement("div");
+  overlay.id = VIEWER_ID;
+  overlay.className = "mampara-viewer";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+
+  const top = document.createElement("div");
+  top.className = "mampara-viewer-top";
+
+  const meta = document.createElement("div");
+  const label = document.createElement("strong");
+  label.id = "mampara-viewer-label";
+  const counter = document.createElement("span");
+  counter.id = "mampara-viewer-counter";
+  meta.append(label, counter);
+
+  const close = document.createElement("button");
+  close.type = "button";
+  close.className = "mampara-viewer-close";
+  close.setAttribute("aria-label", "Cerrar visor");
+  close.innerHTML = '<i class="fas fa-xmark"></i>';
+  close.addEventListener("click", closeViewer);
+  top.append(meta, close);
+
+  const stage = document.createElement("div");
+  stage.className = "mampara-viewer-stage";
+
+  const image = document.createElement("img");
+  image.id = "mampara-viewer-image";
+  stage.appendChild(image);
+
+  if (gallery.filter((item) => item.url).length > 1) {
+    const prev = document.createElement("button");
+    prev.type = "button";
+    prev.className = "mampara-viewer-nav is-prev";
+    prev.setAttribute("aria-label", "Foto anterior");
+    prev.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    prev.addEventListener("click", () => move(-1));
+
+    const next = document.createElement("button");
+    next.type = "button";
+    next.className = "mampara-viewer-nav is-next";
+    next.setAttribute("aria-label", "Foto siguiente");
+    next.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    next.addEventListener("click", () => move(1));
+    stage.append(prev, next);
+  }
+
+  const strip = document.createElement("div");
+  strip.className = "mampara-viewer-strip";
+  gallery.forEach((item, idx) => {
+    if (!item.url) return;
+    const thumb = document.createElement("button");
+    thumb.type = "button";
+    thumb.dataset.index = String(idx);
+    thumb.className = "mampara-viewer-thumb";
+    const img = document.createElement("img");
+    img.src = item.url;
+    img.alt = item.label;
+    thumb.appendChild(img);
+    thumb.addEventListener("click", () => {
+      activeIndex = idx;
+      updateViewer();
+    });
+    strip.appendChild(thumb);
+  });
+
+  overlay.append(top, stage, strip);
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) closeViewer();
+  });
+  document.body.appendChild(overlay);
+  updateViewer();
+}
+
+function availableIndices() {
+  return gallery.map((item, i) => (item.url ? i : -1)).filter((i) => i >= 0);
+}
+
+function move(direction) {
+  const indices = availableIndices();
+  if (indices.length < 2) return;
+  const currentPos = Math.max(0, indices.indexOf(activeIndex));
+  activeIndex = indices[(currentPos + direction + indices.length) % indices.length];
+  updateViewer();
+}
+
+function updateViewer() {
+  const item = gallery[activeIndex];
+  if (!item?.url) return;
+
+  const image = document.getElementById("mampara-viewer-image");
+  const label = document.getElementById("mampara-viewer-label");
+  const counter = document.getElementById("mampara-viewer-counter");
+  if (image) {
+    image.src = item.url;
+    image.alt = item.label;
+  }
+  if (label) label.textContent = item.label;
+
+  const indices = availableIndices();
+  const position = indices.indexOf(activeIndex) + 1;
+  if (counter) counter.textContent = `${position} / ${indices.length}`;
+
+  document.querySelectorAll(".mampara-viewer-thumb").forEach((thumb) => {
+    thumb.classList.toggle("is-active", Number(thumb.dataset.index) === activeIndex);
   });
 }
 
-const abrirCarrusel = (indiceInicial) => {
-  if (!carruselImagenes.length) return;
-
-  carruselIndice = Math.max(
-    0,
-    Math.min(indiceInicial, carruselImagenes.length - 1)
-  );
-  const mostrarControles = carruselImagenes.length > 1;
-
-  const overlay = document.createElement("div");
-  overlay.id = CARRUSEL_ID;
-  overlay.className =
-    "fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 py-6 animate-fade";
-  overlay.style.zIndex = "1900";
-  overlay.setAttribute("role", "dialog");
-  overlay.setAttribute("aria-modal", "true");
-
-  const arrowHidden = mostrarControles ? "" : "opacity-0 pointer-events-none";
-
-  overlay.innerHTML = `
-    <div class="relative w-full max-w-5xl mx-auto">
-      <button
-        type="button"
-        class="${DARK_BUTTON_BASE} absolute top-3 right-3 w-11 h-11 text-2xl leading-none z-10"
-        data-close
-        aria-label="Cerrar"
-        style="${DARK_BUTTON_STYLE}"
-      >&times;</button>
-      <div class="flex items-center justify-center gap-4 sm:gap-6">
-        <button
-          type="button"
-          class="${DARK_BUTTON_BASE} w-12 h-12 text-2xl leading-none flex-shrink-0 ${arrowHidden}"
-          data-prev
-          aria-label="Anterior"
-          style="${DARK_BUTTON_STYLE}"
-        >
-          &#10094;
-        </button>
-        <img
-          id="mampara-carrusel-img"
-          src="${carruselImagenes[carruselIndice].url}"
-          alt="${textoSeguro(carruselImagenes[carruselIndice].label)}"
-          class="max-h-[75vh] max-w-[80vw] object-contain rounded-2xl bg-black/30 shadow-2xl transition-opacity duration-300"
-        />
-        <button
-          type="button"
-          class="${DARK_BUTTON_BASE} w-12 h-12 text-2xl leading-none flex-shrink-0 ${arrowHidden}"
-          data-next
-          aria-label="Siguiente"
-          style="${DARK_BUTTON_STYLE}"
-        >
-          &#10095;
-        </button>
-      </div>
-      <p id="mampara-carrusel-label" class="text-center text-sm text-gray-200 mt-4">
-        ${carruselImagenes[carruselIndice].labelHtml}
-      </p>
-    </div>
-  `;
-
-  document.body.appendChild(overlay);
-  limpiarCarruselOffset = aplicarOffsetSidebar(overlay);
-  registrarEscape();
-
-  overlay.addEventListener("click", (event) => {
-    if (event.target.closest("[data-close]") || event.target === overlay) {
-      cerrarCarrusel();
-      return;
-    }
-
-    if (event.target.closest("[data-prev]")) {
-      moverCarrusel(-1);
-    }
-    if (event.target.closest("[data-next]")) {
-      moverCarrusel(1);
-    }
-  });
-};
-
-const moverCarrusel = (direccion) => {
-  if (!carruselImagenes.length) return;
-  carruselIndice =
-    (carruselIndice + direccion + carruselImagenes.length) %
-    carruselImagenes.length;
-  actualizarCarrusel();
-};
-
-const actualizarCarrusel = () => {
-  const img = document.getElementById("mampara-carrusel-img");
-  const label = document.getElementById("mampara-carrusel-label");
-  if (!img) return;
-
-  const siguiente = carruselImagenes[carruselIndice];
-  img.classList.add("opacity-0");
-
-  window.setTimeout(() => {
-    img.src = siguiente.url || "";
-    img.alt = textoSeguro(siguiente.label);
-    if (label) label.innerHTML = siguiente.labelHtml;
-    img.classList.remove("opacity-0");
-  }, 120);
-};
-
-const cerrarModales = () => {
-  document.getElementById(MODAL_ID)?.remove();
-  cerrarCarrusel();
-  limpiarDetalleOffset?.();
-  limpiarDetalleOffset = null;
-  removerEscape();
-};
-
-const cerrarCarrusel = () => {
-  document.getElementById(CARRUSEL_ID)?.remove();
-  limpiarCarruselOffset?.();
-  limpiarCarruselOffset = null;
-};
-
-const escListener = (event) => {
-  if (event.key !== "Escape") return;
-  if (document.getElementById(CARRUSEL_ID)) {
-    cerrarCarrusel();
-    return;
-  }
-  cerrarModales();
-};
-
-const registrarEscape = () => {
-  if (escListenerActivo) return;
-  document.addEventListener("keydown", escListener);
-  escListenerActivo = true;
-};
-
-const removerEscape = () => {
-  if (!escListenerActivo) return;
-  document.removeEventListener("keydown", escListener);
-  escListenerActivo = false;
-};
+export function mostrarDetalleMampara(payload) {
+  closeDetail();
+  gallery = normalizeImages(payload?.imagenes);
+  activeIndex = availableIndices()[0] ?? 0;
+  document.body.appendChild(buildDetail(payload));
+  bindKeyboard();
+}
