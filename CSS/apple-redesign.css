@@ -682,3 +682,157 @@ tbody tr:hover{background:#fafafa!important}
     scroll-behavior:auto!important
   }
 }
+
+
+/* ---------- Mamparas detail / evidence viewer ---------- */
+.mampara-detail-overlay{
+  position:fixed!important;inset:0!important;z-index:10000!important;
+  display:grid!important;place-items:center!important;
+  padding:24px!important;
+  background:rgba(18,18,20,.46)!important;
+  backdrop-filter:blur(14px) saturate(115%)!important;
+}
+.mampara-detail-panel{
+  width:min(1040px,94vw)!important;
+  max-height:90vh!important;
+  overflow:auto!important;
+  border:1px solid rgba(255,255,255,.68)!important;
+  border-radius:18px!important;
+  background:#f8f8fa!important;
+  box-shadow:0 32px 100px rgba(0,0,0,.24)!important;
+}
+.mampara-detail-header{
+  position:sticky;top:0;z-index:2;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+  padding:20px 22px 17px;
+  border-bottom:1px solid var(--ui-line-soft);
+  background:rgba(248,248,250,.94);
+  backdrop-filter:blur(22px);
+}
+.mampara-detail-header h2{
+  margin:0;color:var(--ui-text);
+  font-size:24px;font-weight:660;letter-spacing:-.035em
+}
+.mampara-detail-header p:not(.ui-eyebrow){
+  margin:5px 0 0;color:var(--ui-muted);font-size:12px;line-height:1.45
+}
+.mampara-detail-close,.mampara-viewer-close{
+  width:34px;height:34px;display:grid;place-items:center;flex:0 0 auto;
+  border:1px solid var(--ui-line);border-radius:10px;
+  background:#fff;color:#45454a;font-size:14px
+}
+.mampara-detail-close:hover,.mampara-viewer-close:hover{background:#f0f0f2}
+.mampara-detail-metrics{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;padding:16px 22px 0
+}
+.mampara-detail-metric{
+  min-width:0;padding:13px 14px;
+  border:1px solid var(--ui-line-soft);border-radius:11px;background:#fff
+}
+.mampara-detail-metric span{
+  display:block;margin-bottom:5px;
+  color:var(--ui-muted);font-size:9.5px;font-weight:740;letter-spacing:.08em;text-transform:uppercase
+}
+.mampara-detail-metric strong{
+  display:block;color:#2b2b2f;font-size:14px;font-weight:680;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.mampara-detail-gallery{padding:18px 22px 22px}
+.mampara-detail-gallery-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px
+}
+.mampara-detail-gallery-head h3{
+  margin:0;color:#29292d;font-size:13px;font-weight:720
+}
+.mampara-detail-gallery-head span{color:var(--ui-muted);font-size:10.5px}
+.mampara-photo-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px
+}
+.mampara-photo-card{
+  width:100%;padding:0;overflow:hidden;
+  border:1px solid var(--ui-line);border-radius:12px;
+  background:#fff;text-align:left;
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease
+}
+.mampara-photo-card:not(:disabled):hover{
+  transform:translateY(-2px);border-color:#c9d7e5;box-shadow:0 10px 24px rgba(0,0,0,.07)
+}
+.mampara-photo-media{
+  aspect-ratio:16/10;display:grid;place-items:center;overflow:hidden;background:#ededf0
+}
+.mampara-photo-media img{width:100%;height:100%;object-fit:cover;display:block}
+.mampara-photo-media span{color:#aaaab0;font-size:24px}
+.mampara-photo-caption{
+  padding:9px 10px;color:#55555b;font-size:10.5px;font-weight:620;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.mampara-photo-card.is-empty{opacity:.58;cursor:not-allowed}
+
+/* Fullscreen viewer */
+.mampara-viewer{
+  position:fixed!important;inset:0!important;z-index:11000!important;
+  display:grid!important;
+  grid-template-rows:auto minmax(0,1fr) auto!important;
+  gap:10px!important;
+  padding:14px 18px 16px!important;
+  background:rgba(10,10,12,.92)!important;
+  backdrop-filter:blur(22px) saturate(105%)!important
+}
+.mampara-viewer-top{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  max-width:1380px;width:100%;margin:0 auto
+}
+.mampara-viewer-top>div{display:flex;align-items:baseline;gap:10px;min-width:0}
+.mampara-viewer-top strong{
+  color:#f2f2f4;font-size:12px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.mampara-viewer-top span{color:#8e8e93;font-size:10.5px;white-space:nowrap}
+.mampara-viewer-close{
+  border-color:rgba(255,255,255,.12)!important;background:rgba(255,255,255,.08)!important;color:#fff!important
+}
+.mampara-viewer-close:hover{background:rgba(255,255,255,.14)!important}
+.mampara-viewer-stage{
+  position:relative;min-height:0;
+  display:flex;align-items:center;justify-content:center;
+  max-width:1380px;width:100%;margin:0 auto
+}
+.mampara-viewer-stage>img{
+  display:block;max-width:100%;max-height:calc(100vh - 150px);
+  width:auto;height:auto;object-fit:contain;
+  border-radius:12px;background:#101012;
+  box-shadow:0 20px 70px rgba(0,0,0,.42)
+}
+.mampara-viewer-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:42px;height:42px;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.12);border-radius:50%;
+  background:rgba(28,28,30,.74);color:#fff;
+  backdrop-filter:blur(12px);font-size:13px
+}
+.mampara-viewer-nav:hover{background:rgba(48,48,52,.9)}
+.mampara-viewer-nav.is-prev{left:14px}
+.mampara-viewer-nav.is-next{right:14px}
+.mampara-viewer-strip{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  min-height:54px;max-width:100%;overflow-x:auto;padding:3px
+}
+.mampara-viewer-thumb{
+  width:70px;height:44px;flex:0 0 auto;padding:2px;
+  border:1px solid transparent;border-radius:8px;background:transparent;opacity:.55
+}
+.mampara-viewer-thumb img{
+  width:100%;height:100%;display:block;object-fit:cover;border-radius:6px
+}
+.mampara-viewer-thumb.is-active{border-color:#78b8ff;opacity:1;background:rgba(10,132,255,.18)}
+.mampara-viewer-thumb:hover{opacity:.9}
+
+@media(max-width:760px){
+  .mampara-detail-overlay{padding:10px!important}
+  .mampara-detail-panel{width:100%!important;max-height:94vh!important}
+  .mampara-detail-metrics,.mampara-photo-grid{grid-template-columns:1fr!important}
+  .mampara-viewer{padding:10px!important}
+  .mampara-viewer-nav{width:38px;height:38px}
+  .mampara-viewer-nav.is-prev{left:6px}
+  .mampara-viewer-nav.is-next{right:6px}
+  .mampara-viewer-stage>img{max-height:calc(100vh - 135px)}
+}
