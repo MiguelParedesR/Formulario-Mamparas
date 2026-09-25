@@ -593,3 +593,197 @@ body.sidebar-hidden #dashboardContent {
     animation: popIn 0.3s ease-out;
 }
 
+/* TPP IOS PROD REDESIGN 2026-09-25 */
+:root{
+  --tpp-bg:#f5f5f7;
+  --tpp-surface:#ffffff;
+  --tpp-surface-soft:#f7f7f9;
+  --tpp-text:#111113;
+  --tpp-muted:#6e6e73;
+  --tpp-line:rgba(0,0,0,.09);
+  --tpp-accent:#0071e3;
+  --tpp-accent-soft:#e8f2ff;
+  --tpp-danger:#d92d20;
+  --tpp-success:#027a48;
+  --sidebar-bg:#f7f7f9;
+  --sidebar-bg-dark:#f7f7f9;
+  --sidebar-hover:rgba(0,0,0,.045);
+  --sidebar-border:rgba(0,0,0,.08);
+  --sidebar-text:#111113;
+  --sidebar-muted:#3a3a3c;
+  --sidebar-accent:#0071e3;
+  --sidebar-shadow:none;
+}
+
+html,body{
+  background:var(--tpp-bg)!important;
+  color:var(--tpp-text)!important;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif!important;
+}
+
+#dashboardContent,
+main.app-layout{
+  background:linear-gradient(180deg,#fbfbfd 0,var(--tpp-bg) 260px)!important;
+}
+
+#dashboardContent{
+  padding:clamp(22px,3vw,38px)!important;
+}
+
+h1,h2,h3,h4{
+  color:var(--tpp-text)!important;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif!important;
+  letter-spacing:-.025em;
+}
+
+p,.text-gray-500,.text-slate-500,.text-gray-600,.text-slate-600{
+  color:var(--tpp-muted)!important;
+}
+
+.sidebar{
+  background:rgba(247,247,249,.96)!important;
+  color:var(--tpp-text)!important;
+  border-right:1px solid var(--tpp-line)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(26px);
+}
+
+.logo,.sidebar-header{
+  border-bottom:1px solid var(--tpp-line)!important;
+  background:transparent!important;
+}
+
+.logo-text{
+  color:var(--tpp-text)!important;
+  letter-spacing:-.02em!important;
+}
+
+.menu-link,.submenu-link{
+  color:#3a3a3c!important;
+  border-radius:10px!important;
+  margin:2px 8px!important;
+  padding:10px 12px!important;
+}
+
+.menu-link:hover,.submenu-link:hover{
+  background:rgba(0,0,0,.045)!important;
+  color:#111113!important;
+}
+
+.menu .active-link,
+.submenu .submenu-link.active-link{
+  background:#fff!important;
+  color:#111113!important;
+  box-shadow:0 1px 2px rgba(0,0,0,.04),0 0 0 1px rgba(0,0,0,.035)!important;
+}
+
+.menu .active-link::before{display:none!important}
+
+.sidebar-footer{
+  background:transparent!important;
+  border-top:1px solid var(--tpp-line)!important;
+}
+
+.sidebar-footer .sidebar-return,
+.collapse-btn,.sidebar-toggle-internal,.sidebar-toggle-floating,.sidebar-toggle,.sidebar-button{
+  background:rgba(0,0,0,.055)!important;
+  color:#111113!important;
+  border:0!important;
+  border-radius:10px!important;
+  box-shadow:none!important;
+}
+
+input,select,textarea,
+.input,.select,.textarea{
+  background:#fff!important;
+  color:#111113!important;
+  border:1px solid rgba(0,0,0,.12)!important;
+  border-radius:10px!important;
+  box-shadow:none!important;
+  outline:none!important;
+}
+
+input:focus,select:focus,textarea:focus,
+.input:focus,.select:focus,.textarea:focus{
+  border-color:rgba(0,113,227,.52)!important;
+  box-shadow:0 0 0 3px rgba(0,113,227,.10)!important;
+}
+
+button,.btn,
+[class*="btn-"],
+button[class*="bg-"]{
+  border-radius:10px!important;
+  box-shadow:none!important;
+}
+
+.bg-indigo-600,.bg-blue-600,.bg-sky-600{
+  background-color:var(--tpp-accent)!important;
+}
+
+.text-indigo-600,.text-blue-600,.text-sky-600{
+  color:var(--tpp-accent)!important;
+}
+
+.bg-white,
+.form-card,
+.modal-content{
+  box-shadow:none!important;
+}
+
+.form-card,
+section.bg-white,
+aside.bg-white{
+  border-color:var(--tpp-line)!important;
+}
+
+table{
+  border-collapse:collapse!important;
+  background:transparent!important;
+}
+
+thead th{
+  background:transparent!important;
+  color:var(--tpp-muted)!important;
+  border-bottom:1px solid var(--tpp-line)!important;
+}
+
+tbody td{
+  border-bottom:1px solid var(--tpp-line)!important;
+}
+
+tbody tr:hover{
+  background:rgba(255,255,255,.55)!important;
+}
+
+.anexo-card{
+  border-radius:12px!important;
+  box-shadow:none!important;
+}
+
+.anexo-card:hover{
+  transform:none!important;
+  box-shadow:0 0 0 1px rgba(0,113,227,.18)!important;
+}
+
+.lightbox-content,
+.modal-content{
+  border-radius:16px!important;
+  box-shadow:0 24px 70px rgba(0,0,0,.18)!important;
+}
+
+@media(max-width:1023px){
+  .sidebar{
+    box-shadow:18px 0 42px rgba(0,0,0,.12)!important;
+  }
+  #dashboardContent{
+    padding:18px 16px 34px!important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation:none!important;
+    transition:none!important;
+    scroll-behavior:auto!important;
+  }
+}
