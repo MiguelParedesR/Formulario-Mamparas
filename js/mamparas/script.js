@@ -15,6 +15,8 @@ let detallePrefill = null;
 let placaPrefill = "";
 let formularioInicializado = null;
 let fechaHoraListenerActivo = false;
+let actualizarEstadoFormularioFn = null;
+let estadoPlacaExterno = null;
 
 const toggleHidden = (el, hidden) => {
   if (!el) return;
@@ -50,6 +52,17 @@ if (feedbackCloseBtn) {
 }
 
 export function mostrarModal(tipo, mensaje) {
+  const inline = document.getElementById("mamparasFeedback");
+  if (inline) {
+    inline.textContent = mensaje;
+    inline.dataset.tone = tipo === "error" ? "error" : "success";
+    inline.classList.add("is-visible");
+    if (tipo !== "error") {
+      window.setTimeout(() => inline.classList.remove("is-visible"), 4200);
+    }
+    return;
+  }
+
   const feedbackModal = document.getElementById("feedbackModal");
   const loader = document.getElementById("loadingAnimation");
   const msg = document.getElementById("feedbackMessage");
@@ -65,11 +78,228 @@ export function mostrarModal(tipo, mensaje) {
     msg.textContent = mensaje;
     const colorClass = tipo === "error" ? "text-red-600" : "text-green-600";
     msg.className = `message text-sm font-medium ${colorClass}`;
-  }, 500);
+  }, 300);
 
-  setTimeout(() => {
-    hideModalOverlay(feedbackModal);
-  }, 4500);
+  setTimeout(() => hideModalOverlay(feedbackModal), 4200);
+}
+
+const FIELD_RULES = {
+  placa: {
+    message: "6 caracteres alfanuméricos",
+    invalid: "Ingresa una placa de 6 caracteres alfanuméricos.",
+    valid: () => /^[A-Z0-9]{6}$/.test(normalizarPlaca(obtenerInput("placa")?.value || "")),
+  },
+  empresa: {
+    message: "Selecciona la empresa transportista",
+    invalid: "Selecciona una empresa.",
+    valid: () => {
+      const empresa = obtenerInput("empresa");
+      if (!empresa?.value) return false;
+      if (empresa.value !== "otra") return true;
+      return Boolean((obtenerInput("nueva_empresa")?.value || "").trim());
+    },
+  },
+  chofer: {
+    message: "Nombre del conductor",
+    invalid: "Ingresa el nombre del conductor.",
+    valid: () => Boolean((obtenerInput("chofer")?.value || "").trim()),
+  },
+  lugar: {
+    message: "Ubicación de la inspección",
+    invalid: "Selecciona el lugar de la inspección.",
+    valid: () => Boolean(obtenerInput("lugar")?.value),
+  },
+  incorreccion: {
+    message: "Al seleccionar se habilitan medidas y fotografías",
+    invalid: "Selecciona el tipo de incorrección.",
+    valid: () => Boolean(obtenerInput("incorreccion")?.value),
+  },
+  responsable: {
+    message: "Responsable de la inspección",
+    invalid: "Selecciona al responsable.",
+    valid: () => Boolean(obtenerInput("responsable")?.value),
+  },
+  observaciones: {
+    message: "Contexto operativo observado",
+    invalid: "Selecciona la operación observada.",
+    valid: () => Boolean(obtenerInput("observaciones")?.value),
+  },
+};
+
+function setFieldVisualState(id, { marcarInvalido = false } = {}) {
+  const rule = FIELD_RULES[id];
+  const wrapper = document.querySelector(`[data-required-field="${id}"]`);
+  const message = document.getElementById(`${id}FieldMessage`);
+  if (!rule || !wrapper) return false;
+
+  const valid = Boolean(rule.valid());
+  const touched = wrapper.dataset.touched === "1";
+
+  wrapper.classList.remove("is-error", "is-warning", "is-complete");
+
+  if (id === "placa" && valid && estadoPlacaExterno?.message) {
+    wrapper.classList.add(estadoPlacaExterno.tone === "warning" ? "is-warning" : "is-complete");
+    if (message) message.textContent = estadoPlacaExterno.message;
+    return valid;
+  }
+
+  if (valid) {
+    wrapper.classList.add("is-complete");
+    if (message) message.textContent = rule.message;
+    return true;
+  }
+
+  if (touched || marcarInvalido) {
+    wrapper.classList.add("is-error");
+    if (message) message.textContent = rule.invalid;
+  } else if (message) {
+    message.textContent = rule.message;
+  }
+  return false;
+}
+
+function parseDetalleActual() {
+  const raw = obtenerInput("detalle")?.value || "";
+  return parseDetalleJSON(raw) || null;
+}
+
+function contarEvidenciasDetalle(detalle) {
+  if (!detalle?.imagenes || typeof detalle.imagenes !== "object") return 0;
+  return Object.values(detalle.imagenes).filter(Boolean).length;
+}
+
+function actualizarEstadoFormulario({ marcarInvalidos = false } = {}) {
+  const form = document.getElementById("form-inspeccion");
+  if (!form) return false;
+
+  const fieldStatus = Object.fromEntries(
+    Object.keys(FIELD_RULES).map((id) => [id, setFieldVisualState(id, { marcarInvalido })])
+  );
+
+  const detalle = parseDetalleActual();
+  const detalleListo = Boolean(detalle && form.dataset.detailDirty !== "1");
+  const evidenciaCount = contarEvidenciasDetalle(detalle);
+
+  const unitComplete = fieldStatus.placa;
+  const operationComplete = fieldStatus.empresa && fieldStatus.chofer && fieldStatus.lugar;
+  const findingComplete =
+    fieldStatus.incorreccion && fieldStatus.responsable && fieldStatus.observaciones;
+  const evidenceComplete = detalleListo;
+
+  const steps = [
+    ["unit", unitComplete],
+    ["operation", operationComplete],
+    ["finding", findingComplete],
+    ["evidence", evidenceComplete],
+  ];
+  const firstIncomplete = steps.findIndex(([, complete]) => !complete);
+
+  steps.forEach(([name, complete], index) => {
+    const el = document.querySelector(`.v3-step[data-step="${name}"]`);
+    if (!el) return;
+    el.classList.remove("is-current", "is-complete", "is-pending");
+    el.removeAttribute("aria-current");
+
+    const badge = el.querySelector("b");
+    if (complete) {
+      el.classList.add("is-complete");
+      if (badge) badge.textContent = "✓";
+    } else {
+      el.classList.add(index === firstIncomplete ? "is-current" : "is-pending");
+      if (index === firstIncomplete) el.setAttribute("aria-current", "step");
+      if (badge) badge.textContent = String(index + 1);
+    }
+  });
+
+  const completeCount =
+    Object.values(fieldStatus).filter(Boolean).length + (evidenceComplete ? 1 : 0);
+  const total = Object.keys(FIELD_RULES).length + 1;
+
+  const countEl = document.getElementById("validationCount");
+  const textEl = document.getElementById("validationText");
+  if (countEl) countEl.textContent = `${completeCount} de ${total} requisitos completos`;
+
+  let summary = "Completa los campos para habilitar el registro.";
+  if (fieldStatus.incorreccion && !detalleListo) {
+    summary = form.dataset.detailDirty === "1"
+      ? "Guarda las medidas y evidencias actualizadas."
+      : "Completa y guarda las medidas y evidencias.";
+  } else if (completeCount === total) {
+    summary = "Inspección lista para registrar.";
+  }
+  if (textEl) textEl.textContent = summary;
+
+  const btnRegistrar = document.getElementById("btnRegistrarInspeccion");
+  const allComplete = completeCount === total;
+  if (btnRegistrar) {
+    btnRegistrar.disabled = !allComplete;
+    btnRegistrar.setAttribute("aria-disabled", String(!allComplete));
+  }
+
+  const badge = document.getElementById("detalleStateBadge");
+  if (badge) {
+    badge.classList.remove("is-pending", "is-ready", "is-dirty");
+    if (!fieldStatus.incorreccion) {
+      badge.textContent = "Pendiente";
+      badge.classList.add("is-pending");
+    } else if (detalleListo) {
+      badge.textContent = "Listo";
+      badge.classList.add("is-ready");
+    } else {
+      badge.textContent = "Por guardar";
+      badge.classList.add("is-dirty");
+    }
+  }
+
+  const evidenceCountEl = document.getElementById("evidenceStateCount");
+  if (evidenceCountEl) evidenceCountEl.textContent = String(evidenciaCount);
+
+  return allComplete;
+}
+
+function initEstadoFormulario() {
+  const form = document.getElementById("form-inspeccion");
+  if (!form) return;
+
+  form.dataset.detailDirty = obtenerInput("detalle")?.value ? "0" : "1";
+
+  Object.keys(FIELD_RULES).forEach((id) => {
+    const input = obtenerInput(id);
+    const wrapper = document.querySelector(`[data-required-field="${id}"]`);
+    if (!input || !wrapper) return;
+
+    const touch = () => {
+      wrapper.dataset.touched = "1";
+      actualizarEstadoFormulario();
+    };
+    input.addEventListener("change", touch);
+    input.addEventListener("input", () => actualizarEstadoFormulario());
+    input.addEventListener("blur", touch);
+  });
+
+  const nuevaEmpresa = obtenerInput("nueva_empresa");
+  if (nuevaEmpresa) {
+    nuevaEmpresa.addEventListener("input", () => {
+      const wrapper = document.querySelector('[data-required-field="empresa"]');
+      if (wrapper) wrapper.dataset.touched = "1";
+      actualizarEstadoFormulario();
+    });
+  }
+
+  const detailContainer = document.getElementById("contenidoDetalle");
+  if (detailContainer) {
+    const markDirty = (event) => {
+      if (!event.target.matches("input, textarea, select")) return;
+      form.dataset.detailDirty = "1";
+      mostrarDetalleGuardadoAviso(false);
+      actualizarEstadoFormulario();
+    };
+    detailContainer.addEventListener("input", markDirty);
+    detailContainer.addEventListener("change", markDirty);
+  }
+
+  actualizarEstadoFormularioFn = actualizarEstadoFormulario;
+  actualizarEstadoFormulario();
 }
 
 export function mostrarModalCorreo(datosFormulario = {}, detalleJSON, options = {}) {
@@ -954,30 +1184,48 @@ function limpiarDetalleModal({ clearStored = true } = {}) {
   if (clearStored) {
     const detalleCampo = obtenerInput("detalle");
     if (detalleCampo) detalleCampo.value = "";
+    const form = document.getElementById("form-inspeccion");
+    if (form) form.dataset.detailDirty = "1";
     renderGaleriaMamparas(null);
     mostrarDetalleGuardadoAviso(false);
   }
   toggleDetalleAlert(false);
+  actualizarEstadoFormularioFn?.();
 }
 
 function mostrarDetalleGuardadoAviso(visible) {
   const aviso = document.getElementById("detalleGuardadoAviso");
-  if (!aviso) return;
-  aviso.classList.toggle("hidden", !visible);
-  aviso.classList.toggle("is-visible", visible);
+  const badge = document.getElementById("detalleStateBadge");
+  if (aviso) {
+    aviso.classList.toggle("hidden", !visible);
+    aviso.classList.toggle("is-visible", visible);
+  }
+  if (badge && visible) {
+    badge.textContent = "Listo";
+    badge.classList.remove("is-pending", "is-dirty");
+    badge.classList.add("is-ready");
+  }
 }
 
 function renderGaleriaMamparas(detalle) {
   const cont = document.getElementById("galeriaMamparas");
+  const countEl = document.getElementById("evidenceStateCount");
   if (!cont) return;
 
   cont.innerHTML = "";
-  const imagenes = detalle?.imagenes;
-  if (!imagenes || !Object.keys(imagenes).length) {
+  const imagenes = detalle?.imagenes && typeof detalle.imagenes === "object"
+    ? detalle.imagenes
+    : {};
+  const disponibles = Object.entries(imagenes).filter(([, url]) => Boolean(url));
+
+  if (countEl) countEl.textContent = String(disponibles.length);
+
+  if (!disponibles.length) {
     const empty = document.createElement("div");
-    empty.className = "evidence-empty";
-    empty.innerHTML = '<i class="fas fa-images"></i><strong>Sin evidencias</strong><span>Completa el detalle para agregar fotografías.</span>';
+    empty.className = "evidence-empty compact";
+    empty.innerHTML = "<strong>Sin evidencias</strong><span>Las fotografías guardadas aparecerán aquí.</span>";
     cont.appendChild(empty);
+    actualizarEstadoFormularioFn?.();
     return;
   }
 
@@ -988,9 +1236,7 @@ function renderGaleriaMamparas(detalle) {
     foto_observacion: "Observación",
   };
 
-  Object.entries(imagenes).forEach(([key, url]) => {
-    if (!url) return;
-
+  disponibles.forEach(([key, url]) => {
     const item = document.createElement("button");
     item.type = "button";
     item.className = "evidence-card";
@@ -1012,23 +1258,20 @@ function renderGaleriaMamparas(detalle) {
     cont.appendChild(item);
   });
 
-  if (!cont.childElementCount) {
-    const empty = document.createElement("p");
-    empty.textContent = "Sin evidencias registradas aún.";
-    cont.appendChild(empty);
-  }
+  actualizarEstadoFormularioFn?.();
 }
 
 async function guardarDetalleJSON() {
   const incorreccion = obtenerInput("incorreccion");
-  const detalleModal = document.getElementById("detalleModal");
   const campoDetalle = obtenerInput("detalle");
-  if (!incorreccion || !campoDetalle || !detalleModal) return;
+  const form = document.getElementById("form-inspeccion");
+  const btnGuardar = document.getElementById("btnGuardarDetalle");
+  if (!incorreccion || !campoDetalle || !form) return false;
 
   const tipo = incorreccion.value;
   if (!tipo) {
-    toggleDetalleAlert(true, "Selecciona un tipo de incorrecci\u00F3n.");
-    return;
+    toggleDetalleAlert(true, "Selecciona un tipo de incorrección.");
+    return false;
   }
 
   const detalle = {
@@ -1038,130 +1281,132 @@ async function guardarDetalleJSON() {
     timestamp: new Date().toISOString(),
   };
 
-  const prefill = detallePrefill && detallePrefill.tipo === tipo ? detallePrefill : null;
+  const stored = parseDetalleJSON(campoDetalle.value);
+  const prefill =
+    detallePrefill && detallePrefill.tipo === tipo
+      ? detallePrefill
+      : stored && stored.tipo === tipo
+        ? stored
+        : null;
   const prefillDatos = prefill?.datos || {};
   const prefillImagenes = prefill?.imagenes || {};
 
-  if (tipo === "Mampara") {
-    const sepCentralInput = obtenerInput("sepCentral")?.value.trim();
-    const alturaMamparaInput = obtenerInput("alturaMampara")?.value.trim();
-    const fotoPanoramica = obtenerInput("fotoPanoramica")?.files?.[0];
-    const fotoAltura = obtenerInput("fotoAltura")?.files?.[0];
-    const fotoLateral = obtenerInput("fotoLateral")?.files?.[0];
-
-    const sepCentral =
-      sepCentralInput || prefillDatos.separacion_lateral_central || prefillDatos.separacion_central || "";
-    const alturaMampara = alturaMamparaInput || prefillDatos.altura_mampara || "";
-    const fotoPanoramicaBase = fotoPanoramica || prefillImagenes.foto_panoramica_unidad;
-    const fotoAlturaBase = fotoAltura || prefillImagenes.foto_altura_mampara;
-    const fotoLateralBase = fotoLateral || prefillImagenes.foto_lateral_central;
-
-    const faltantes = [];
-    if (!sepCentral) faltantes.push("la separaci\u00F3n lateral");
-    if (!alturaMampara) faltantes.push("la altura");
-    if (!fotoPanoramicaBase) faltantes.push("la foto panor\u00E1mica");
-    if (!fotoAlturaBase) faltantes.push("la foto de altura");
-    if (!fotoLateralBase) faltantes.push("la foto lateral");
-
-    if (faltantes.length) {
-      toggleDetalleAlert(true, `Completa ${faltantes.join(", ")}.`);
-      return;
-    }
-
-    const fotoPanoramicaUrl = fotoPanoramica
-      ? await subirImagen("panoramica", fotoPanoramica)
-      : prefillImagenes.foto_panoramica_unidad;
-    const fotoAlturaUrl = fotoAltura
-      ? await subirImagen("altura", fotoAltura)
-      : prefillImagenes.foto_altura_mampara;
-    const fotoLateralUrl = fotoLateral
-      ? await subirImagen("lateral", fotoLateral)
-      : prefillImagenes.foto_lateral_central;
-
-    if (!fotoPanoramicaUrl || !fotoAlturaUrl || !fotoLateralUrl) {
-      toggleDetalleAlert(true, "Hubo un problema al subir las im\u00E1genes. Intenta nuevamente.");
-      return;
-    }
-
-    detalle.datos = {
-      separacion_lateral_central: sepCentral,
-      altura_mampara: alturaMampara,
-    };
-    detalle.imagenes = {
-      foto_panoramica_unidad: fotoPanoramicaUrl,
-      foto_altura_mampara: fotoAlturaUrl,
-      foto_lateral_central: fotoLateralUrl,
-    };
-  } else {
-    const observacionInput = obtenerInput("observacionTexto")?.value.trim();
-    const fotoObservacion = obtenerInput("fotoObservacion")?.files?.[0];
-    const observacionTexto = observacionInput || prefillDatos.observacion_texto || "";
-    const fotoObservacionBase = fotoObservacion || prefillImagenes.foto_observacion;
-    const faltantes = [];
-    if (!observacionTexto) faltantes.push("la descripci\u00F3n");
-    if (!fotoObservacionBase) faltantes.push("la foto de observaci\u00F3n");
-
-    if (faltantes.length) {
-      toggleDetalleAlert(true, `Completa ${faltantes.join(" y ")}.`);
-      return;
-    }
-
-    const fotoObservacionUrl = fotoObservacion
-      ? await subirImagen("observacion", fotoObservacion)
-      : prefillImagenes.foto_observacion;
-    if (!fotoObservacionUrl) {
-      toggleDetalleAlert(true, "No se pudo subir la foto de la observaci\u00F3n.");
-      return;
-    }
-
-    detalle.datos = {
-      observacion_texto: observacionTexto,
-    };
-    detalle.imagenes = {
-      foto_observacion: fotoObservacionUrl,
-    };
+  if (btnGuardar) {
+    btnGuardar.disabled = true;
+    btnGuardar.textContent = "Guardando...";
   }
 
-  toggleDetalleAlert(false);
+  try {
+    if (tipo === "Mampara") {
+      const sepCentralInput = obtenerInput("sepCentral")?.value.trim();
+      const alturaMamparaInput = obtenerInput("alturaMampara")?.value.trim();
+      const fotoPanoramica = obtenerInput("fotoPanoramica")?.files?.[0];
+      const fotoAltura = obtenerInput("fotoAltura")?.files?.[0];
+      const fotoLateral = obtenerInput("fotoLateral")?.files?.[0];
 
-  const placa = (obtenerInput("placa")?.value || "sinplaca").trim().toUpperCase();
-  const jsonMeta = await subirDetalleJSONArchivo(detalle, placa);
-  if (jsonMeta) {
-    detalle.json_storage = jsonMeta;
+      const sepCentral =
+        sepCentralInput || prefillDatos.separacion_lateral_central || prefillDatos.separacion_central || "";
+      const alturaMampara = alturaMamparaInput || prefillDatos.altura_mampara || "";
+      const fotoPanoramicaBase = fotoPanoramica || prefillImagenes.foto_panoramica_unidad;
+      const fotoAlturaBase = fotoAltura || prefillImagenes.foto_altura_mampara;
+      const fotoLateralBase = fotoLateral || prefillImagenes.foto_lateral_central;
+
+      const faltantes = [];
+      if (!sepCentral) faltantes.push("la separación lateral");
+      if (!alturaMampara) faltantes.push("la altura");
+      if (!fotoPanoramicaBase) faltantes.push("la foto panorámica");
+      if (!fotoAlturaBase) faltantes.push("la foto de altura");
+      if (!fotoLateralBase) faltantes.push("la foto lateral");
+
+      if (faltantes.length) {
+        toggleDetalleAlert(true, `Completa ${faltantes.join(", ")}.`);
+        return false;
+      }
+
+      const fotoPanoramicaUrl = fotoPanoramica
+        ? await subirImagen("panoramica", fotoPanoramica)
+        : prefillImagenes.foto_panoramica_unidad;
+      const fotoAlturaUrl = fotoAltura
+        ? await subirImagen("altura", fotoAltura)
+        : prefillImagenes.foto_altura_mampara;
+      const fotoLateralUrl = fotoLateral
+        ? await subirImagen("lateral", fotoLateral)
+        : prefillImagenes.foto_lateral_central;
+
+      if (!fotoPanoramicaUrl || !fotoAlturaUrl || !fotoLateralUrl) {
+        toggleDetalleAlert(true, "No se pudieron guardar todas las fotografías.");
+        return false;
+      }
+
+      detalle.datos = {
+        separacion_lateral_central: sepCentral,
+        altura_mampara: alturaMampara,
+      };
+      detalle.imagenes = {
+        foto_panoramica_unidad: fotoPanoramicaUrl,
+        foto_altura_mampara: fotoAlturaUrl,
+        foto_lateral_central: fotoLateralUrl,
+      };
+    } else {
+      const observacionInput = obtenerInput("observacionTexto")?.value.trim();
+      const fotoObservacion = obtenerInput("fotoObservacion")?.files?.[0];
+      const observacionTexto = observacionInput || prefillDatos.observacion_texto || "";
+      const fotoObservacionBase = fotoObservacion || prefillImagenes.foto_observacion;
+      const faltantes = [];
+
+      if (!observacionTexto) faltantes.push("la descripción");
+      if (!fotoObservacionBase) faltantes.push("la foto de observación");
+      if (faltantes.length) {
+        toggleDetalleAlert(true, `Completa ${faltantes.join(" y ")}.`);
+        return false;
+      }
+
+      const fotoObservacionUrl = fotoObservacion
+        ? await subirImagen("observacion", fotoObservacion)
+        : prefillImagenes.foto_observacion;
+      if (!fotoObservacionUrl) {
+        toggleDetalleAlert(true, "No se pudo guardar la fotografía.");
+        return false;
+      }
+
+      detalle.datos = { observacion_texto: observacionTexto };
+      detalle.imagenes = { foto_observacion: fotoObservacionUrl };
+    }
+
+    toggleDetalleAlert(false);
+
+    const placa = (obtenerInput("placa")?.value || "sinplaca").trim().toUpperCase();
+    const jsonMeta = await subirDetalleJSONArchivo(detalle, placa);
+    if (jsonMeta) detalle.json_storage = jsonMeta;
+
+    campoDetalle.value = JSON.stringify(detalle);
+    form.dataset.detailDirty = "0";
+    mostrarDetalleGuardadoAviso(true);
+    renderGaleriaMamparas(detalle);
+    detallePrefill = detalle;
+    placaPrefill = normalizarPlaca(obtenerInput("placa")?.value || "");
+    actualizarEstadoFormularioFn?.();
+    return true;
+  } finally {
+    if (btnGuardar) {
+      btnGuardar.disabled = false;
+      btnGuardar.textContent = "Guardar detalle";
+    }
   }
-
-  campoDetalle.value = JSON.stringify(detalle);
-  mostrarDetalleGuardadoAviso(true);
-  renderGaleriaMamparas(detalle);
-  hideModalOverlay(detalleModal);
-  mostrarModal("success", "Detalle guardado correctamente.");
-
-  detallePrefill = null;
-  placaPrefill = "";
 }
 
 function initDetalleModal() {
-  const btnDetalle = document.getElementById("btnAgregarDetalle");
   const incorreccion = obtenerInput("incorreccion");
-  const detalleModal = document.getElementById("detalleModal");
-  const cerrarModal = document.getElementById("cerrarDetalleModal");
   const btnGuardarDetalle = document.getElementById("btnGuardarDetalle");
   const btnLimpiarDetalle = document.getElementById("btnLimpiarDetalle");
-  if (!btnDetalle || !incorreccion || !detalleModal) return;
-
-  btnDetalle.addEventListener("click", () => {
-    if (!incorreccion.value) return;
-    generarContenidoModal(incorreccion.value);
-    showModalOverlay(detalleModal);
-  });
-
-  if (cerrarModal) {
-    cerrarModal.addEventListener("click", () => hideModalOverlay(detalleModal));
-  }
-  bindEscClose(detalleModal, () => hideModalOverlay(detalleModal));
+  const detailContainer = document.getElementById("contenidoDetalle");
+  if (!incorreccion || !detailContainer) return;
 
   if (btnGuardarDetalle) {
-    btnGuardarDetalle.addEventListener("click", guardarDetalleJSON);
+    btnGuardarDetalle.addEventListener("click", (event) => {
+      event.preventDefault();
+      void guardarDetalleJSON();
+    });
   }
 
   if (btnLimpiarDetalle) {
@@ -1170,33 +1415,69 @@ function initDetalleModal() {
       limpiarDetalleModal();
       detallePrefill = null;
       placaPrefill = "";
+      const form = document.getElementById("form-inspeccion");
+      if (form) form.dataset.detailDirty = "1";
+      actualizarEstadoFormularioFn?.();
     });
   }
-
-  detalleModal.addEventListener("click", (event) => {
-    if (event.target === detalleModal) {
-      hideModalOverlay(detalleModal);
-    }
-  });
 }
 
 function initDetalleTrigger() {
   const incorreccion = obtenerInput("incorreccion");
-  const btnDetalle = document.getElementById("btnAgregarDetalle");
   const detalleInput = obtenerInput("detalle");
-  if (!incorreccion || !btnDetalle || !detalleInput) return;
+  const acciones = document.getElementById("detalleActions");
+  const title = document.getElementById("detalleInlineTitle");
+  const hint = document.getElementById("detalleInlineHint");
+  const form = document.getElementById("form-inspeccion");
+  if (!incorreccion || !detalleInput) return;
 
   actualizarBotonDetalleFn = () => {
-    const tieneValor = Boolean(incorreccion.value);
-    toggleHidden(btnDetalle, !tieneValor);
+    const tipo = incorreccion.value;
+    const tieneValor = Boolean(tipo);
+    toggleHidden(acciones, !tieneValor);
+
     if (!tieneValor) {
       detalleInput.value = "";
+      if (form) form.dataset.detailDirty = "1";
+      const cont = document.getElementById("contenidoDetalle");
+      if (cont) {
+        cont.innerHTML =
+          '<div class="inline-detail-empty"><span>Selecciona una incorrección</span><small>Las medidas y fotografías aparecerán aquí.</small></div>';
+      }
+      if (title) title.textContent = "Medidas y evidencia";
+      if (hint) hint.textContent = "Selecciona una incorrección para mostrar los campos requeridos.";
       mostrarDetalleGuardadoAviso(false);
       renderGaleriaMamparas(null);
+      actualizarEstadoFormularioFn?.();
+      return;
     }
+
+    if (title) {
+      title.textContent = tipo === "Mampara" ? "Medidas de Mampara" : `Detalle de ${tipo}`;
+    }
+    if (hint) {
+      hint.textContent =
+        tipo === "Mampara"
+          ? "Referencia: separación 15 cm · altura 180 cm · 3 fotografías obligatorias."
+          : "Describe el hallazgo y agrega una fotografía obligatoria.";
+    }
+
+    generarContenidoModal(tipo);
+    if (form && !detalleInput.value) form.dataset.detailDirty = "1";
+    actualizarEstadoFormularioFn?.();
   };
 
-  incorreccion.addEventListener("change", actualizarBotonDetalleFn);
+  incorreccion.addEventListener("change", () => {
+    const stored = parseDetalleJSON(detalleInput.value);
+    if (stored && stored.tipo !== incorreccion.value) {
+      detalleInput.value = "";
+      detallePrefill = null;
+      placaPrefill = "";
+    }
+    if (form) form.dataset.detailDirty = "1";
+    actualizarBotonDetalleFn();
+  });
+
   actualizarBotonDetalleFn();
 }
 
@@ -1268,7 +1549,12 @@ async function consultarPlacaExistente(placa) {
   if (!posibles.length) return;
 
   try {
-    let query = supabase.from("inspecciones").select("*");
+    estadoPlacaExterno = { tone: "info", message: "Validando antecedentes..." };
+    actualizarEstadoFormularioFn?.();
+
+    let query = supabase
+      .from("inspecciones")
+      .select("id,fecha,hora,empresa,placa,chofer,lugar,incorreccion,responsable,observaciones,separacion_central,altura_mampara,foto_unidad,foto_observacion,detalle");
 
     if (posibles.length > 1) {
       const filtro = posibles.map((valor) => `placa.eq.${valor}`).join(",");
@@ -1286,12 +1572,21 @@ async function consultarPlacaExistente(placa) {
 
     if (data && data.length) {
       registroPlacaDetectado = data[0];
+      estadoPlacaExterno = {
+        tone: "warning",
+        message: "Existe un registro anterior para esta placa.",
+      };
+      actualizarEstadoFormularioFn?.();
       mostrarModalPlaca(data[0], placaRaw);
     } else {
       registroPlacaDetectado = null;
+      estadoPlacaExterno = null;
+      actualizarEstadoFormularioFn?.();
       ocultarModalPlaca();
     }
   } catch (error) {
+    estadoPlacaExterno = null;
+    actualizarEstadoFormularioFn?.();
     console.error("Error validando placa:", error.message || error);
   }
 }
@@ -1411,9 +1706,7 @@ function aplicarRegistroFormulario(registro) {
   };
 
   const placaInput = obtenerInput("placa");
-  if (placaInput && registro.placa) {
-    placaInput.value = String(registro.placa).toUpperCase();
-  }
+  if (placaInput && registro.placa) placaInput.value = String(registro.placa).toUpperCase();
 
   const empresaInput = obtenerInput("empresa");
   const nuevaEmpresa = obtenerInput("nueva_empresa");
@@ -1442,17 +1735,20 @@ function aplicarRegistroFormulario(registro) {
   setSelectValue("observaciones", registro.observaciones);
 
   const choferInput = obtenerInput("chofer");
-  if (choferInput && registro.chofer) {
-    choferInput.value = registro.chofer;
-  }
+  if (choferInput && registro.chofer) choferInput.value = registro.chofer;
+
+  detallePrefill = detallePayload;
+  placaPrefill = normalizarPlaca(placaInput?.value || registro.placa || "");
 
   const incorreccionInput = obtenerInput("incorreccion");
   if (incorreccionInput) {
     const opciones = Array.from(incorreccionInput.options || []).map((option) => option.value);
     const tipo =
-      opciones.includes(detallePayload.tipo) ? detallePayload.tipo : opciones.includes(registro?.incorreccion)
-        ? registro?.incorreccion
-        : "Otros";
+      opciones.includes(detallePayload.tipo)
+        ? detallePayload.tipo
+        : opciones.includes(registro?.incorreccion)
+          ? registro?.incorreccion
+          : "Otros";
     incorreccionInput.value = tipo;
     incorreccionInput.dispatchEvent(new Event("change", { bubbles: true }));
   }
@@ -1460,12 +1756,14 @@ function aplicarRegistroFormulario(registro) {
   const detalleCampo = obtenerInput("detalle");
   if (detalleCampo) detalleCampo.value = JSON.stringify(detallePayload);
 
-  detallePrefill = detallePayload;
-  placaPrefill = normalizarPlaca(placaInput?.value || registro.placa || "");
+  const form = document.getElementById("form-inspeccion");
+  if (form) form.dataset.detailDirty = "0";
 
+  aplicarPrefillEnModal(detallePayload);
   renderGaleriaMamparas(detallePayload);
   mostrarDetalleGuardadoAviso(true);
   toggleDetalleAlert(false);
+  actualizarEstadoFormularioFn?.();
 }
 
 function ocultarModalPlaca() {
@@ -1534,6 +1832,9 @@ function initValidacionPlaca() {
       placaIgnorada = "";
     }
 
+    estadoPlacaExterno = null;
+    actualizarEstadoFormularioFn?.();
+
     if (valorNormalizado.length < MIN_PLACA_LENGTH) {
       ultimoValorConsultado = "";
       if (debounceId) clearTimeout(debounceId);
@@ -1587,21 +1888,26 @@ function initFormulario() {
   initPreviewModal();
   initModalPlacaListeners();
   initValidacionPlaca();
+  initEstadoFormulario();
 
   let procesandoRegistro = false;
 
   const procesarRegistro = async () => {
     if (procesandoRegistro) return;
-    if (typeof form.reportValidity === "function" && !form.reportValidity()) {
-      mostrarModal("error", "Completa los campos obligatorios antes de continuar.");
+
+    const listo = actualizarEstadoFormulario({ marcarInvalidos: true });
+    if (!listo) {
+      mostrarModal("error", "Completa los campos marcados y guarda las medidas y evidencias antes de registrar.");
+      const primerError = form.querySelector(".v3-field.is-error input, .v3-field.is-error select");
+      primerError?.focus();
       return;
     }
 
     autocompletarFechaHora();
 
     const detalleCampo = obtenerInput("detalle");
-    if (!detalleCampo || !detalleCampo.value) {
-      mostrarModal("error", "Debes registrar el detalle antes de guardar.");
+    if (!detalleCampo || !detalleCampo.value || form.dataset.detailDirty === "1") {
+      mostrarModal("error", "Guarda las medidas y evidencias antes de registrar.");
       return;
     }
 
@@ -1650,8 +1956,10 @@ function initFormulario() {
           cerrarTodosLosModales();
           autocompletarFechaHora();
           actualizarEmpresaPersonalizadaFn?.();
+          if (form) form.dataset.detailDirty = "1";
           actualizarBotonDetalleFn?.();
           renderGaleriaMamparas(null);
+          estadoPlacaExterno = null;
           registroPlacaDetectado = null;
           placaIgnorada = "";
           detallePrefill = null;
@@ -1660,7 +1968,7 @@ function initFormulario() {
           return exito;
         } finally {
           procesandoRegistro = false;
-          if (btnRegistrar) btnRegistrar.disabled = false;
+          actualizarEstadoFormularioFn?.();
         }
       },
     });
