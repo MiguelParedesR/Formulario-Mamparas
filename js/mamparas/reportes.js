@@ -13,8 +13,29 @@ const OPERADORES_REFERENCIA = [
   "Ernesto Alfaro",
 ];
 
-const LOGO_TPP_BASE64 =
-  "iVBORw0KGgoAAAANSUhEUgAAAHgAAAAoCAYAAABQ0GJ1AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABO0lEQVR4nO2ZQQ6DIBRFv62bPopqKgkl0vv/5xpoE2mR7BncpsbR9f7D78AyDDpwHDCCCAAAIIIIAAAggg8HyD+S1yujkvyMXR0SNEEUu5h0b5GN1fWG0EBH7gYCU+iNgtmybzBept0D81Wp9aI1NgZmviTHtONc8FwMB7yuC1ZgBlt1mAWW22YBdbdpgF1t2mAXW8W8zci6pN86hVY9WnXgdQbPvDU2C7j4+AFWiYX/gqfLPjAf64mvMbVUWWdR3Gp0ZjoaAVp2LzYzj2mL4es9vq+7O42h8Du8LwC2MKa79HRhN6VYXBk80ts1omS9X575+cJCLuvkekA81VdI8N3V4LmAh2YnrOB+hd4B4DhoDBIYAwSGAMMhgDBIYAwSGAMFhgLhhUZ15YGoa7czO/0ohrY/PCujQAAAAASUVORK5CYII=";
+const LOGO_TPP_URL = "https://i.postimg.cc/W48hdkrt/LOGOX-removebg-preview.png";
+
+function setReportStatus(tipo, mensaje) {
+  const status = document.getElementById("reportStatus");
+  if (!status) return;
+
+  const styles = {
+    info: "border-blue-200 bg-blue-50 text-blue-800",
+    warning: "border-amber-200 bg-amber-50 text-amber-800",
+    success: "border-green-200 bg-green-50 text-green-800",
+    error: "border-red-200 bg-red-50 text-red-800",
+  };
+
+  status.className = `rounded-xl border px-4 py-3 text-sm ${styles[tipo] || styles.info}`;
+  status.textContent = mensaje;
+}
+
+function clearReportStatus() {
+  const status = document.getElementById("reportStatus");
+  if (!status) return;
+  status.className = "hidden rounded-xl border px-4 py-3 text-sm";
+  status.textContent = "";
+}
 
 function setExportButtonState(cargando) {
   const btn = document.getElementById("btnExportarExcel");
@@ -64,7 +85,42 @@ function descargarBlob(blob, nombreArchivo) {
   document.body.appendChild(link);
   link.click();
   link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  window.setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+async function cargarLogoValido(workbook, worksheet) {
+  try {
+    const response = await fetch(LOGO_TPP_URL, { cache: "force-cache" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const blob = await response.blob();
+    if (!blob.type.startsWith("image/")) throw new Error("La respuesta no es una imagen");
+
+    const arrayBuffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = "";
+    const CHUNK = 0x8000;
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+    }
+    const base64 = btoa(binary);
+    if (!base64 || base64.length % 4 !== 0) throw new Error("Logo con Base64 inválido");
+
+    const extension = blob.type.includes("jpeg") ? "jpeg" : "png";
+    const logoId = workbook.addImage({ base64, extension });
+    worksheet.addImage(logoId, {
+      tl: { col: 0.1, row: 0.1 },
+      ext: { width: 150, height: 60 },
+    });
+    return true;
+  } catch (error) {
+    console.warn("Logo TPP omitido; el Excel continuará sin bloquearse:", error);
+    worksheet.mergeCells("A1:B1");
+    worksheet.getCell("A1").value = "TPP";
+    worksheet.getCell("A1").font = { bold: true, size: 20, name: "Arial" };
+    worksheet.getCell("A1").alignment = { vertical: "middle", horizontal: "left" };
+    return false;
+  }
 }
 
 async function cargarOperadores() {
@@ -107,12 +163,8 @@ function ultimoDiaMes(anio, mes) {
   return String(new Date(Number(anio), Number(mes), 0).getDate()).padStart(2, "0");
 }
 
-function aplicarFormatoCorporativo(worksheet, workbook, data) {
-  const logoId = workbook.addImage({ base64: LOGO_TPP_BASE64, extension: "png" });
-  worksheet.addImage(logoId, {
-    tl: { col: 0.1, row: 0.1 },
-    ext: { width: 150, height: 60 },
-  });
+async function aplicarFormatoCorporativo(worksheet, workbook, data) {
+  await cargarLogoValido(workbook, worksheet);
 
   worksheet.getCell("I1").value = "F-OPESEG-045";
   worksheet.getCell("I1").alignment = { vertical: "middle", horizontal: "right" };
@@ -123,6 +175,8 @@ function aplicarFormatoCorporativo(worksheet, workbook, data) {
   worksheet.getCell("A2").alignment = { vertical: "middle", horizontal: "center" };
   worksheet.getCell("A2").font = { bold: true, size: 14, name: "Arial" };
 
+  worksheet.getRow(1).height = 46;
+  worksheet.getRow(2).height = 24;
   worksheet.getRow(3).height = 8;
 
   const headers = [
@@ -209,7 +263,7 @@ async function generarExcel(data, anio, mes, operador) {
   workbook.created = new Date();
 
   const worksheet = workbook.addWorksheet("Reporte");
-  aplicarFormatoCorporativo(worksheet, workbook, data);
+  await aplicarFormatoCorporativo(worksheet, workbook, data);
 
   const operadorNombre =
     !operador || operador === "Todos"
@@ -226,15 +280,20 @@ async function generarExcel(data, anio, mes, operador) {
 }
 
 async function exportarExcel() {
+  clearReportStatus();
+
   const mesValor = document.getElementById("mes")?.value || "";
   const operador = document.getElementById("operador")?.value || "Todos";
 
   if (!mesValor) {
-    mostrarModal("error", "Seleccione un mes para generar el reporte.");
+    const mensaje = "Seleccione un mes para generar el reporte.";
+    setReportStatus("warning", mensaje);
+    mostrarModal("error", mensaje);
     return;
   }
 
   setExportButtonState(true);
+  setReportStatus("info", "Consultando registros y preparando el Excel...");
 
   try {
     const [anio, mes] = mesValor.split("-");
@@ -255,20 +314,25 @@ async function exportarExcel() {
     if (error) throw error;
 
     if (!data?.length) {
-      mostrarModal("error", "No hay registros para el filtro seleccionado.");
+      const mensaje = operador === "Todos"
+        ? `No se encontraron registros para ${mes}/${anio}.`
+        : `No se encontraron registros para ${operador} en ${mes}/${anio}.`;
+      setReportStatus("warning", mensaje);
+      mostrarModal("error", mensaje);
       return;
     }
 
     await generarExcel(data, anio, mes, operador);
-    mostrarModal("success", "Excel F-OPESEG-045 generado correctamente.");
+    const mensaje = `Excel F-OPESEG-045 generado con ${data.length} registro(s).`;
+    setReportStatus("success", mensaje);
+    mostrarModal("success", mensaje);
   } catch (error) {
     console.error("Error generando Excel F-OPESEG-045:", error);
-    mostrarModal(
-      "error",
-      error?.message
-        ? `No se pudo generar el Excel: ${error.message}`
-        : "No se pudo generar el Excel."
-    );
+    const mensaje = error?.message
+      ? `No se pudo generar el Excel: ${error.message}`
+      : "No se pudo generar el Excel.";
+    setReportStatus("error", mensaje);
+    mostrarModal("error", mensaje);
   } finally {
     setExportButtonState(false);
   }
