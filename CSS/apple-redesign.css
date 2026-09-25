@@ -432,6 +432,82 @@ button{cursor:pointer}
   .progress-track{grid-column:1/-1!important}
 }
 
+
+/* Historical incident editor uses the same three-sheet geometry */
+#verEditarPanel .word-workspace{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:14px!important;
+  padding:18px!important;
+  align-items:stretch!important
+}
+#verEditarPanel .word-column{
+  min-width:0!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:720px!important;
+  padding:27px 28px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#fff!important;
+  box-shadow:0 7px 24px rgba(34,49,72,.08)!important;
+  align-self:stretch!important
+}
+#verEditarPanel .word-column.evidence-sheet{
+  position:relative!important;
+  top:auto!important;
+  border-top:2px solid var(--v3-teal)!important
+}
+#verEditarPanel .word-section{
+  width:100%!important;
+  min-width:0!important
+}
+#verEditarPanel .word-section>textarea,
+#verEditarPanel .word-metadata input,
+#verEditarPanel .word-metadata select{
+  width:100%!important;
+  inline-size:100%!important;
+  min-width:100%!important;
+  min-inline-size:100%!important;
+  max-width:none!important;
+  max-inline-size:none!important;
+  display:block!important;
+  box-sizing:border-box!important
+}
+#verEditarPanel .word-section>textarea{
+  min-height:180px!important;
+  resize:vertical!important
+}
+#verEditarPanel #modalHechos{min-height:340px!important}
+#verEditarPanel #modalIntroduccion{min-height:190px!important}
+#verEditarPanel #modalListaAnexos{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important
+}
+@media(max-width:1280px){
+  #verEditarPanel .word-workspace{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important
+  }
+  #verEditarPanel .word-column.evidence-sheet{
+    grid-column:1/-1!important;
+    min-height:auto!important
+  }
+}
+@media(max-width:820px){
+  #verEditarPanel .word-workspace{
+    grid-template-columns:1fr!important;
+    padding:10px!important
+  }
+  #verEditarPanel .word-column,
+  #verEditarPanel .word-column.evidence-sheet{
+    grid-column:auto!important;
+    min-height:auto!important
+  }
+}
+
 /* Mamparas workflow */
 .v3-ops{
   max-width:1480px;
