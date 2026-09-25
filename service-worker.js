@@ -13,7 +13,7 @@ const asset = (path = "") => {
   return BASE_PATH ? `${BASE_PATH}/${cleaned}` : cleaned;
 };
 
-const VERSION = "v7.144";
+const VERSION = "v7.145";
 const CACHE_NAME = `CCTV-${VERSION}${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
 const STATIC_ASSETS = [
@@ -109,4 +109,4 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
-console.log("[SW] TPP cache strategy v7.144 active");
+console.log("[SW] TPP cache strategy v7.145 active");
