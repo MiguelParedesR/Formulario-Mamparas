@@ -22,6 +22,7 @@ const CORE_STYLES = [
   withBase("CSS/global.css"),
   withBase("CSS/styles.css"),
   withBase("CSS/dashboard/dashboard.css"),
+  withBase("CSS/apple-redesign.css"),
 ];
 
 const FONT_AWESOME =
