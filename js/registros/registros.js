@@ -47,6 +47,7 @@ const modalInputs = {
   dirigidoA: document.getElementById("modalDirigidoA"),
   remitente: document.getElementById("modalRemitente"),
   fecha: document.getElementById("modalFecha"),
+  introduccion: document.getElementById("modalIntroduccion"),
   hechos: document.getElementById("modalHechos"),
   analisis: document.getElementById("modalAnalisis"),
   conclusiones: document.getElementById("modalConclusiones"),
@@ -86,14 +87,21 @@ async function cargarIncidencias() {
 }
 
 function filtrarPorBusqueda(lista, texto) {
-  const filtro = texto.toLowerCase();
+  const filtro = String(texto || "").trim().toLowerCase();
   if (!filtro) return [...lista];
 
   return lista.filter((inc) => {
     const extra = obtenerValorExtra(inc);
-    const placa = (extra.placa || "").toLowerCase();
-    const contenedor = (extra.contenedor || "").toLowerCase();
-    return placa.includes(filtro) || contenedor.includes(filtro);
+    const valores = [
+      extra.placa,
+      extra.contenedor,
+      inc.tipo_incidencia,
+      inc.asunto,
+      inc.remitente,
+      inc.dirigido_a,
+      inc.fecha_informe,
+    ];
+    return valores.some((valor) => String(valor || "").toLowerCase().includes(filtro));
   });
 }
 
@@ -140,32 +148,33 @@ function renderEmptyTableMessage(tableBody) {
  * @returns {HTMLTableRowElement} The table row element
  */
 function createIncidentRow(incident, state, extra) {
-  // Ajuste de clases dinámicas para barras de progreso
-  state.color = `bg-${state.color}`;
-
   const tr = document.createElement("tr");
-  tr.className = "hover:bg-gray-50 transition";
+
+  const tone =
+    state.estado === "COMPLETO"
+      ? { label: "Completo", fg: "#067647", bg: "#ecfdf3" }
+      : { label: "Borrador", fg: "#9a6700", bg: "#fffaeb" };
 
   tr.innerHTML = `
-    <td class="px-3 py-2 text-sm">${incident.fecha_informe || "-"}</td>
-    <td class="px-3 py-2 text-sm">${incident.tipo_incidencia || "-"}</td>
-    <td class="px-3 py-2 text-sm">${extra.placa || "-"}</td>
-    <td class="px-3 py-2 text-sm">${extra.contenedor || "-"}</td>
-
-    <td class="px-3 py-2">
-      <div class="w-full bg-gray-200 rounded-full h-2">
-        <div class="h-2 rounded-full ${state.color}" style="width:${state.porcentaje}%"></div>
+    <td>${incident.fecha_informe || "-"}</td>
+    <td><strong>${incident.tipo_incidencia || "-"}</strong></td>
+    <td>${extra.placa || "-"}</td>
+    <td>${extra.contenedor || "-"}</td>
+    <td>
+      <div style="min-width:120px">
+        <div class="report-progress__track">
+          <div style="height:100%;width:${state.porcentaje}%;border-radius:999px;background:#0a66c2"></div>
+        </div>
+        <span class="tpp-help">${state.porcentaje}%</span>
       </div>
-      <span class="text-xs text-gray-600">${state.porcentaje}%</span>
     </td>
-
-    <td class="px-3 py-2 text-sm font-semibold ${state.estado === "COMPLETO" ? "text-green-600" : "text-amber-600"}">
-      ${state.estado}
+    <td>
+      <span style="display:inline-flex;padding:5px 8px;border-radius:999px;background:${tone.bg};color:${tone.fg};font-size:11px;font-weight:700">
+        ${tone.label}
+      </span>
     </td>
-
-    <td class="px-3 py-2 text-sm flex gap-2">
-      <button class="ver-btn px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 shadow"
-              data-id="${incident.id}">
+    <td>
+      <button class="ver-btn tpp-btn" data-id="${incident.id}" type="button">
         Ver / Editar
       </button>
     </td>
@@ -225,6 +234,9 @@ function pintarModal() {
   modalInputs.dirigidoA.value = incidenciaActual.dirigido_a || "";
   modalInputs.remitente.value = incidenciaActual.remitente || "";
   modalInputs.fecha.value = incidenciaActual.fecha_informe || "";
+  if (modalInputs.introduccion) {
+    modalInputs.introduccion.value = incidenciaActual.campos.introduccion || "";
+  }
   modalInputs.hechos.value = incidenciaActual.campos.hechos || "";
   modalInputs.analisis.value = incidenciaActual.analisis || "";
   modalInputs.conclusiones.value = incidenciaActual.conclusiones || "";
@@ -236,6 +248,7 @@ function pintarModal() {
   );
   renderAnexosModal();
   actualizarBarraModal();
+  setupNumberedTextarea(modalInputs.introduccion);
   setupNumberedTextarea(modalInputs.hechos);
   setupNumberedTextarea(modalInputs.analisis);
   setupNumberedTextarea(modalInputs.conclusiones);
@@ -249,8 +262,7 @@ function renderCamposExtraModal(tipo, valorExtra = {}) {
   modalExtraRefs.contenedor = null;
   modalExtraRefs.placa = null;
 
-  const baseClasses =
-    "w-full rounded-xl border-gray-300 shadow-sm text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 transition";
+  const baseClasses = "tpp-control uppercase";
 
   if (tipo === "CABLE" || tipo === "MERCADERIA") {
     modalExtraContainer.innerHTML = `
@@ -296,22 +308,50 @@ function renderCamposExtraModal(tipo, valorExtra = {}) {
 
 function renderAnexosModal() {
   if (!modalAnexosLista) return;
+  modalAnexosLista.innerHTML = "";
 
-  if (!incidenciaActual.anexos || incidenciaActual.anexos.length === 0) {
+  const anexos = Array.isArray(incidenciaActual?.anexos) ? incidenciaActual.anexos : [];
+  if (!anexos.length) {
     modalAnexosLista.innerHTML =
-      '<p class="text-sm text-gray-500">No hay anexos cargados.</p>';
+      '<div class="form-status form-status--info">No hay anexos cargados.</div>';
     return;
   }
 
-  modalAnexosLista.innerHTML = incidenciaActual.anexos
-    .map(
-      (a) => `
-        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-          <a href="${a.url}" target="_blank" class="text-indigo-600 underline text-sm">${a.name}</a>
-        </div>
-      `
-    )
-    .join("");
+  anexos.forEach((anexo, index) => {
+    const nombre = anexo?.name || `Anexo ${index + 1}`;
+    const url = anexo?.url || "";
+    const isImage = /\.(png|jpe?g|webp)(\?|$)/i.test(url) || /\.(png|jpe?g|webp)$/i.test(nombre);
+    const isPdf = /\.pdf(\?|$)/i.test(url) || /\.pdf$/i.test(nombre);
+
+    const item = document.createElement("a");
+    item.href = url || "#";
+    item.target = "_blank";
+    item.rel = "noopener noreferrer";
+    item.className = "evidence-card";
+    item.style.textDecoration = "none";
+    item.title = nombre;
+
+    if (isImage && url) {
+      item.innerHTML = `
+        <img src="${url}" alt="${nombre}" loading="lazy" />
+        <span class="evidence-card__footer"><span class="evidence-card__name">${nombre}</span></span>
+      `;
+    } else {
+      item.innerHTML = `
+        <span style="height:110px;display:grid;place-items:center;background:#f5f5f7;color:${isPdf ? "#b42318" : "#55565a"};font-size:26px">
+          <i class="fa-regular ${isPdf ? "fa-file-pdf" : "fa-file"}"></i>
+        </span>
+        <span class="evidence-card__footer"><span class="evidence-card__name">${nombre}</span></span>
+      `;
+    }
+
+    if (!url) {
+      item.removeAttribute("href");
+      item.removeAttribute("target");
+    }
+
+    modalAnexosLista.appendChild(item);
+  });
 }
 
 function toggleModal(show) {
@@ -321,13 +361,15 @@ function toggleModal(show) {
     modalOverlay.classList.add("flex");
     modalPanel.classList.remove("scale-95", "opacity-0");
     modalPanel.classList.add("scale-100", "opacity-100");
+    document.body.style.overflow = "hidden";
   } else {
     modalOverlay.classList.add("hidden");
     modalOverlay.classList.remove("flex");
     modalOverlay.classList.add("opacity-0");
     modalPanel.classList.add("scale-95", "opacity-0");
     modalPanel.classList.remove("scale-100", "opacity-100");
-    modalAnexosInput.value = "";
+    document.body.style.overflow = "";
+    if (modalAnexosInput) modalAnexosInput.value = "";
     if (modalFeedback) modalFeedback.className = "hidden";
   }
 }
@@ -353,6 +395,7 @@ function sincronizarIncidenciaDesdeModal() {
   incidenciaActual.dirigido_a = modalInputs.dirigidoA.value;
   incidenciaActual.remitente = modalInputs.remitente.value;
   incidenciaActual.fecha_informe = modalInputs.fecha.value;
+  incidenciaActual.campos.introduccion = modalInputs.introduccion?.value || "";
   incidenciaActual.campos.hechos = modalInputs.hechos.value;
   incidenciaActual.analisis = modalInputs.analisis.value;
   incidenciaActual.conclusiones = modalInputs.conclusiones.value;
@@ -365,15 +408,17 @@ function sincronizarIncidenciaDesdeModal() {
 }
 
 function actualizarBarraModal() {
-  if (!incidenciaActual) return { porcentaje: 0 };
+  if (!incidenciaActual) return { porcentaje: 0, estado: "BORRADOR" };
   sincronizarIncidenciaDesdeModal();
 
   const progreso = calcularProgresoInforme(incidenciaActual);
 
-  if (modalProgressBar && modalProgressLabel) {
-    modalProgressBar.classList.add(`bg-${progreso.color}`, `w-[${progreso.porcentaje}%]`);
-    modalProgressLabel.textContent = `${progreso.porcentaje}%`;
+  if (modalProgressBar) {
+    modalProgressBar.style.width = `${progreso.porcentaje}%`;
+    modalProgressBar.style.background =
+      progreso.porcentaje === 100 ? "#067647" : progreso.porcentaje >= 50 ? "#d89a00" : "#b42318";
   }
+  if (modalProgressLabel) modalProgressLabel.textContent = `${progreso.porcentaje}%`;
 
   return progreso;
 }
@@ -492,10 +537,11 @@ function mostrarFeedback(texto, tipo = "info") {
   if (!modalFeedback || !modalFeedbackText) return;
   modalFeedbackText.textContent = texto;
   modalFeedback.className =
-    "text-sm px-3 py-2 rounded-lg " +
-    (tipo === "success"
-      ? "bg-emerald-50 text-emerald-700"
-      : "bg-rose-50 text-rose-700");
+    tipo === "success"
+      ? "form-status form-status--success is-visible"
+      : tipo === "error"
+        ? "form-status form-status--error is-visible"
+        : "form-status form-status--info is-visible";
 }
 
 function bindEventosModal() {
