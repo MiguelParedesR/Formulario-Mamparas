@@ -1,50 +1,65 @@
-/* ============================================================
-   DASHBOARD CSS — ANIMACIONES + ESTILOS DE CARDS
-   ============================================================ */
+/* TPP Dashboard — Apple/iOS flat production redesign */
+.fade-up{opacity:0;animation:fadeUp .38s ease-out forwards}
+.fade-up-delayed{opacity:0;animation:fadeUp .55s ease-out forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-.fade-up {
-    opacity: 0;
-    animation: fadeUp 0.5s ease-out forwards;
+#dashboardView{max-width:1180px;margin:0 auto}
+#dashboardView>div:first-child{padding:4px 0 24px;border-bottom:1px solid rgba(0,0,0,.09)}
+#dashboardView h1{font-size:clamp(30px,4vw,46px)!important;line-height:1.02!important;letter-spacing:-.045em!important}
+#dashboardView .grid{display:block!important;margin-top:8px!important}
+
+.dashboard-card{
+  position:relative;
+  display:flex;
+  align-items:center;
+  min-height:92px;
+  width:100%;
+  padding:18px 48px 18px 4px!important;
+  margin:0!important;
+  border:0!important;
+  border-bottom:1px solid rgba(0,0,0,.09)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  cursor:pointer;
+  transition:background .16s ease,transform .16s ease!important;
 }
-
-.fade-up-delayed {
-    opacity: 0;
-    animation: fadeUp 0.9s ease-out forwards;
+.dashboard-card::after{
+  content:"›";
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#8e8e93;
+  font-size:28px;
+  font-weight:300;
 }
-
-@keyframes fadeUp {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.dashboard-card:hover{
+  background:rgba(255,255,255,.55)!important;
+  box-shadow:none!important;
+  transform:none!important;
 }
-
-/* Cards hover */
-.dashboard-card {
-    transition: box-shadow 0.25s ease, transform 0.25s ease;
-    cursor: pointer;
+.dashboard-card:active{background:rgba(0,0,0,.035)!important}
+.dashboard-card>div:last-child{display:grid;grid-template-columns:48px minmax(0,1fr);column-gap:14px;align-items:center;width:100%}
+.dashboard-card>div:last-child>div:first-child{
+  grid-row:1 / span 2;
+  width:42px!important;
+  height:42px!important;
+  margin:0!important;
+  border-radius:11px!important;
+  background:rgba(0,113,227,.08)!important;
+  color:#0071e3!important;
+  font-size:18px!important;
 }
+.dashboard-card h2{font-size:17px!important;font-weight:650!important;letter-spacing:-.02em!important;color:#111113!important}
+.dashboard-card p{margin-top:3px!important;font-size:13px!important;line-height:1.4!important;color:#6e6e73!important}
+.dashboard-icon-bg{display:none!important}
 
-.dashboard-card:hover {
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
-    transform: scale(1.02);
+@media(max-width:640px){
+  #dashboardView>div:first-child{padding-bottom:18px}
+  .dashboard-card{min-height:82px;padding-right:38px!important}
+  .dashboard-card>div:last-child{grid-template-columns:42px minmax(0,1fr);column-gap:12px}
+  .dashboard-card>div:last-child>div:first-child{width:38px!important;height:38px!important}
+  .dashboard-card h2{font-size:16px!important}
 }
-
-/* Icon background */
-.dashboard-icon-bg {
-    position: absolute;
-    right: 15px;
-    top: 10px;
-    font-size: 80px;
-    color: rgba(0, 0, 0, 0.06);
-    pointer-events: none;
-}
-
-.dashboard-icon-bg i {
-    opacity: 0.10 !important;
-}
+@media(prefers-reduced-motion:reduce){.fade-up,.fade-up-delayed{opacity:1;animation:none}.dashboard-card{transition:none!important}}
