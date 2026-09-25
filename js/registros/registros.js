@@ -47,6 +47,7 @@ const modalInputs = {
   dirigidoA: document.getElementById("modalDirigidoA"),
   remitente: document.getElementById("modalRemitente"),
   fecha: document.getElementById("modalFecha"),
+  introduccion: document.getElementById("modalIntroduccion"),
   hechos: document.getElementById("modalHechos"),
   analisis: document.getElementById("modalAnalisis"),
   conclusiones: document.getElementById("modalConclusiones"),
@@ -126,7 +127,7 @@ function renderTabla(lista) {
 function renderEmptyTableMessage(tableBody) {
   tableBody.innerHTML = `
     <tr>
-      <td colspan="8" class="text-center py-4 text-gray-500">
+      <td colspan="7" class="text-center py-8 text-gray-500">
         No hay registros para mostrar
       </td>
     </tr>`;
@@ -225,6 +226,7 @@ function pintarModal() {
   modalInputs.dirigidoA.value = incidenciaActual.dirigido_a || "";
   modalInputs.remitente.value = incidenciaActual.remitente || "";
   modalInputs.fecha.value = incidenciaActual.fecha_informe || "";
+  modalInputs.introduccion.value = incidenciaActual.campos.introduccion || "";
   modalInputs.hechos.value = incidenciaActual.campos.hechos || "";
   modalInputs.analisis.value = incidenciaActual.analisis || "";
   modalInputs.conclusiones.value = incidenciaActual.conclusiones || "";
@@ -236,6 +238,7 @@ function pintarModal() {
   );
   renderAnexosModal();
   actualizarBarraModal();
+  setupNumberedTextarea(modalInputs.introduccion);
   setupNumberedTextarea(modalInputs.hechos);
   setupNumberedTextarea(modalInputs.analisis);
   setupNumberedTextarea(modalInputs.conclusiones);
@@ -299,19 +302,60 @@ function renderAnexosModal() {
 
   if (!incidenciaActual.anexos || incidenciaActual.anexos.length === 0) {
     modalAnexosLista.innerHTML =
-      '<p class="text-sm text-gray-500">No hay anexos cargados.</p>';
+      '<div class="form-feedback is-visible" data-tone="info">No hay anexos cargados.</div>';
     return;
   }
 
-  modalAnexosLista.innerHTML = incidenciaActual.anexos
-    .map(
-      (a) => `
-        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-          <a href="${a.url}" target="_blank" class="text-indigo-600 underline text-sm">${a.name}</a>
-        </div>
-      `
-    )
-    .join("");
+  modalAnexosLista.innerHTML = "";
+  const grid = document.createElement("div");
+  grid.style.cssText = "display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px";
+
+  incidenciaActual.anexos.forEach((anexo) => {
+    const url = anexo?.url || "";
+    const nombre = anexo?.name || "Anexo";
+    const esImagen = /\.(png|jpe?g|webp|gif)(\?|$)/i.test(url) || /\.(png|jpe?g|webp|gif)$/i.test(nombre);
+
+    if (esImagen && url) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "evidence-card";
+      btn.innerHTML = `
+        <img src="${url}" alt="${nombre}" loading="lazy" />
+        <div class="evidence-caption">${nombre}</div>
+      `;
+      btn.addEventListener("click", () => abrirPreviewRegistro(url));
+      grid.appendChild(btn);
+    } else {
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.className = "evidence-card";
+      link.innerHTML = `
+        <div style="height:120px;display:grid;place-items:center;background:#f7f7f9;font-size:28px">PDF</div>
+        <div class="evidence-caption">${nombre}</div>
+      `;
+      grid.appendChild(link);
+    }
+  });
+
+  modalAnexosLista.appendChild(grid);
+}
+
+function abrirPreviewRegistro(url) {
+  const modal = document.getElementById("registroPreviewModal");
+  const image = document.getElementById("registroPreviewImage");
+  if (!modal || !image || !url) return;
+  image.src = url;
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function cerrarPreviewRegistro() {
+  const modal = document.getElementById("registroPreviewModal");
+  if (!modal) return;
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
 }
 
 function toggleModal(show) {
@@ -353,6 +397,7 @@ function sincronizarIncidenciaDesdeModal() {
   incidenciaActual.dirigido_a = modalInputs.dirigidoA.value;
   incidenciaActual.remitente = modalInputs.remitente.value;
   incidenciaActual.fecha_informe = modalInputs.fecha.value;
+  incidenciaActual.campos.introduccion = modalInputs.introduccion.value;
   incidenciaActual.campos.hechos = modalInputs.hechos.value;
   incidenciaActual.analisis = modalInputs.analisis.value;
   incidenciaActual.conclusiones = modalInputs.conclusiones.value;
@@ -371,7 +416,9 @@ function actualizarBarraModal() {
   const progreso = calcularProgresoInforme(incidenciaActual);
 
   if (modalProgressBar && modalProgressLabel) {
-    modalProgressBar.classList.add(`bg-${progreso.color}`, `w-[${progreso.porcentaje}%]`);
+    modalProgressBar.style.width = `${progreso.porcentaje}%`;
+    modalProgressBar.style.background =
+      progreso.porcentaje >= 100 ? "#147d64" : progreso.porcentaje >= 50 ? "#9a6700" : "#c9342f";
     modalProgressLabel.textContent = `${progreso.porcentaje}%`;
   }
 
@@ -499,6 +546,16 @@ function mostrarFeedback(texto, tipo = "info") {
 }
 
 function bindEventosModal() {
+  const previewModal = document.getElementById("registroPreviewModal");
+  const previewClose = document.getElementById("registroPreviewClose");
+  previewClose?.addEventListener("click", cerrarPreviewRegistro);
+  previewModal?.addEventListener("click", (event) => {
+    if (event.target === previewModal) cerrarPreviewRegistro();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") cerrarPreviewRegistro();
+  });
+
   if (modalClose) {
     modalClose.addEventListener("click", () => toggleModal(false));
   }
