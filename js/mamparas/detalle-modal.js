@@ -8,28 +8,29 @@ let escListenerActivo = false;
 
 const MODAL_ID = "mampara-modal";
 const CARRUSEL_ID = "mampara-carrusel";
-const DARK_BUTTON_BASE =
-  "rounded-full text-white shadow-lg flex items-center justify-center transition hover:opacity-90 focus-visible:ring-2 focus-visible:ring-white/60";
-const DARK_BUTTON_STYLE =
-  "background-color: #0b1a2a; border: 1px solid rgba(255,255,255,0.22);";
 
 const textoSeguro = (valor, fallback = "--") => {
   if (valor === null || valor === undefined || valor === "") return fallback;
   return String(valor);
 };
 
+const escapeHtml = (valor) =>
+  textoSeguro(valor, "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 const formatearNumero = (valor, unidad) => {
   if (valor === null || valor === undefined || valor === "") return "--";
   const numero = Number.parseFloat(valor);
-  if (Number.isFinite(numero)) {
-    return unidad ? `${numero} ${unidad}` : `${numero}`;
-  }
+  if (Number.isFinite(numero)) return unidad ? `${numero} ${unidad}` : String(numero);
   return String(valor);
 };
 
 const aplicarOffsetSidebar = (overlay) => {
   if (!overlay) return () => {};
-  // Keep overlay aligned with sidebar open/collapsed state (avoid SPA overlap).
   positionModal(overlay);
   const cleanup = watchModalPosition(overlay);
   return typeof cleanup === "function" ? cleanup : () => {};
@@ -37,111 +38,94 @@ const aplicarOffsetSidebar = (overlay) => {
 
 const normalizarImagenes = (imagenes) => {
   if (!Array.isArray(imagenes)) return [];
-  return imagenes.map((img) => ({
-    key: img?.key || "",
-    label: img?.label || "Foto",
-    labelHtml: img?.labelHtml || img?.label || "Foto",
-    url: img?.url || "",
-  }));
+  return imagenes
+    .map((img) => ({
+      key: img?.key || "",
+      label: img?.label || "Foto",
+      url: img?.url || "",
+    }))
+    .filter((img) => img.url);
 };
 
-const construirMiniaturas = (imagenes) => {
-  const disponibles = [];
-  const indices = imagenes.map((img) => {
-    if (img.url) {
-      disponibles.push(img);
-      return disponibles.length - 1;
-    }
-    return -1;
-  });
+function construirGaleria(imagenes) {
+  if (!imagenes.length) {
+    return '<div class="form-status form-status--info">Este registro no tiene evidencias disponibles.</div>';
+  }
 
-  const html = imagenes
-    .map((img, idx) => {
-      const habilitada = Boolean(img.url);
-      const carouselIndex = indices[idx];
-      const dataAttr = `data-carousel-index="${carouselIndex}"`;
-      const disabledAttr = habilitada ? "" : 'disabled aria-disabled="true"';
-      const claseBase =
-        "w-full h-28 rounded-xl border border-gray-200 shadow-sm overflow-hidden transition";
-      const claseHover = habilitada
-        ? "cursor-pointer hover:shadow-md hover:ring-2 hover:ring-blue-500"
-        : "cursor-not-allowed opacity-60";
-      const contenido = habilitada
-        ? `<img src="${img.url}" alt="${textoSeguro(
-            img.label
-          )}" class="w-full h-full object-cover" loading="lazy" />`
-        : `<div class="w-full h-full flex items-center justify-center text-xs text-gray-400">Sin foto</div>`;
-
-      return `
-        <div class="text-center" style="flex: 1 1 0; min-width: 180px;">
-          <button type="button" class="${claseBase} ${claseHover}" ${dataAttr} ${disabledAttr}>
-            ${contenido}
-          </button>
-          <p class="text-xs font-semibold text-gray-600 mt-2">${img.labelHtml}</p>
-        </div>
-      `;
-    })
-    .join("");
-
-  return { html, disponibles };
-};
+  return `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
+      ${imagenes.map((img,index) => `
+        <button type="button" class="evidence-card" data-carousel-index="${index}" style="text-align:left">
+          <img src="${escapeHtml(img.url)}" alt="${escapeHtml(img.label)}" loading="lazy" />
+          <span class="evidence-card__footer">
+            <span class="evidence-card__name">${escapeHtml(img.label)}</span>
+          </span>
+        </button>
+      `).join("")}
+    </div>
+  `;
+}
 
 export function mostrarDetalleMampara(payload) {
   cerrarModales();
 
   const tipo = textoSeguro(payload?.tipo, "Mampara");
+  const esMampara = tipo.toUpperCase() === "MAMPARA";
   const separacion = formatearNumero(payload?.separacion, "cm");
   const altura = formatearNumero(payload?.altura, "cm");
-  const imagenes = normalizarImagenes(payload?.imagenes);
-  const { html: miniaturasHtml, disponibles } = construirMiniaturas(imagenes);
-
-  carruselImagenes = disponibles;
+  const observacion = textoSeguro(payload?.observacion, "--");
+  carruselImagenes = normalizarImagenes(payload?.imagenes);
   carruselIndice = 0;
 
   const overlay = document.createElement("div");
   overlay.id = MODAL_ID;
-  overlay.className =
-    "fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-6 animate-fade";
-  overlay.style.zIndex = "1800";
+  overlay.className = "media-lightbox flex";
+  overlay.style.zIndex = "7200";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", `Detalle de ${tipo}`);
 
   overlay.innerHTML = `
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl p-6 sm:p-8 relative animate-grow" style="overflow: visible;">
-      <button
-        type="button"
-        class="${DARK_BUTTON_BASE} absolute w-10 h-10 text-xl leading-none z-10"
-        data-close
-        aria-label="Cerrar"
-        style="${DARK_BUTTON_STYLE} top: -16px; right: -16px;"
-      >&times;</button>
+    <div class="media-lightbox__dialog" style="background:#fff;max-height:92vh;overflow:auto">
+      <button type="button" class="media-close" data-close aria-label="Cerrar">×</button>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-          <p class="text-[11px] uppercase tracking-[0.2em] text-gray-500">Tipo</p>
-          <p class="text-lg font-semibold text-gray-900">${tipo}</p>
-        </div>
-        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-          <p class="text-[11px] uppercase tracking-[0.2em] text-gray-500">Separaci&oacute;n lateral central</p>
-          <p class="text-lg font-semibold text-gray-900">${separacion}</p>
-        </div>
-        <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-          <p class="text-[11px] uppercase tracking-[0.2em] text-gray-500">Altura de mampara</p>
-          <p class="text-lg font-semibold text-gray-900">${altura}</p>
-        </div>
-      </div>
+      <header style="padding:24px 26px 18px;border-bottom:1px solid #e1e2e5">
+        <p class="tpp-eyebrow">Inspección registrada</p>
+        <h2 style="margin:3px 0 5px;font-size:24px;letter-spacing:-.03em">${escapeHtml(tipo)}</h2>
+        <p class="tpp-help">Revisa el detalle técnico y abre cualquier evidencia para verla a tamaño completo.</p>
+      </header>
 
-      <div class="mt-6">
-        <div class="flex flex-nowrap gap-4 overflow-x-auto pb-2">
-          ${miniaturasHtml}
+      <div style="padding:22px 26px 28px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px">
+          ${esMampara ? `
+            <div class="inspection-action">
+              <p class="tpp-eyebrow">Separación lateral</p>
+              <h3 style="font-size:22px;margin-top:5px">${escapeHtml(separacion)}</h3>
+            </div>
+            <div class="inspection-action">
+              <p class="tpp-eyebrow">Altura</p>
+              <h3 style="font-size:22px;margin-top:5px">${escapeHtml(altura)}</h3>
+            </div>
+          ` : `
+            <div class="inspection-action" style="grid-column:1/-1">
+              <p class="tpp-eyebrow">Observación</p>
+              <p style="margin:6px 0 0;line-height:1.55">${escapeHtml(observacion)}</p>
+            </div>
+          `}
         </div>
+
+        <div class="inspection-column__head">
+          <p class="tpp-eyebrow">Evidencias</p>
+          <h2>Proyección fotográfica</h2>
+        </div>
+        ${construirGaleria(carruselImagenes)}
       </div>
     </div>
   `;
 
-  const container =
-    document.getElementById("mampara-detalle-modal-container") || document.body;
+  const container = document.getElementById("mampara-detalle-modal-container") || document.body;
   container.appendChild(overlay);
+  document.body.style.overflow = "hidden";
   limpiarDetalleOffset = aplicarOffsetSidebar(overlay);
   registrarEscape();
 
@@ -150,73 +134,40 @@ export function mostrarDetalleMampara(payload) {
       cerrarModales();
       return;
     }
-
     const btn = event.target.closest("[data-carousel-index]");
     if (!btn) return;
-    const nextIndex = Number(btn.dataset.carouselIndex);
-    if (Number.isFinite(nextIndex) && nextIndex >= 0) {
-      abrirCarrusel(nextIndex);
-    }
+    const index = Number(btn.dataset.carouselIndex);
+    if (Number.isFinite(index)) abrirCarrusel(index);
   });
 }
 
 const abrirCarrusel = (indiceInicial) => {
   if (!carruselImagenes.length) return;
 
-  carruselIndice = Math.max(
-    0,
-    Math.min(indiceInicial, carruselImagenes.length - 1)
-  );
-  const mostrarControles = carruselImagenes.length > 1;
-
+  carruselIndice = Math.max(0, Math.min(indiceInicial, carruselImagenes.length - 1));
   const overlay = document.createElement("div");
   overlay.id = CARRUSEL_ID;
-  overlay.className =
-    "fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 py-6 animate-fade";
-  overlay.style.zIndex = "1900";
+  overlay.className = "media-lightbox flex";
+  overlay.style.zIndex = "7400";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
 
-  const arrowHidden = mostrarControles ? "" : "opacity-0 pointer-events-none";
-
   overlay.innerHTML = `
-    <div class="relative w-full max-w-5xl mx-auto">
-      <button
-        type="button"
-        class="${DARK_BUTTON_BASE} absolute top-3 right-3 w-11 h-11 text-2xl leading-none z-10"
-        data-close
-        aria-label="Cerrar"
-        style="${DARK_BUTTON_STYLE}"
-      >&times;</button>
-      <div class="flex items-center justify-center gap-4 sm:gap-6">
-        <button
-          type="button"
-          class="${DARK_BUTTON_BASE} w-12 h-12 text-2xl leading-none flex-shrink-0 ${arrowHidden}"
-          data-prev
-          aria-label="Anterior"
-          style="${DARK_BUTTON_STYLE}"
-        >
-          &#10094;
-        </button>
-        <img
-          id="mampara-carrusel-img"
-          src="${carruselImagenes[carruselIndice].url}"
-          alt="${textoSeguro(carruselImagenes[carruselIndice].label)}"
-          class="max-h-[75vh] max-w-[80vw] object-contain rounded-2xl bg-black/30 shadow-2xl transition-opacity duration-300"
-        />
-        <button
-          type="button"
-          class="${DARK_BUTTON_BASE} w-12 h-12 text-2xl leading-none flex-shrink-0 ${arrowHidden}"
-          data-next
-          aria-label="Siguiente"
-          style="${DARK_BUTTON_STYLE}"
-        >
-          &#10095;
-        </button>
+    <div class="media-lightbox__dialog">
+      <button type="button" class="media-close" data-close aria-label="Cerrar">×</button>
+      <div class="media-stage" style="position:relative">
+        <button type="button" data-prev class="media-close" aria-label="Anterior"
+          style="left:12px!important;right:auto!important;top:50%!important;transform:translateY(-50%);display:${carruselImagenes.length > 1 ? "grid" : "none"}!important">‹</button>
+        <img id="mampara-carrusel-img"
+          src="${escapeHtml(carruselImagenes[carruselIndice].url)}"
+          alt="${escapeHtml(carruselImagenes[carruselIndice].label)}" />
+        <button type="button" data-next class="media-close" aria-label="Siguiente"
+          style="top:50%!important;transform:translateY(-50%);display:${carruselImagenes.length > 1 ? "grid" : "none"}!important">›</button>
       </div>
-      <p id="mampara-carrusel-label" class="text-center text-sm text-gray-200 mt-4">
-        ${carruselImagenes[carruselIndice].labelHtml}
-      </p>
+      <div class="media-lightbox__footer">
+        <strong id="mampara-carrusel-label">${escapeHtml(carruselImagenes[carruselIndice].label)}</strong>
+        <span class="tpp-help" style="margin-left:auto">${carruselIndice + 1} / ${carruselImagenes.length}</span>
+      </div>
     </div>
   `;
 
@@ -229,21 +180,14 @@ const abrirCarrusel = (indiceInicial) => {
       cerrarCarrusel();
       return;
     }
-
-    if (event.target.closest("[data-prev]")) {
-      moverCarrusel(-1);
-    }
-    if (event.target.closest("[data-next]")) {
-      moverCarrusel(1);
-    }
+    if (event.target.closest("[data-prev]")) moverCarrusel(-1);
+    if (event.target.closest("[data-next]")) moverCarrusel(1);
   });
 };
 
 const moverCarrusel = (direccion) => {
   if (!carruselImagenes.length) return;
-  carruselIndice =
-    (carruselIndice + direccion + carruselImagenes.length) %
-    carruselImagenes.length;
+  carruselIndice = (carruselIndice + direccion + carruselImagenes.length) % carruselImagenes.length;
   actualizarCarrusel();
 };
 
@@ -251,16 +195,12 @@ const actualizarCarrusel = () => {
   const img = document.getElementById("mampara-carrusel-img");
   const label = document.getElementById("mampara-carrusel-label");
   if (!img) return;
-
   const siguiente = carruselImagenes[carruselIndice];
-  img.classList.add("opacity-0");
-
-  window.setTimeout(() => {
-    img.src = siguiente.url || "";
-    img.alt = textoSeguro(siguiente.label);
-    if (label) label.innerHTML = siguiente.labelHtml;
-    img.classList.remove("opacity-0");
-  }, 120);
+  img.src = siguiente.url || "";
+  img.alt = textoSeguro(siguiente.label);
+  if (label) label.textContent = siguiente.label;
+  const footerMeta = document.querySelector("#mampara-carrusel .media-lightbox__footer .tpp-help");
+  if (footerMeta) footerMeta.textContent = `${carruselIndice + 1} / ${carruselImagenes.length}`;
 };
 
 const cerrarModales = () => {
@@ -268,6 +208,7 @@ const cerrarModales = () => {
   cerrarCarrusel();
   limpiarDetalleOffset?.();
   limpiarDetalleOffset = null;
+  document.body.style.overflow = "";
   removerEscape();
 };
 
@@ -278,6 +219,14 @@ const cerrarCarrusel = () => {
 };
 
 const escListener = (event) => {
+  if (event.key === "ArrowLeft" && document.getElementById(CARRUSEL_ID)) {
+    moverCarrusel(-1);
+    return;
+  }
+  if (event.key === "ArrowRight" && document.getElementById(CARRUSEL_ID)) {
+    moverCarrusel(1);
+    return;
+  }
   if (event.key !== "Escape") return;
   if (document.getElementById(CARRUSEL_ID)) {
     cerrarCarrusel();
