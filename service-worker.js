@@ -13,7 +13,7 @@ const asset = (path = "") => {
   return BASE_PATH ? `${BASE_PATH}/${cleaned}` : cleaned;
 };
 
-const VERSION = "v7.140";
+const VERSION = "v7.141";
 const CACHE_NAME = `CCTV-${VERSION}${BASE_PATH ? `-${BASE_PATH.replace(/\//g, "-")}` : ""}`;
 
 const STATIC_ASSETS = [
