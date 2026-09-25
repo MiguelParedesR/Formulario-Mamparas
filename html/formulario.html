@@ -1,192 +1,136 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TPP &mdash; Nuevo Informe de Incidencia</title>
-
   <link rel="stylesheet" href="../CSS/tailwind.css" />
   <link rel="stylesheet" href="../CSS/global.css" />
   <link rel="stylesheet" href="../CSS/dashboard/dashboard.css" />
-
-  <style>
-    body {
-      background-color: #f4f6f8;
-    }
-
-    .gallery-thumb:hover {
-      transform: scale(1.05);
-    }
-  </style>
+  <link rel="stylesheet" href="../CSS/apple-redesign.css" />
 </head>
-
-<body class="bg-slate-50">
-  <main class="app-layout">
-    <div class="app-layout-inner space-y-8 animate-fade">
-
-      <!-- HEADER -->
-      <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-slide select-none">
-        <div>
-          <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
-            <i class="fas fa-file-signature text-indigo-600"></i> Nuevo Informe de Incidencia
-          </h1>
-          <p class="text-sm text-gray-500" id="tipoDescripcion">Obteniendo informaci&oacute;n del tipo seleccionado&hellip;</p>
+<body>
+  <main class="apple-page">
+    <div class="report-editor">
+      <header class="document-toolbar">
+        <div class="document-titlebar">
+          <div class="document-icon"><i class="fas fa-file-lines"></i></div>
+          <div>
+            <h1>Informe de incidencia</h1>
+            <p id="tipoDescripcion">Obteniendo plantilla seleccionada&hellip;</p>
+          </div>
         </div>
-
-        <div class="flex flex-wrap items-center gap-3">
-          <button id="btnVolverDashboard"
-            class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium hover:bg-gray-100 flex items-center gap-2">
-            <i class="fas fa-arrow-left"></i> Volver
-          </button>
-
-          <button id="btnGuardarBorrador"
-            class="px-5 py-2 rounded-lg border border-amber-300 bg-amber-50 text-sm font-semibold text-amber-700 hover:bg-amber-100">
-            Guardar Borrador
-          </button>
-
-          <button id="btnGuardarCompleto"
-            class="px-5 py-2 rounded-lg bg-indigo-600 text-sm font-semibold text-white shadow-md hover:bg-indigo-700">
-            Guardar Informe
-          </button>
-
-          <button id="btnExportarWord"
-            class="px-5 py-2 rounded-lg border border-emerald-500 bg-white text-sm font-semibold text-emerald-600 hover:bg-emerald-50">
-            Exportar Word
-          </button>
+        <div class="document-actions" aria-label="Acciones del documento">
+          <button id="btnVolverDashboard" type="button"><i class="fas fa-arrow-left"></i>&nbsp; Volver</button>
+          <button id="btnGuardarBorrador" type="button" class="button-draft">Guardar borrador</button>
+          <button id="btnGuardarCompleto" type="button" class="button-primary">Guardar informe</button>
+          <button id="btnExportarWord" type="button" class="button-word"><i class="fas fa-file-word"></i>&nbsp; Exportar Word</button>
         </div>
       </header>
 
-      <!-- PROGRESS -->
-      <div class="animate-grow">
-        <div class="flex justify-between mb-1">
-          <span class="text-xs font-semibold text-gray-600 uppercase">Avance del informe</span>
-          <span id="progressLabel" class="text-xs font-semibold text-gray-600">0%</span>
+      <div id="formFeedback" class="form-feedback" data-tone="info" role="status" aria-live="polite"></div>
+
+      <div class="document-progress">
+        <span class="progress-copy">Avance del informe · puedes guardar un borrador en cualquier momento</span>
+        <span id="progressLabel" class="progress-value">0%</span>
+        <div class="progress-track">
+          <div id="progressBar" style="width:0;background:#c9342f"></div>
         </div>
-        <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden shadow-inner">
-          <div id="progressBar" class="h-2 w-0 bg-red-500 rounded-full transition-all duration-500"></div>
-        </div>
-        <p class="text-[11px] text-gray-500 mt-1">Puedes guardar borradores incompletos.</p>
       </div>
 
-      <!-- FORM CARD -->
-      <section class="bg-white rounded-3xl border border-gray-100 shadow-xl p-6 sm:p-8 animate-slide">
-        <form id="form-incidencia" class="space-y-8">
-          <div class="grid gap-6 lg:grid-cols-[2fr_2fr_1.2fr] app-3col-grid w-full items-start">
-
-            <!-- COLUMNA IZQUIERDA -->
-            <div class="space-y-6">
-              <section class="bg-slate-50 border border-gray-100 shadow-sm rounded-2xl p-5 space-y-4">
+      <form id="form-incidencia" novalidate>
+        <div class="word-workspace">
+          <div class="word-column">
+            <section class="word-section">
+              <p class="section-kicker">Sección I</p>
+              <h2>Encabezado del informe</h2>
+              <div class="word-metadata">
+                <div class="field-wide">
+                  <label for="asunto">Asunto</label>
+                  <input id="asunto" readonly />
+                </div>
+                <div class="field-wide">
+                  <label for="dirigidoA">Dirigido a</label>
+                  <input id="dirigidoA" value="GERENTE DE SSOMA, PROTECCIÓN Y DESARROLLO PROYECTO MARVAL" readonly />
+                </div>
                 <div>
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion I</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Asunto y serie</h2>
+                  <label for="remitente">Remitente</label>
+                  <input id="remitente" value="SUPERVISOR DE SEGURIDAD" readonly />
                 </div>
-                <div class="space-y-4">
-                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="space-y-1">
-                      <label class="text-sm font-semibold text-gray-700">Asunto (automatico)</label>
-                      <input id="asunto" readonly class="w-full rounded-xl border border-gray-200 bg-white shadow-sm px-4 py-2 text-sm" />
-                    </div>
-                    <div class="space-y-1">
-                      <label class="text-sm font-semibold text-gray-700">Dirigido a</label>
-                      <input id="dirigidoA" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2 text-sm uppercase" value="GERENTE DE SSOMA, PROTECCI&Oacute;N Y DESARROLLO PROYECTO MARVAL" readonly />
-                    </div>
-                    <div class="space-y-1">
-                      <label class="text-sm font-semibold text-gray-700">Remitente</label>
-                      <input id="remitente" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2 text-sm uppercase" value="SUPERVISOR DE SEGURIDAD" readonly />
-                    </div>
-                    <div class="space-y-1">
-                      <label class="text-sm font-semibold text-gray-700">Fecha del informe</label>
-                      <input id="fechaInforme" type="date" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2 text-sm" />
-                    </div>
-                  </div>
-                  <div id="campoExtraContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
-                </div>
-              </section>
-
-              <section class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 space-y-3">
                 <div>
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion II</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Introduccion</h2>
+                  <label for="fechaInforme">Fecha</label>
+                  <input id="fechaInforme" type="date" />
                 </div>
-                <textarea id="introduccion" rows="6" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-3 text-sm resize-y" placeholder="1. Describa la introduccion del informe..."></textarea>
-                <p class="text-[11px] text-gray-500">Presiona Enter para insertar numeracion.</p>
-              </section>
+              </div>
+              <div id="campoExtraContainer" class="word-metadata" style="margin-top:12px"></div>
+            </section>
 
-              <section class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 space-y-3">
-                <div>
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion V</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Analisis</h2>
-                </div>
-                <textarea id="analisis" rows="6" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-3 text-sm resize-y" placeholder="1. Analiza los hechos..."></textarea>
-              </section>
-            </div>
+            <section class="word-section">
+              <p class="section-kicker">Sección II</p>
+              <h2>Introducción</h2>
+              <textarea id="introduccion" rows="7" placeholder="1. Describa el contexto del informe..."></textarea>
+            </section>
 
-            <!-- COLUMNA CENTRAL -->
-            <div class="space-y-6">
-              <section class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 space-y-3">
-                <div class="flex flex-col">
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion III</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Hechos</h2>
-                </div>
-                <textarea id="hechos" rows="12" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-3 text-sm resize-y" placeholder="1. Primer hecho..."></textarea>
-                <p class="text-[11px] text-gray-500">Presiona Enter para insertar numeracion automatica.</p>
-              </section>
-
-              <section class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 space-y-3">
-                <div>
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion VI</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Conclusiones</h2>
-                </div>
-                <textarea id="conclusiones" rows="6" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-3 text-sm resize-y" placeholder="1. Conclusion..."></textarea>
-              </section>
-
-              <section class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 space-y-3">
-                <div>
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion VII</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Recomendaciones</h2>
-                </div>
-                <textarea id="recomendaciones" rows="6" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-3 text-sm resize-y" placeholder="1. Accion recomendada..."></textarea>
-              </section>
-            </div>
-
-            <!-- COLUMNA DERECHA -->
-            <aside class="space-y-4 sticky top-6 bg-white border border-gray-200 rounded-xl shadow p-4 max-h-[90vh] overflow-y-auto">
-              <section class="space-y-2">
-                <h2 class="text-sm font-semibold text-gray-700">SECCION VIII Evidencias</h2>
-
-                <input id="anexos" type="file" accept="image/*,.pdf" multiple class="sr-only" />
-                <button type="button" id="btnSubirAnexos"
-                  class="w-full px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition">
-                  Subir evidencias (m&aacute;x. 30)
-                </button>
-
-                <div id="anexosPreview" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
-
-                <p class="text-xs text-gray-500">Haz clic en una imagen para verla grande. Archivos permitidos: JPG, PNG, PDF, WebP.</p>
-              </section>
-            </aside>
+            <section class="word-section">
+              <p class="section-kicker">Sección V</p>
+              <h2>Análisis</h2>
+              <textarea id="analisis" rows="8" placeholder="1. Analice los hechos registrados..."></textarea>
+            </section>
           </div>
-        </form>
-      </section>
-      <!-- MODAL PREVIEW -->
-      <div id="modalPreview" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
-        <div class="relative bg-white rounded-xl shadow-2xl max-w-3xl w-full p-4 animate-[fadeIn_0.3s_ease-out]">
-          <button onclick="cerrarModalPreview()" class="absolute top-2 right-2 text-xl text-gray-600 hover:text-red-500">
-            &times;
-          </button>
-          <img id="previewImagen" src="" alt="Previsualizaci&oacute;n" />
-          <p class="text-sm text-center text-gray-500 mt-2">Previsualizaci&oacute;n</p>
-        </div>
-      </div>
 
+          <div class="word-column">
+            <section class="word-section">
+              <p class="section-kicker">Sección III</p>
+              <h2>Hechos</h2>
+              <textarea id="hechos" rows="16" placeholder="1. Registre el primer hecho..."></textarea>
+            </section>
+
+            <section class="word-section">
+              <p class="section-kicker">Sección VI</p>
+              <h2>Conclusiones</h2>
+              <textarea id="conclusiones" rows="8" placeholder="1. Registre una conclusión..."></textarea>
+            </section>
+
+            <section class="word-section">
+              <p class="section-kicker">Sección VII</p>
+              <h2>Recomendaciones</h2>
+              <textarea id="recomendaciones" rows="8" placeholder="1. Registre una acción recomendada..."></textarea>
+            </section>
+          </div>
+
+          <aside class="word-column evidence-sheet">
+            <div class="evidence-head">
+              <div>
+                <p class="section-kicker">Sección VIII</p>
+                <h2>Evidencias</h2>
+                <p>Imágenes o PDF que sustenten el informe.</p>
+              </div>
+              <span id="evidenceCount" class="progress-value">0 / 30</span>
+            </div>
+
+            <input id="anexos" type="file" accept="image/*,.pdf" multiple class="sr-only" />
+            <div id="dropZoneAnexos" class="rounded-xl border border-dashed border-slate-300 p-3" style="margin-bottom:12px">
+              <button type="button" id="btnSubirAnexos" class="evidence-upload">
+                <i class="fas fa-cloud-arrow-up"></i>&nbsp; Agregar evidencias
+              </button>
+              <p class="text-xs text-gray-500 text-center" style="margin-top:8px">También puedes arrastrar archivos aquí · máximo 30 · 12 MB por archivo</p>
+            </div>
+
+            <div id="anexosPreview"></div>
+          </aside>
+        </div>
+      </form>
     </div>
   </main>
 
+  <div id="modalPreview" class="fixed inset-0 z-[6500] hidden items-center justify-center" role="dialog" aria-modal="true" aria-label="Vista ampliada de evidencia">
+    <div class="relative">
+      <button type="button" onclick="cerrarModalPreview()" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-black/70 text-white" aria-label="Cerrar vista">&times;</button>
+      <img id="previewImagen" src="" alt="Previsualización de evidencia" />
+      <p class="text-sm text-center mt-2">Vista ampliada · ESC para cerrar</p>
+    </div>
+  </div>
+
   <script type="module" src="../js/formularios/formulario.js"></script>
 </body>
-
 </html>
-
-
-
