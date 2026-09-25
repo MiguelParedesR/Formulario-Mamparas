@@ -3,47 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TPP &mdash; Nuevo Informe de Incidencia</title>
+  <title>Nuevo informe</title>
   <link rel="stylesheet" href="../CSS/tailwind.css" />
   <link rel="stylesheet" href="../CSS/global.css" />
   <link rel="stylesheet" href="../CSS/dashboard/dashboard.css" />
   <link rel="stylesheet" href="../CSS/apple-redesign.css" />
 </head>
 <body>
-  <main class="apple-page">
-    <div class="report-editor">
-      <header class="document-toolbar">
-        <div class="document-titlebar">
-          <div class="document-icon"><i class="fas fa-file-lines"></i></div>
-          <div>
-            <h1>Informe de incidencia</h1>
+  <main class="report-editor">
+    <div class="v3-doc-shell">
+      <div class="v3-doc-top">
+        <div class="document-toolbar">
+          <div class="document-titlebar">
             <p id="tipoDescripcion">Obteniendo plantilla seleccionada&hellip;</p>
           </div>
+          <div class="document-actions" aria-label="Acciones del documento">
+            <button id="btnVolverDashboard" type="button">Volver</button>
+            <button id="btnGuardarBorrador" type="button" class="button-draft">Guardar borrador</button>
+            <button id="btnGuardarCompleto" type="button" class="button-primary">Guardar informe</button>
+            <button id="btnExportarWord" type="button" class="button-word">Exportar Word</button>
+          </div>
         </div>
-        <div class="document-actions" aria-label="Acciones del documento">
-          <button id="btnVolverDashboard" type="button"><i class="fas fa-arrow-left"></i>&nbsp; Volver</button>
-          <button id="btnGuardarBorrador" type="button" class="button-draft">Guardar borrador</button>
-          <button id="btnGuardarCompleto" type="button" class="button-primary">Guardar informe</button>
-          <button id="btnExportarWord" type="button" class="button-word"><i class="fas fa-file-word"></i>&nbsp; Exportar Word</button>
-        </div>
-      </header>
 
-      <div id="formFeedback" class="form-feedback" data-tone="info" role="status" aria-live="polite"></div>
+        <div id="formFeedback" class="form-feedback" data-tone="info" role="status" aria-live="polite"></div>
 
-      <div class="document-progress">
-        <span class="progress-copy">Avance del informe · puedes guardar un borrador en cualquier momento</span>
-        <span id="progressLabel" class="progress-value">0%</span>
-        <div class="progress-track">
-          <div id="progressBar" style="width:0;background:#c9342f"></div>
+        <div class="document-progress">
+          <span class="progress-copy">Avance del documento</span>
+          <div class="progress-track"><div id="progressBar" style="width:0;background:#c94d4d"></div></div>
+          <span id="progressLabel" class="progress-value">0%</span>
         </div>
       </div>
 
       <form id="form-incidencia" novalidate>
         <div class="word-workspace">
-          <div class="word-column">
+          <article class="word-column">
             <section class="word-section">
-              <p class="section-kicker">Sección I</p>
-              <h2>Encabezado del informe</h2>
+              <p class="section-kicker">Documento · 01</p>
+              <h2>Contexto y cabecera</h2>
               <div class="word-metadata">
                 <div class="field-wide">
                   <label for="asunto">Asunto</label>
@@ -62,60 +58,57 @@
                   <input id="fechaInforme" type="date" />
                 </div>
               </div>
-              <div id="campoExtraContainer" class="word-metadata" style="margin-top:12px"></div>
+              <div id="campoExtraContainer" class="word-metadata" style="margin-top:11px"></div>
             </section>
 
             <section class="word-section">
               <p class="section-kicker">Sección II</p>
               <h2>Introducción</h2>
-              <textarea id="introduccion" rows="7" placeholder="1. Describa el contexto del informe..."></textarea>
+              <textarea id="introduccion" rows="7" placeholder="1. Describe el contexto y el motivo del informe..."></textarea>
             </section>
 
             <section class="word-section">
               <p class="section-kicker">Sección V</p>
               <h2>Análisis</h2>
-              <textarea id="analisis" rows="8" placeholder="1. Analice los hechos registrados..."></textarea>
+              <textarea id="analisis" rows="8" placeholder="1. Analiza las circunstancias y la secuencia del evento..."></textarea>
             </section>
-          </div>
+          </article>
 
-          <div class="word-column">
+          <article class="word-column">
             <section class="word-section">
-              <p class="section-kicker">Sección III</p>
+              <p class="section-kicker">Documento · 02</p>
               <h2>Hechos</h2>
-              <textarea id="hechos" rows="16" placeholder="1. Registre el primer hecho..."></textarea>
+              <textarea id="hechos" rows="16" placeholder="1. Registra los hechos en orden cronológico..."></textarea>
             </section>
 
             <section class="word-section">
               <p class="section-kicker">Sección VI</p>
               <h2>Conclusiones</h2>
-              <textarea id="conclusiones" rows="8" placeholder="1. Registre una conclusión..."></textarea>
+              <textarea id="conclusiones" rows="8" placeholder="1. Resume los hallazgos principales..."></textarea>
             </section>
 
             <section class="word-section">
               <p class="section-kicker">Sección VII</p>
               <h2>Recomendaciones</h2>
-              <textarea id="recomendaciones" rows="8" placeholder="1. Registre una acción recomendada..."></textarea>
+              <textarea id="recomendaciones" rows="8" placeholder="1. Registra las acciones recomendadas..."></textarea>
             </section>
-          </div>
+          </article>
 
           <aside class="word-column evidence-sheet">
             <div class="evidence-head">
               <div>
-                <p class="section-kicker">Sección VIII</p>
+                <p class="section-kicker">Documento · 03</p>
                 <h2>Evidencias</h2>
-                <p>Imágenes o PDF que sustenten el informe.</p>
+                <p>Fotografías o PDF que sustenten el informe.</p>
               </div>
               <span id="evidenceCount" class="progress-value">0 / 30</span>
             </div>
 
             <input id="anexos" type="file" accept="image/*,.pdf" multiple class="sr-only" />
-            <div id="dropZoneAnexos" class="rounded-xl border border-dashed border-slate-300 p-3" style="margin-bottom:12px">
-              <button type="button" id="btnSubirAnexos" class="evidence-upload">
-                <i class="fas fa-cloud-arrow-up"></i>&nbsp; Agregar evidencias
-              </button>
-              <p class="text-xs text-gray-500 text-center" style="margin-top:8px">También puedes arrastrar archivos aquí · máximo 30 · 12 MB por archivo</p>
+            <div id="dropZoneAnexos">
+              <button type="button" id="btnSubirAnexos" class="evidence-upload">Agregar fotografías o PDF</button>
+              <p class="text-xs text-gray-500 text-center" style="margin-top:5px">Arrastra archivos aquí o selecciona desde el equipo · 12 MB máx.</p>
             </div>
-
             <div id="anexosPreview"></div>
           </aside>
         </div>
