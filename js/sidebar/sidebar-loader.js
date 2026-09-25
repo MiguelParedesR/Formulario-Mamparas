@@ -20,6 +20,7 @@ const CORE_STYLES = [
   withBase("CSS/tailwind.css"),
   SIDEBAR_CSS,
   withBase("CSS/global.css"),
+  withBase("CSS/apple-system.css"),
   withBase("CSS/styles.css"),
   withBase("CSS/dashboard/dashboard.css"),
 ];
