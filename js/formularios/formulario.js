@@ -328,10 +328,10 @@ function renderGaleriaAnexos(anexos = []) {
   anexosPreview.innerHTML = "";
 
   if (!anexos.length) {
-    const msg = document.createElement("p");
-    msg.className = "text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-center";
-    msg.textContent = "Aun no has cargado evidencias.";
-    anexosPreview.appendChild(msg);
+    const empty = document.createElement("div");
+    empty.className = "evidence-empty";
+    empty.innerHTML = '<i class="fas fa-images"></i><strong>Sin evidencias</strong><span>Agrega fotografías o PDF que sustenten el informe.</span>';
+    anexosPreview.appendChild(empty);
     return;
   }
 
