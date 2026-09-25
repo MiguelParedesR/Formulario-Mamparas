@@ -1,24 +1,24 @@
 <link rel="stylesheet" href="../../CSS/apple-redesign.css" />
 
-<main class="mamparas-root mamparas-modern">
-  <header class="mamparas-header">
-    <div>
-      <p class="ui-eyebrow">Control operativo</p>
-      <h1>Registro de inspección</h1>
-      <p>Registra la unidad, el hallazgo y la evidencia fotográfica en una sola vista.</p>
-    </div>
-    <div class="health-pill"><span></span> Formulario activo</div>
-  </header>
+<main class="v3-ops">
+  <div class="v3-stepbar" aria-label="Etapas de inspección">
+    <div class="v3-step active"><b>1</b>Unidad</div>
+    <div class="v3-step"><b>2</b>Operación</div>
+    <div class="v3-step"><b>3</b>Hallazgo</div>
+    <div class="v3-step"><b>4</b>Evidencias</div>
+  </div>
 
   <div id="mamparasFeedback" class="form-feedback" data-tone="info" role="status" aria-live="polite"></div>
 
   <form id="form-inspeccion" novalidate>
-    <div class="mamparas-shell">
-      <section class="mamparas-form-surface">
-        <div class="mamparas-form-section">
-          <p class="section-kicker">01 · Unidad</p>
-          <h2>Identificación</h2>
-          <div class="mamparas-fields">
+    <div class="v3-ops-surface">
+      <div class="v3-ops-main">
+        <section class="v3-ops-band">
+          <div class="v3-ops-band-head">
+            <span class="v3-band-no">01</span>
+            <strong>Identificación de la unidad</strong>
+          </div>
+          <div class="v3-ops-grid">
             <div>
               <label for="fecha">Fecha</label>
               <input type="date" id="fecha" name="fecha" required readonly />
@@ -35,12 +35,14 @@
               <p class="helper">6 caracteres alfanuméricos</p>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="mamparas-form-section">
-          <p class="section-kicker">02 · Operación</p>
-          <h2>Datos de atención</h2>
-          <div class="mamparas-fields">
+        <section class="v3-ops-band">
+          <div class="v3-ops-band-head">
+            <span class="v3-band-no">02</span>
+            <strong>Datos de operación</strong>
+          </div>
+          <div class="v3-ops-grid">
             <div>
               <label for="empresa">Empresa</label>
               <select id="empresa" name="empresa" required>
@@ -68,12 +70,10 @@
               </select>
               <input type="text" id="nueva_empresa" name="nueva_empresa" placeholder="Nombre de la empresa" class="hidden" style="margin-top:8px" />
             </div>
-
             <div>
               <label for="chofer">Chofer</label>
               <input type="text" id="chofer" name="chofer" placeholder="Nombre completo" required />
             </div>
-
             <div>
               <label for="lugar">Lugar</label>
               <select id="lugar" name="lugar" required>
@@ -83,14 +83,16 @@
               </select>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="mamparas-form-section">
-          <p class="section-kicker">03 · Hallazgo</p>
-          <h2>Clasificación</h2>
-          <div class="mamparas-fields">
+        <section class="v3-ops-band">
+          <div class="v3-ops-band-head">
+            <span class="v3-band-no">03</span>
+            <strong>Clasificación del hallazgo</strong>
+          </div>
+          <div class="v3-ops-grid">
             <div>
-              <label for="incorreccion">Tipo de incorrección</label>
+              <label for="incorreccion">Incorrección</label>
               <select id="incorreccion" name="incorreccion" required>
                 <option value="">Seleccione</option>
                 <option value="Mampara">Mampara</option>
@@ -98,9 +100,8 @@
                 <option value="Pernos">Pernos</option>
                 <option value="Otros">Otros</option>
               </select>
-              <p class="helper">Habilita el detalle y las fotos requeridas</p>
+              <p class="helper">Habilita medidas y fotografías requeridas</p>
             </div>
-
             <div>
               <label for="responsable">Responsable</label>
               <select id="responsable" name="responsable" required>
@@ -117,7 +118,6 @@
                 <option value="Ernesto Alfaro">Ernesto Alfaro</option>
               </select>
             </div>
-
             <div>
               <label for="observaciones">Operación observada</label>
               <select id="observaciones" name="observaciones" required>
@@ -128,47 +128,40 @@
               </select>
             </div>
           </div>
-        </div>
+        </section>
+      </div>
 
-        <div class="mamparas-submit">
-          <button id="btnRegistrarInspeccion" type="submit">
-            Registrar inspección
-          </button>
-        </div>
-      </section>
-
-      <aside class="mamparas-side">
-        <section class="mamparas-side-panel primary">
+      <aside class="v3-ops-side">
+        <section class="v3-side-section">
           <p class="section-kicker">Detalle obligatorio</p>
-          <h3>Medidas y evidencias</h3>
-          <p>Selecciona una incorrección para completar las medidas y fotografías exigidas.</p>
+          <h3>Medidas</h3>
+          <p>Completa las medidas y la evidencia sin salir del flujo de inspección.</p>
           <input type="hidden" id="detalle" name="detalle" />
           <div id="detalleGuardadoAviso" class="form-feedback" data-tone="success" style="margin-top:12px">
             Detalle guardado y listo para registrar.
           </div>
-          <button type="button" id="btnAgregarDetalle" class="apple-button primary hidden" style="width:100%;margin-top:12px">
-            <i class="fas fa-sliders"></i>
+          <button type="button" id="btnAgregarDetalle" class="v3-btn primary hidden" style="width:100%;margin-top:13px">
             Completar detalle
           </button>
         </section>
 
-        <section class="mamparas-side-panel">
-          <div class="evidence-head">
-            <div>
-              <p class="section-kicker">Evidencias</p>
-              <h3>Vista previa</h3>
-              <p>Las fotos guardadas aparecerán aquí.</p>
-            </div>
-          </div>
-          <div id="galeriaMamparas" class="evidence-gallery">
+        <section class="v3-side-section">
+          <p class="section-kicker">Evidencias</p>
+          <h3>Fotografías</h3>
+          <p>Las fotografías guardadas aparecerán aquí y podrán ampliarse.</p>
+          <div id="galeriaMamparas">
             <div class="evidence-empty">
-              <i class="fas fa-images"></i>
               <strong>Sin evidencias</strong>
               <span>Completa el detalle para agregar fotografías.</span>
             </div>
           </div>
         </section>
       </aside>
+
+      <footer class="v3-ops-footer">
+        <p>Los campos obligatorios y la evidencia se validan antes del registro final.</p>
+        <button id="btnRegistrarInspeccion" type="submit" class="v3-btn primary">Registrar inspección</button>
+      </footer>
     </div>
   </form>
 
@@ -178,62 +171,44 @@
         <div>
           <p class="section-kicker">Detalle de inspección</p>
           <h3 class="text-lg font-semibold text-gray-800">Medidas y fotografías</h3>
-          <p class="text-sm text-gray-500">Completa lo solicitado y revisa cada fotografía antes de guardar.</p>
         </div>
-        <button id="cerrarDetalleModal" type="button" class="apple-button" aria-label="Cerrar">
-          <i class="fas fa-xmark"></i>
-        </button>
+        <button id="cerrarDetalleModal" type="button" class="v3-btn" aria-label="Cerrar">Cerrar</button>
       </div>
-
       <div class="px-6 py-4 overflow-y-auto" style="flex:1 1 auto;min-height:0">
-        <div id="detalleAlert" class="form-feedback" data-tone="warning">
-          Completa los campos obligatorios antes de guardar el detalle.
-        </div>
+        <div id="detalleAlert" class="form-feedback" data-tone="warning">Completa los campos obligatorios antes de guardar el detalle.</div>
         <div id="contenidoDetalle" class="space-y-4"></div>
       </div>
-
       <div class="flex justify-end gap-2 px-6 py-4 border-t border-gray-100">
-        <button id="btnLimpiarDetalle" type="button" class="apple-button">Limpiar</button>
-        <button id="btnGuardarDetalle" type="button" class="apple-button primary">Guardar detalle</button>
+        <button id="btnLimpiarDetalle" type="button" class="v3-btn">Limpiar</button>
+        <button id="btnGuardarDetalle" type="button" class="v3-btn primary">Guardar detalle</button>
       </div>
     </div>
   </div>
 
   <div id="modalPlacaExistente" class="modal-overlay hidden items-center justify-center px-4 z-50" role="dialog" aria-modal="true">
     <div class="modal-card bg-white w-full max-w-lg p-6 relative">
-      <button id="cerrarModalPlaca" type="button" class="absolute top-3 right-3 apple-button" aria-label="Cerrar">
-        <i class="fas fa-xmark"></i>
-      </button>
+      <button id="cerrarModalPlaca" type="button" class="absolute top-3 right-3 v3-btn" aria-label="Cerrar">Cerrar</button>
       <p class="section-kicker">Registro encontrado</p>
       <h3 class="text-lg font-semibold text-gray-800">Esta placa ya tiene antecedentes</h3>
-      <p class="text-sm text-gray-700" style="margin-top:12px">
-        La placa <strong id="placaDuplicada"></strong> fue registrada con la incorrección <strong id="tipoIncorreccion"></strong>.
-      </p>
-      <p class="text-sm text-gray-600" style="margin-top:8px">Puedes reutilizar sus datos o iniciar una inspección nueva.</p>
+      <p class="text-sm text-gray-700" style="margin-top:12px">La placa <strong id="placaDuplicada"></strong> fue registrada con la incorrección <strong id="tipoIncorreccion"></strong>.</p>
       <div class="flex flex-wrap justify-end gap-3" style="margin-top:18px">
-        <button id="btnCancelarPlaca" type="button" class="apple-button">Crear nuevo</button>
-        <button id="btnContinuarPlaca" type="button" class="apple-button primary">Reutilizar datos</button>
+        <button id="btnCancelarPlaca" type="button" class="v3-btn">Crear nuevo</button>
+        <button id="btnContinuarPlaca" type="button" class="v3-btn primary">Reutilizar datos</button>
       </div>
     </div>
   </div>
 
   <div id="feedbackModal" class="modal-overlay hidden items-center justify-center z-50">
     <div class="modal-card bg-white w-80 p-5 text-center relative">
-      <button type="button" class="absolute top-3 right-3 apple-button" data-close-feedback aria-label="Cerrar">
-        <i class="fas fa-xmark"></i>
-      </button>
-      <div id="loadingAnimation" class="mx-auto h-9 w-9 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
-      <p id="feedbackMessage" class="message text-sm font-medium" style="margin-top:12px"></p>
+      <p id="feedbackMessage" class="message text-sm font-medium"></p>
+      <div id="loadingAnimation" class="mx-auto h-9 w-9 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" style="margin-top:12px"></div>
     </div>
   </div>
 
-  <div id="modalPreview" class="fixed inset-0 z-[12000] hidden items-center justify-center" role="dialog" aria-modal="true" aria-label="Vista ampliada de evidencia">
+  <div id="modalPreview" class="fixed inset-0 z-[12000] hidden items-center justify-center" role="dialog" aria-modal="true">
     <div class="relative">
-      <button type="button" onclick="cerrarModalPreview()" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-black/70 text-white" aria-label="Cerrar">
-        <i class="fas fa-xmark"></i>
-      </button>
+      <button type="button" onclick="cerrarModalPreview()" class="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-black/70 text-white" aria-label="Cerrar">×</button>
       <img id="previewImagen" src="" alt="Previsualización de evidencia" />
-      <p class="text-sm text-center mt-2">Vista ampliada · ESC para cerrar</p>
     </div>
   </div>
 
