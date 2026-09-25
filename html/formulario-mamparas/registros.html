@@ -1,60 +1,43 @@
-<!doctype html>
-<main class="mamparas-root min-h-screen bg-slate-50 py-8 text-gray-800">
-  <div class="w-full px-6 space-y-8">
-    <header class="space-y-2">
-      <h1 class="text-2xl font-bold flex items-center gap-3 text-gray-900">
-        <i class="fas fa-database text-indigo-600"></i>
-        Registros de Inspecci&oacute;n
-      </h1>
-      <p class="text-sm text-gray-500">Consulta, filtra y revisa los registros almacenados desde cualquier dispositivo.</p>
-    </header>
+<link rel="stylesheet" href="../../CSS/apple-redesign.css" />
 
-    <section class="w-full bg-white rounded-2xl border border-gray-100 shadow-md p-6 space-y-6">
-      <!-- BUSCADOR -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <p class="text-base font-semibold text-gray-800">Filtrar registros</p>
-          <p class="text-sm text-gray-500">Busca r&aacute;pidamente una placa espec&iacute;fica.</p>
-        </div>
-        <div class="w-full sm:w-72">
-          <label class="sr-only" for="buscarPlaca">Buscar por placa</label>
-          <div class="relative">
-            <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
-            <input class="w-full rounded-lg border border-gray-300 bg-white px-10 py-2 text-sm text-gray-700 uppercase tracking-wide shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none" type="text" id="buscarPlaca" placeholder="Ej: ABC123" />
-          </div>
-        </div>
-      </div>
-
-      <!-- TABLA -->
-      <div class="w-full overflow-x-auto">
-        <div class="max-h-[70vh] overflow-y-auto">
-          <table class="w-full table-auto border-collapse text-gray-700 text-sm leading-relaxed">
-            <thead class="sticky top-0 z-10 bg-gray-100">
-              <tr>
-                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Fecha</th>
-                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Hora</th>
-                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Empresa</th>
-                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Placa</th>
-                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Chofer</th>
-                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Lugar</th>
-                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Incorrecci&oacute;n</th>
-                <th class="px-3 py-3 text-left font-semibold text-sm border-b border-gray-200 uppercase">Responsable</th>
-                <th class="px-3 py-3 text-center font-semibold text-sm border-b border-gray-200 uppercase">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-registros">
-              <!-- Filas generadas dinámicamente por js/mamparas/registros.js -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+<main class="mamparas-root mamparas-modern">
+  <div class="mamparas-header">
+    <div>
+      <p class="section-kicker">Mamparas</p>
+      <h1>Registros de inspección</h1>
+      <p>Consulta inspecciones históricas y abre su detalle fotográfico sin salir del módulo.</p>
+    </div>
+    <div class="w-full sm:w-80">
+      <label for="buscarPlaca">Buscar placa</label>
+      <input type="search" id="buscarPlaca" placeholder="Ej. ABC123" maxlength="12" autocomplete="off" />
+    </div>
   </div>
 
-  <!-- Contenedor para el modal de detalle -->
+  <section class="mamparas-form-surface">
+    <div class="overflow-x-auto">
+      <div class="max-h-[72vh] overflow-y-auto">
+        <table class="w-full table-auto text-gray-700 text-sm">
+          <thead class="sticky top-0 z-10">
+            <tr>
+              <th class="px-4 py-3 text-left">Fecha</th>
+              <th class="px-4 py-3 text-left">Hora</th>
+              <th class="px-4 py-3 text-left">Empresa</th>
+              <th class="px-4 py-3 text-left">Placa</th>
+              <th class="px-4 py-3 text-left">Chofer</th>
+              <th class="px-4 py-3 text-left">Lugar</th>
+              <th class="px-4 py-3 text-left">Incorrección</th>
+              <th class="px-4 py-3 text-left">Responsable</th>
+              <th class="px-4 py-3 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-registros"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
   <div id="mampara-detalle-modal-container"></div>
 
-  <!-- SCRIPTS -->
   <script type="module" src="../../js/mamparas/registros.js"></script>
   <script type="module" src="../../js/mamparas/detalle-modal.js"></script>
 </main>
