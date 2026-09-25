@@ -1,192 +1,207 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TPP &mdash; Nuevo Informe de Incidencia</title>
-
+  <title>TPP — Nuevo Informe de Incidencia</title>
   <link rel="stylesheet" href="../CSS/tailwind.css" />
   <link rel="stylesheet" href="../CSS/global.css" />
-  <link rel="stylesheet" href="../CSS/dashboard/dashboard.css" />
-
-  <style>
-    body {
-      background-color: #f4f6f8;
-    }
-
-    .gallery-thumb:hover {
-      transform: scale(1.05);
-    }
-  </style>
+  <link rel="stylesheet" href="../CSS/apple-system.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
-<body class="bg-slate-50">
+<body>
   <main class="app-layout">
-    <div class="app-layout-inner space-y-8 animate-fade">
-
-      <!-- HEADER -->
-      <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-slide select-none">
-        <div>
-          <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
-            <i class="fas fa-file-signature text-indigo-600"></i> Nuevo Informe de Incidencia
-          </h1>
-          <p class="text-sm text-gray-500" id="tipoDescripcion">Obteniendo informaci&oacute;n del tipo seleccionado&hellip;</p>
+    <div class="app-layout-inner">
+      <header class="tpp-topbar">
+        <div class="tpp-title-group">
+          <p class="tpp-eyebrow">Terminales Portuarios Peruanos · Seguridad</p>
+          <h1 class="tpp-page-title">Informe de incidencia</h1>
+          <p class="tpp-page-subtitle" id="tipoDescripcion">
+            Obteniendo información del tipo seleccionado…
+          </p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3">
-          <button id="btnVolverDashboard"
-            class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium hover:bg-gray-100 flex items-center gap-2">
-            <i class="fas fa-arrow-left"></i> Volver
+        <div class="tpp-toolbar" aria-label="Acciones del informe">
+          <button id="btnVolverDashboard" type="button" class="tpp-btn">
+            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+            Volver
           </button>
-
-          <button id="btnGuardarBorrador"
-            class="px-5 py-2 rounded-lg border border-amber-300 bg-amber-50 text-sm font-semibold text-amber-700 hover:bg-amber-100">
-            Guardar Borrador
+          <button id="btnGuardarBorrador" type="button" class="tpp-btn tpp-btn--warning">
+            <i class="fa-regular fa-floppy-disk" aria-hidden="true"></i>
+            Guardar borrador
           </button>
-
-          <button id="btnGuardarCompleto"
-            class="px-5 py-2 rounded-lg bg-indigo-600 text-sm font-semibold text-white shadow-md hover:bg-indigo-700">
-            Guardar Informe
+          <button id="btnGuardarCompleto" type="button" class="tpp-btn tpp-btn--primary">
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+            Guardar informe
           </button>
-
-          <button id="btnExportarWord"
-            class="px-5 py-2 rounded-lg border border-emerald-500 bg-white text-sm font-semibold text-emerald-600 hover:bg-emerald-50">
+          <button id="btnExportarWord" type="button" class="tpp-btn tpp-btn--success">
+            <i class="fa-regular fa-file-word" aria-hidden="true"></i>
             Exportar Word
           </button>
         </div>
       </header>
 
-      <!-- PROGRESS -->
-      <div class="animate-grow">
-        <div class="flex justify-between mb-1">
-          <span class="text-xs font-semibold text-gray-600 uppercase">Avance del informe</span>
-          <span id="progressLabel" class="text-xs font-semibold text-gray-600">0%</span>
+      <div class="report-progress" aria-label="Avance del informe">
+        <span class="report-progress__label">Avance</span>
+        <div class="report-progress__track" aria-hidden="true">
+          <div id="progressBar" style="width:0%"></div>
         </div>
-        <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden shadow-inner">
-          <div id="progressBar" class="h-2 w-0 bg-red-500 rounded-full transition-all duration-500"></div>
-        </div>
-        <p class="text-[11px] text-gray-500 mt-1">Puedes guardar borradores incompletos.</p>
+        <span id="progressLabel">0%</span>
       </div>
 
-      <!-- FORM CARD -->
-      <section class="bg-white rounded-3xl border border-gray-100 shadow-xl p-6 sm:p-8 animate-slide">
-        <form id="form-incidencia" class="space-y-8">
-          <div class="grid gap-6 lg:grid-cols-[2fr_2fr_1.2fr] app-3col-grid w-full items-start">
+      <div id="formStatus" class="form-status" role="status" aria-live="polite"></div>
 
-            <!-- COLUMNA IZQUIERDA -->
-            <div class="space-y-6">
-              <section class="bg-slate-50 border border-gray-100 shadow-sm rounded-2xl p-5 space-y-4">
-                <div>
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion I</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Asunto y serie</h2>
-                </div>
-                <div class="space-y-4">
-                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="space-y-1">
-                      <label class="text-sm font-semibold text-gray-700">Asunto (automatico)</label>
-                      <input id="asunto" readonly class="w-full rounded-xl border border-gray-200 bg-white shadow-sm px-4 py-2 text-sm" />
-                    </div>
-                    <div class="space-y-1">
-                      <label class="text-sm font-semibold text-gray-700">Dirigido a</label>
-                      <input id="dirigidoA" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2 text-sm uppercase" value="GERENTE DE SSOMA, PROTECCI&Oacute;N Y DESARROLLO PROYECTO MARVAL" readonly />
-                    </div>
-                    <div class="space-y-1">
-                      <label class="text-sm font-semibold text-gray-700">Remitente</label>
-                      <input id="remitente" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2 text-sm uppercase" value="SUPERVISOR DE SEGURIDAD" readonly />
-                    </div>
-                    <div class="space-y-1">
-                      <label class="text-sm font-semibold text-gray-700">Fecha del informe</label>
-                      <input id="fechaInforme" type="date" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-2 text-sm" />
-                    </div>
-                  </div>
-                  <div id="campoExtraContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
-                </div>
-              </section>
-
-              <section class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 space-y-3">
-                <div>
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion II</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Introduccion</h2>
-                </div>
-                <textarea id="introduccion" rows="6" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-3 text-sm resize-y" placeholder="1. Describa la introduccion del informe..."></textarea>
-                <p class="text-[11px] text-gray-500">Presiona Enter para insertar numeracion.</p>
-              </section>
-
-              <section class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 space-y-3">
-                <div>
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion V</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Analisis</h2>
-                </div>
-                <textarea id="analisis" rows="6" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-3 text-sm resize-y" placeholder="1. Analiza los hechos..."></textarea>
-              </section>
-            </div>
-
-            <!-- COLUMNA CENTRAL -->
-            <div class="space-y-6">
-              <section class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 space-y-3">
-                <div class="flex flex-col">
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion III</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Hechos</h2>
-                </div>
-                <textarea id="hechos" rows="12" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-3 text-sm resize-y" placeholder="1. Primer hecho..."></textarea>
-                <p class="text-[11px] text-gray-500">Presiona Enter para insertar numeracion automatica.</p>
-              </section>
-
-              <section class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 space-y-3">
-                <div>
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion VI</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Conclusiones</h2>
-                </div>
-                <textarea id="conclusiones" rows="6" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-3 text-sm resize-y" placeholder="1. Conclusion..."></textarea>
-              </section>
-
-              <section class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 space-y-3">
-                <div>
-                  <p class="text-xs font-semibold text-indigo-500 uppercase tracking-widest">Seccion VII</p>
-                  <h2 class="text-lg font-semibold text-gray-900">Recomendaciones</h2>
-                </div>
-                <textarea id="recomendaciones" rows="6" class="w-full rounded-xl border border-gray-200 shadow-sm px-4 py-3 text-sm resize-y" placeholder="1. Accion recomendada..."></textarea>
-              </section>
-            </div>
-
-            <!-- COLUMNA DERECHA -->
-            <aside class="space-y-4 sticky top-6 bg-white border border-gray-200 rounded-xl shadow p-4 max-h-[90vh] overflow-y-auto">
-              <section class="space-y-2">
-                <h2 class="text-sm font-semibold text-gray-700">SECCION VIII Evidencias</h2>
-
-                <input id="anexos" type="file" accept="image/*,.pdf" multiple class="sr-only" />
-                <button type="button" id="btnSubirAnexos"
-                  class="w-full px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition">
-                  Subir evidencias (m&aacute;x. 30)
-                </button>
-
-                <div id="anexosPreview" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
-
-                <p class="text-xs text-gray-500">Haz clic en una imagen para verla grande. Archivos permitidos: JPG, PNG, PDF, WebP.</p>
-              </section>
-            </aside>
+      <form id="form-incidencia" class="word-workspace" novalidate>
+        <!-- COLUMNA 1 · DATOS / ÍNDICE -->
+        <aside class="word-outline">
+          <div class="word-outline__head">
+            <p class="tpp-eyebrow">Datos del documento</p>
+            <h2>Información del informe</h2>
           </div>
-        </form>
-      </section>
-      <!-- MODAL PREVIEW -->
-      <div id="modalPreview" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
-        <div class="relative bg-white rounded-xl shadow-2xl max-w-3xl w-full p-4 animate-[fadeIn_0.3s_ease-out]">
-          <button onclick="cerrarModalPreview()" class="absolute top-2 right-2 text-xl text-gray-600 hover:text-red-500">
-            &times;
-          </button>
-          <img id="previewImagen" src="" alt="Previsualizaci&oacute;n" />
-          <p class="text-sm text-center text-gray-500 mt-2">Previsualizaci&oacute;n</p>
-        </div>
-      </div>
 
+          <div class="word-outline__fields">
+            <div class="tpp-field">
+              <label for="asunto">Asunto</label>
+              <input id="asunto" readonly />
+            </div>
+
+            <div class="tpp-field">
+              <label for="dirigidoA">Dirigido a</label>
+              <input id="dirigidoA" class="uppercase"
+                value="GERENTE DE SSOMA, PROTECCIÓN Y DESARROLLO PROYECTO MARVAL" readonly />
+            </div>
+
+            <div class="tpp-field">
+              <label for="remitente">Remitente</label>
+              <input id="remitente" class="uppercase" value="SUPERVISOR DE SEGURIDAD" readonly />
+            </div>
+
+            <div class="tpp-field">
+              <label for="fechaInforme">Fecha del informe</label>
+              <input id="fechaInforme" type="date" />
+            </div>
+
+            <div id="campoExtraContainer" class="word-outline__fields"></div>
+          </div>
+
+          <nav class="word-outline__nav" aria-label="Secciones del informe">
+            <a href="#sec-introduccion"><span>01</span> Introducción</a>
+            <a href="#sec-hechos"><span>02</span> Hechos</a>
+            <a href="#sec-analisis"><span>03</span> Análisis</a>
+            <a href="#sec-conclusiones"><span>04</span> Conclusiones</a>
+            <a href="#sec-recomendaciones"><span>05</span> Recomendaciones</a>
+          </nav>
+        </aside>
+
+        <!-- COLUMNA 2 · DOCUMENTO TIPO WORD -->
+        <section class="word-stage" aria-label="Documento">
+          <div class="word-stage__bar">
+            <span>Vista de documento · A4</span>
+            <div class="word-stage__tools" aria-hidden="true">
+              <button type="button" class="word-stage__tool" tabindex="-1"><strong>B</strong></button>
+              <button type="button" class="word-stage__tool" tabindex="-1"><em>I</em></button>
+              <button type="button" class="word-stage__tool" tabindex="-1">≡</button>
+            </div>
+          </div>
+
+          <article class="word-paper">
+            <div class="word-paper__header">
+              <div>
+                <div class="word-paper__brand">TPP</div>
+                <p class="tpp-help">Terminales Portuarios Peruanos S.A.</p>
+              </div>
+              <div class="word-paper__meta">
+                <strong>INFORME DE SEGURIDAD</strong><br />
+                Documento de trabajo
+              </div>
+            </div>
+
+            <section class="word-section" id="sec-introduccion">
+              <h2 class="word-section__title">I. Introducción</h2>
+              <textarea id="introduccion" rows="7"
+                placeholder="1. Contextualiza el hecho, fecha, lugar y motivo del informe…"></textarea>
+              <p class="word-section__hint">Enter agrega una nueva numeración automáticamente.</p>
+            </section>
+
+            <section class="word-section" id="sec-hechos">
+              <h2 class="word-section__title">II. Hechos</h2>
+              <textarea id="hechos" rows="12"
+                placeholder="1. Describe los hechos en orden cronológico…"></textarea>
+              <p class="word-section__hint">Usa una idea por punto para facilitar la lectura del informe final.</p>
+            </section>
+
+            <section class="word-section" id="sec-analisis">
+              <h2 class="word-section__title">III. Análisis</h2>
+              <textarea id="analisis" rows="8"
+                placeholder="1. Analiza causas, condiciones, controles y hallazgos…"></textarea>
+            </section>
+
+            <section class="word-section" id="sec-conclusiones">
+              <h2 class="word-section__title">IV. Conclusiones</h2>
+              <textarea id="conclusiones" rows="7"
+                placeholder="1. Resume las conclusiones sustentadas por los hechos…"></textarea>
+            </section>
+
+            <section class="word-section" id="sec-recomendaciones">
+              <h2 class="word-section__title">V. Recomendaciones</h2>
+              <textarea id="recomendaciones" rows="7"
+                placeholder="1. Registra acciones concretas y verificables…"></textarea>
+            </section>
+          </article>
+        </section>
+
+        <!-- COLUMNA 3 · EVIDENCIAS -->
+        <aside class="evidence-inspector">
+          <div class="evidence-inspector__head">
+            <p class="tpp-eyebrow">Evidencias</p>
+            <h2>Fotos y documentos</h2>
+            <p class="tpp-help">Máximo 30 archivos · JPG, PNG, WebP y PDF.</p>
+          </div>
+
+          <input id="anexos" type="file" accept="image/*,.pdf" multiple class="sr-only" />
+
+          <button type="button" id="dropZoneAnexos" class="evidence-drop">
+            <span>
+              <i class="fa-regular fa-images" style="font-size:22px;margin-bottom:8px" aria-hidden="true"></i>
+              <strong>Agregar evidencias</strong>
+              <span>Haz clic o arrastra archivos aquí</span>
+            </span>
+          </button>
+
+          <button type="button" id="btnSubirAnexos" class="tpp-btn" style="width:100%;margin-top:10px">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Seleccionar archivos
+          </button>
+
+          <div class="evidence-count">
+            <i class="fa-regular fa-circle-check" aria-hidden="true"></i>
+            <span id="evidenceCountText">Sin archivos cargados</span>
+          </div>
+
+          <div id="anexosPreview"></div>
+        </aside>
+      </form>
     </div>
   </main>
 
+  <!-- VISOR DE EVIDENCIA -->
+  <div id="modalPreview" class="media-lightbox hidden">
+    <div class="media-lightbox__dialog">
+      <button type="button" class="media-close" onclick="cerrarModalPreview()" aria-label="Cerrar vista previa">×</button>
+      <div class="media-stage">
+        <img id="previewImagen" src="" alt="Previsualización de evidencia" />
+      </div>
+      <div class="media-lightbox__footer">
+        <div style="min-width:0;flex:1">
+          <strong id="previewNombre" style="display:block;font-size:13px">Evidencia</strong>
+          <span id="previewMeta" class="tpp-help">Vista previa</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="../js/formularios/formulario.js"></script>
 </body>
-
 </html>
-
-
-
