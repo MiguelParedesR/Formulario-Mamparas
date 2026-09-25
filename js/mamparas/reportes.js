@@ -1,4 +1,3 @@
-﻿// 🚫 NO BORRAR — Bloque restaurado/corregido del módulo Mamparas
 import { supabase, mostrarModal } from "./script.js";
 
 const OPERADORES_REFERENCIA = [
@@ -20,26 +19,52 @@ const LOGO_TPP_BASE64 =
 function setExportButtonState(cargando) {
   const btn = document.getElementById("btnExportarExcel");
   if (!btn) return;
+  if (!btn.dataset.originalLabel) btn.dataset.originalLabel = btn.innerHTML;
 
-  if (cargando) {
-    if (!btn.dataset.originalLabel) {
-      btn.dataset.originalLabel = btn.innerHTML;
-    }
-    btn.disabled = true;
-    btn.classList.add("opacity-60", "cursor-not-allowed");
-    btn.innerHTML = `
-      <span class="flex items-center gap-2">
-        <span class="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
-        Generando...
-      </span>
-    `;
-  } else {
-    btn.disabled = false;
-    btn.classList.remove("opacity-60", "cursor-not-allowed");
-    if (btn.dataset.originalLabel) {
-      btn.innerHTML = btn.dataset.originalLabel;
-    }
+  btn.disabled = cargando;
+  btn.classList.toggle("opacity-60", cargando);
+  btn.classList.toggle("cursor-not-allowed", cargando);
+  btn.innerHTML = cargando
+    ? '<span class="flex items-center gap-2"><span class="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>Generando...</span>'
+    : btn.dataset.originalLabel;
+}
+
+async function cargarExcelJs() {
+  if (window.ExcelJS) return window.ExcelJS;
+
+  const existente = document.querySelector('script[data-exceljs-runtime="1"]');
+  if (existente) {
+    await new Promise((resolve, reject) => {
+      if (window.ExcelJS) return resolve();
+      existente.addEventListener("load", resolve, { once: true });
+      existente.addEventListener("error", reject, { once: true });
+    });
+    if (window.ExcelJS) return window.ExcelJS;
   }
+
+  await new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js";
+    script.dataset.exceljsRuntime = "1";
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("No se pudo cargar ExcelJS"));
+    document.head.appendChild(script);
+  });
+
+  if (!window.ExcelJS) throw new Error("ExcelJS no quedó disponible");
+  return window.ExcelJS;
+}
+
+function descargarBlob(blob, nombreArchivo) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = nombreArchivo;
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
 async function cargarOperadores() {
@@ -52,150 +77,71 @@ async function cargarOperadores() {
   try {
     const { data, error } = await supabase.from("inspecciones").select("responsable");
     if (error) throw error;
-
-    if (Array.isArray(data)) {
-      operadores = [
-        ...new Set(
-          data
-            .map((r) => (r?.responsable || "").trim())
-            .filter((valor) => valor && valor.length > 0)
-        ),
-      ];
-    }
-  } catch (err) {
-    console.error("Error cargando operadores:", err.message || err);
+    operadores = [...new Set(
+      (Array.isArray(data) ? data : [])
+        .map((r) => String(r?.responsable || "").trim())
+        .filter(Boolean)
+    )];
+  } catch (error) {
+    console.error("Error cargando operadores:", error?.message || error);
   }
 
-  if (!operadores.length) {
-    operadores = [...OPERADORES_REFERENCIA];
-  } else {
-    const faltantes = OPERADORES_REFERENCIA.filter((op) => !operadores.includes(op));
-    operadores = [...operadores, ...faltantes];
+  for (const operador of OPERADORES_REFERENCIA) {
+    if (!operadores.includes(operador)) operadores.push(operador);
   }
 
   operadores.sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));
-
-  select.innerHTML = `
-    <option value="Todos">Todos (sin filtro)</option>
-    ${operadores.map((op) => `<option value="${op}">${op}</option>`).join("")}
-  `;
-}
-
-function obtenerUltimoDiaMes(year, month) {
-  const ultimoDia = new Date(Number(year), Number(month), 0).getDate();
-  return String(ultimoDia).padStart(2, "0");
+  select.innerHTML =
+    '<option value="Todos">Todos (sin filtro)</option>' +
+    operadores.map((op) => `<option value="${op}">${op}</option>`).join("");
 }
 
 function aplicarMesActual() {
-  const mesInput = document.getElementById("mes");
-  if (!mesInput) return;
+  const input = document.getElementById("mes");
+  if (!input || input.value) return;
   const hoy = new Date();
-  const mesActual = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}`;
-  mesInput.value = mesActual;
+  input.value = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function construirEncabezadoExcel(sheet, filtros) {
-  const logoId = sheet.workbook.addImage({
-    base64: LOGO_TPP_BASE64,
-    extension: "png",
+function ultimoDiaMes(anio, mes) {
+  return String(new Date(Number(anio), Number(mes), 0).getDate()).padStart(2, "0");
+}
+
+function aplicarFormatoCorporativo(worksheet, workbook, data) {
+  const logoId = workbook.addImage({ base64: LOGO_TPP_BASE64, extension: "png" });
+  worksheet.addImage(logoId, {
+    tl: { col: 0.1, row: 0.1 },
+    ext: { width: 150, height: 60 },
   });
 
-  sheet.mergeCells("A1:B4");
-  sheet.addImage(logoId, "A1:B4");
+  worksheet.getCell("I1").value = "F-OPESEG-045";
+  worksheet.getCell("I1").alignment = { vertical: "middle", horizontal: "right" };
+  worksheet.getCell("I1").font = { bold: true, size: 13, name: "Arial" };
 
-  sheet.mergeCells("C1:J1");
-  sheet.getCell("C1").value = "Terminales Portuarios Peruanos S.A.";
-  sheet.getCell("C1").font = { size: 16, bold: true, color: { argb: "FF1F2937" } };
+  worksheet.mergeCells("A2:I2");
+  worksheet.getCell("A2").value = "REGISTRO DE FALTAS O INCORRECCIONES DE UNIDADES";
+  worksheet.getCell("A2").alignment = { vertical: "middle", horizontal: "center" };
+  worksheet.getCell("A2").font = { bold: true, size: 14, name: "Arial" };
 
-  sheet.mergeCells("C2:J2");
-  sheet.getCell("C2").value = "Reporte de inspecciones del m\u00F3dulo Mamparas";
-  sheet.getCell("C2").font = { size: 12, color: { argb: "FF4B5563" } };
+  worksheet.getRow(3).height = 8;
 
-  sheet.mergeCells("C3:J3");
-  sheet.getCell("C3").value = `Mes: ${filtros.mesEtiqueta}`;
-  sheet.getCell("C3").font = { size: 11 };
-
-  sheet.mergeCells("C4:J4");
-  sheet.getCell("C4").value = `Operador: ${filtros.operadorEtiqueta}`;
-  sheet.getCell("C4").font = { size: 11 };
-}
-
-function formatearCabecera(sheet, rowIndex, totalColumnas) {
-  const headerRow = sheet.getRow(rowIndex);
-  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
-  headerRow.alignment = { horizontal: "center", vertical: "middle" };
-  headerRow.fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: { argb: "FF4338CA" },
-  };
-  headerRow.height = 22;
-
-  for (let i = 1; i <= totalColumnas; i += 1) {
-    const column = sheet.getColumn(i);
-    column.width = [12, 10, 24, 12, 20, 14, 18, 20, 24, 20][i - 1] || 18;
-    column.alignment = { vertical: "middle", wrapText: true };
-    column.border = {
-      top: { style: "thin", color: { argb: "FFE5E7EB" } },
-      left: { style: "thin", color: { argb: "FFE5E7EB" } },
-      bottom: { style: "thin", color: { argb: "FFE5E7EB" } },
-      right: { style: "thin", color: { argb: "FFE5E7EB" } },
-    };
-  }
-
-  sheet.autoFilter = {
-    from: { row: rowIndex, column: 1 },
-    to: { row: rowIndex, column: totalColumnas },
-  };
-}
-
-function obtenerResumenDetalle(detalle) {
-  if (!detalle) return "-";
-  try {
-    const parsed = typeof detalle === "string" ? JSON.parse(detalle || "{}") : detalle;
-    return parsed?.tipo || "-";
-  } catch {
-    return "-";
-  }
-}
-
-async function generarExcel(data, filtros) {
-  const ExcelLib = window.ExcelJS || ExcelJS;
-  const saveAsFn = window.saveAs || saveAs;
-
-  if (!ExcelLib || !saveAsFn) {
-    mostrarModal("error", "No se pudo cargar las librer\u00EDas de exportaci\u00F3n.");
-    return;
-  }
-
-  const workbook = new ExcelLib.Workbook();
-  workbook.creator = "Terminales Portuarios Peruanos";
-  workbook.created = new Date();
-
-  const sheet = workbook.addWorksheet("Reporte Mamparas");
-  construirEncabezadoExcel(sheet, filtros);
-
-  const encabezados = [
+  const headers = [
     "FECHA",
     "HORA",
     "EMPRESA",
     "PLACA",
     "CHOFER",
     "LUGAR",
-    "INCORRECCION",
+    "INCORRECCIONES",
     "RESPONSABLE",
     "OBSERVACIONES",
-    "DETALLE",
   ];
+  worksheet.getRow(4).values = headers;
+  worksheet.getRow(4).height = 28;
 
-  const headerRowIndex = 6;
-  sheet.getRow(headerRowIndex).values = encabezados;
-  formatearCabecera(sheet, headerRowIndex, encabezados.length);
-
-  let rowPointer = headerRowIndex + 1;
-  data.forEach((registro) => {
-    const fila = sheet.getRow(rowPointer);
-    fila.values = [
+  data.forEach((registro, index) => {
+    const row = worksheet.getRow(index + 5);
+    row.values = [
       registro.fecha || "",
       registro.hora || "",
       registro.empresa || "",
@@ -205,90 +151,141 @@ async function generarExcel(data, filtros) {
       registro.incorreccion || "",
       registro.responsable || "",
       registro.observaciones || "",
-      obtenerResumenDetalle(registro.detalle),
     ];
-    fila.height = 18;
-    rowPointer += 1;
+    row.height = 20;
   });
 
+  const widths = [13, 11, 24, 13, 24, 18, 25, 22, 34];
+  worksheet.columns.forEach((column, index) => {
+    column.width = widths[index] || 18;
+    column.alignment = { vertical: "middle", wrapText: true };
+  });
+
+  for (let rowNumber = 4; rowNumber <= data.length + 4; rowNumber += 1) {
+    const row = worksheet.getRow(rowNumber);
+    row.eachCell({ includeEmpty: true }, (cell) => {
+      cell.font = {
+        name: "Arial",
+        size: rowNumber === 4 ? 10 : 9,
+        bold: rowNumber === 4,
+      };
+      cell.alignment = {
+        vertical: "middle",
+        horizontal: rowNumber === 4 ? "center" : "left",
+        wrapText: true,
+      };
+      cell.border = {
+        top: { style: "thin", color: { argb: "FF808080" } },
+        left: { style: "thin", color: { argb: "FF808080" } },
+        bottom: { style: "thin", color: { argb: "FF808080" } },
+        right: { style: "thin", color: { argb: "FF808080" } },
+      };
+      if (rowNumber === 4) {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFDDEEFF" },
+        };
+      }
+    });
+  }
+
+  worksheet.views = [{ state: "frozen", ySplit: 4 }];
+  worksheet.pageSetup = {
+    orientation: "landscape",
+    fitToPage: true,
+    fitToWidth: 1,
+    fitToHeight: 0,
+    paperSize: 9,
+    margins: { left: 0.25, right: 0.25, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 },
+  };
+  worksheet.autoFilter = { from: "A4", to: "I4" };
+}
+
+async function generarExcel(data, anio, mes, operador) {
+  const ExcelJS = await cargarExcelJs();
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = "Terminales Portuarios Peruanos";
+  workbook.created = new Date();
+
+  const worksheet = workbook.addWorksheet("Reporte");
+  aplicarFormatoCorporativo(worksheet, workbook, data);
+
+  const operadorNombre =
+    !operador || operador === "Todos"
+      ? "Todos"
+      : operador.replace(/[^a-zA-Z0-9_-]+/g, "_");
+
   const buffer = await workbook.xlsx.writeBuffer();
-  const nombreArchivo = `reporte_mamparas_${filtros.mesArchivo}_${filtros.operadorArchivo}.xlsx`;
-  saveAsFn(new Blob([buffer]), nombreArchivo);
+  descargarBlob(
+    new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    }),
+    `reporte_${operadorNombre}_${anio}_${mes}.xlsx`
+  );
 }
 
 async function exportarExcel() {
-  const mes = document.getElementById("mes")?.value;
-  const operador = document.getElementById("operador")?.value;
+  const mesValor = document.getElementById("mes")?.value || "";
+  const operador = document.getElementById("operador")?.value || "Todos";
 
-  if (!mes) {
+  if (!mesValor) {
     mostrarModal("error", "Seleccione un mes para generar el reporte.");
     return;
   }
 
   setExportButtonState(true);
-  const [anio, numMes] = mes.split("-");
-  const ultimoDia = obtenerUltimoDiaMes(anio, numMes);
-
-  let query = supabase
-    .from("inspecciones")
-    .select("*")
-    .gte("fecha", `${anio}-${numMes}-01`)
-    .lte("fecha", `${anio}-${numMes}-${ultimoDia}`)
-    .order("fecha", { ascending: true })
-    .order("hora", { ascending: true });
-
-  if (operador && operador !== "Todos") {
-    query = query.eq("responsable", operador);
-  }
-
-  const { data, error } = await query;
-  if (error) {
-    console.error("Error al obtener registros:", error.message);
-    mostrarModal("error", "Error al obtener los datos.");
-    setExportButtonState(false);
-    return;
-  }
-
-  if (!data || !data.length) {
-    mostrarModal("error", "No hay registros para el filtro seleccionado.");
-    setExportButtonState(false);
-    return;
-  }
-
-  const filtros = {
-    mesEtiqueta: `${numMes}/${anio}`,
-    operadorEtiqueta: operador || "Todos",
-    mesArchivo: `${anio}_${numMes}`,
-    operadorArchivo: (operador || "todos").replace(/\s+/g, "_").toLowerCase(),
-  };
 
   try {
-    await generarExcel(data, filtros);
-    mostrarModal("success", "Reporte generado y descargado exitosamente.");
-  } catch (err) {
-    console.error("Error generando el Excel:", err);
-    mostrarModal("error", "Ocurri\u00F3 un error al generar el archivo.");
+    const [anio, mes] = mesValor.split("-");
+    const inicio = `${anio}-${mes}-01`;
+    const fin = `${anio}-${mes}-${ultimoDiaMes(anio, mes)}`;
+
+    let query = supabase
+      .from("inspecciones")
+      .select("fecha,hora,empresa,placa,chofer,lugar,incorreccion,responsable,observaciones")
+      .gte("fecha", inicio)
+      .lte("fecha", fin)
+      .order("fecha", { ascending: true })
+      .order("hora", { ascending: true });
+
+    if (operador !== "Todos") query = query.eq("responsable", operador);
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    if (!data?.length) {
+      mostrarModal("error", "No hay registros para el filtro seleccionado.");
+      return;
+    }
+
+    await generarExcel(data, anio, mes, operador);
+    mostrarModal("success", "Excel F-OPESEG-045 generado correctamente.");
+  } catch (error) {
+    console.error("Error generando Excel F-OPESEG-045:", error);
+    mostrarModal(
+      "error",
+      error?.message
+        ? `No se pudo generar el Excel: ${error.message}`
+        : "No se pudo generar el Excel."
+    );
   } finally {
     setExportButtonState(false);
   }
 }
 
 function initReportes() {
-  if (initReportes.iniciado) return;
   const boton = document.getElementById("btnExportarExcel");
-  if (!boton) return;
+  if (!boton || boton.dataset.reportesBound === "1") return;
 
-  initReportes.iniciado = true;
+  boton.dataset.reportesBound = "1";
   aplicarMesActual();
-  cargarOperadores();
+  void cargarOperadores();
   boton.addEventListener("click", exportarExcel);
 }
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initReportes);
+  document.addEventListener("DOMContentLoaded", initReportes, { once: true });
 } else {
   initReportes();
 }
-
-// 🚫 NO BORRAR — QA Mamparas
-console.log("QA Mamparas: archivo restaurado");
