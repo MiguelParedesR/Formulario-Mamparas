@@ -1,40 +1,31 @@
 <link rel="stylesheet" href="../../CSS/apple-redesign.css" />
 
-<main class="mamparas-root mamparas-modern">
-  <div class="mamparas-header">
-    <div>
-      <p class="section-kicker">Mamparas</p>
-      <h1>Registros de inspección</h1>
-      <p>Consulta inspecciones históricas y abre su detalle fotográfico sin salir del módulo.</p>
-    </div>
-    <div class="w-full sm:w-80">
-      <label for="buscarPlaca">Buscar placa</label>
-      <input type="search" id="buscarPlaca" placeholder="Ej. ABC123" maxlength="12" autocomplete="off" />
+<main class="v3-records">
+  <div class="v3-filterbar">
+    <div class="search-group">
+      <label for="buscarPlaca">Buscar</label>
+      <input type="search" id="buscarPlaca" placeholder="Placa" maxlength="12" autocomplete="off" />
     </div>
   </div>
 
-  <section class="mamparas-form-surface">
-    <div class="overflow-x-auto">
-      <div class="max-h-[72vh] overflow-y-auto">
-        <table class="w-full table-auto text-gray-700 text-sm">
-          <thead class="sticky top-0 z-10">
-            <tr>
-              <th class="px-4 py-3 text-left">Fecha</th>
-              <th class="px-4 py-3 text-left">Hora</th>
-              <th class="px-4 py-3 text-left">Empresa</th>
-              <th class="px-4 py-3 text-left">Placa</th>
-              <th class="px-4 py-3 text-left">Chofer</th>
-              <th class="px-4 py-3 text-left">Lugar</th>
-              <th class="px-4 py-3 text-left">Incorrección</th>
-              <th class="px-4 py-3 text-left">Responsable</th>
-              <th class="px-4 py-3 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tabla-registros"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+  <div class="v3-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Empresa</th>
+          <th>Placa</th>
+          <th>Chofer</th>
+          <th>Lugar</th>
+          <th>Incorrección</th>
+          <th>Responsable</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-registros"></tbody>
+    </table>
+  </div>
 
   <div id="mampara-detalle-modal-container"></div>
 
