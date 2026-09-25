@@ -1538,54 +1538,100 @@ function initEmpresaPersonalizada() {
 async function consultarPlacaExistente(placa) {
   const placaRaw = String(placa || "").toUpperCase().trim();
   const placaNormalizada = normalizarPlaca(placaRaw);
-  const placaConGuion =
-    placaNormalizada.length === MAX_PLACA_LENGTH
-      ? `${placaNormalizada.slice(0, 3)}-${placaNormalizada.slice(3)}`
-      : "";
-  const posibles = [placaRaw, placaNormalizada, placaConGuion].filter(
-    (valor, index, arr) => valor && arr.indexOf(valor) === index
-  );
 
-  if (!posibles.length) return;
+  if (placaNormalizada.length !== MAX_PLACA_LENGTH) return;
+
+  const placaConGuion =
+    placaNormalizada.slice(0, 3) + "-" + placaNormalizada.slice(3);
+  const placaConEspacio =
+    placaNormalizada.slice(0, 3) + " " + placaNormalizada.slice(3);
+
+  const posibles = [
+    placaRaw,
+    placaNormalizada,
+    placaConGuion,
+    placaConEspacio,
+  ].filter((valor, index, arr) => valor && arr.indexOf(valor) === index);
 
   try {
-    estadoPlacaExterno = { tone: "info", message: "Validando antecedentes..." };
+    estadoPlacaExterno = {
+      tone: "info",
+      message: "Validando antecedentes...",
+    };
     actualizarEstadoFormularioFn?.();
 
-    let query = supabase
-      .from("inspecciones")
-      .select("id,fecha,hora,empresa,placa,chofer,lugar,incorreccion,responsable,observaciones,separacion_central,altura_mampara,foto_unidad,foto_observacion,detalle");
+    // Mantener compatibilidad con registros históricos: la versión estable
+    // del formulario leía el registro completo. No restringir columnas aquí
+    // hasta validar el esquema real de producción.
+    let query = supabase.from("inspecciones").select("*");
 
-    if (posibles.length > 1) {
-      const filtro = posibles.map((valor) => `placa.eq.${valor}`).join(",");
-      query = query.or(filtro);
-    } else {
-      query = query.eq("placa", posibles[0]);
-    }
+    const filtro = posibles
+      .map((valor) => "placa.ilike." + valor)
+      .join(",");
 
-    const { data, error } = await query
+    if (filtro) query = query.or(filtro);
+
+    let { data, error } = await query
       .order("fecha", { ascending: false })
       .order("hora", { ascending: false })
-      .limit(1);
+      .limit(10);
 
     if (error) throw error;
 
-    if (data && data.length) {
-      registroPlacaDetectado = data[0];
+    let coincidencia = (data || []).find(
+      (registro) => normalizarPlaca(registro?.placa) === placaNormalizada
+    );
+
+    // Fallback para formatos históricos no previstos, por ejemplo espacios,
+    // puntos u otros separadores entre caracteres.
+    if (!coincidencia) {
+      const patronFlexible =
+        "%" + placaNormalizada.split("").join("%") + "%";
+
+      const fallback = await supabase
+        .from("inspecciones")
+        .select("*")
+        .ilike("placa", patronFlexible)
+        .order("fecha", { ascending: false })
+        .order("hora", { ascending: false })
+        .limit(25);
+
+      if (fallback.error) throw fallback.error;
+
+      coincidencia = (fallback.data || []).find(
+        (registro) => normalizarPlaca(registro?.placa) === placaNormalizada
+      );
+    }
+
+    // Evita que una respuesta antigua abra un registro después de que el
+    // usuario ya cambió la placa.
+    const placaActual = normalizarPlaca(obtenerInput("placa")?.value || "");
+    if (placaActual !== placaNormalizada) return;
+
+    if (coincidencia) {
+      registroPlacaDetectado = coincidencia;
       estadoPlacaExterno = {
         tone: "warning",
-        message: "Existe un registro anterior para esta placa.",
+        message: "Placa existente. Puedes reutilizar los datos del último registro.",
       };
       actualizarEstadoFormularioFn?.();
-      mostrarModalPlaca(data[0], placaRaw);
-    } else {
-      registroPlacaDetectado = null;
-      estadoPlacaExterno = null;
-      actualizarEstadoFormularioFn?.();
-      ocultarModalPlaca();
+      mostrarModalPlaca(coincidencia, placaNormalizada);
+      return;
     }
+
+    registroPlacaDetectado = null;
+    estadoPlacaExterno = {
+      tone: "success",
+      message: "Placa nueva. No se encontraron antecedentes.",
+    };
+    actualizarEstadoFormularioFn?.();
+    ocultarModalPlaca();
   } catch (error) {
-    estadoPlacaExterno = null;
+    registroPlacaDetectado = null;
+    estadoPlacaExterno = {
+      tone: "error",
+      message: "No se pudo validar la placa. Intenta nuevamente.",
+    };
     actualizarEstadoFormularioFn?.();
     console.error("Error validando placa:", error.message || error);
   }
