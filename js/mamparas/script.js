@@ -591,13 +591,13 @@ function normalizarPlaca(valor) {
 export async function subirImagen(nombreCampo, archivo) {
   if (!archivo) return null;
 
-  if (archivo.size > 50 * 1024 * 1024) {
-    alert("La imagen excede los 50MB permitidos.");
+  if (archivo.size > 12 * 1024 * 1024) {
+    mostrarModal("error", "La imagen supera el límite de 12 MB.");
     return null;
   }
 
   if (!archivo.type.startsWith("image/")) {
-    alert("Solo se permiten archivos de imagen.");
+    mostrarModal("error", "Solo se permiten archivos de imagen.");
     return null;
   }
 
@@ -924,8 +924,10 @@ function toggleDetalleAlert(show, message) {
   if (show) {
     alerta.textContent = message || "Completa los campos marcados con * antes de continuar.";
     alerta.classList.remove("hidden");
+    alerta.classList.add("is-visible");
   } else {
     alerta.classList.add("hidden");
+    alerta.classList.remove("is-visible");
   }
 }
 
@@ -962,6 +964,7 @@ function mostrarDetalleGuardadoAviso(visible) {
   const aviso = document.getElementById("detalleGuardadoAviso");
   if (!aviso) return;
   aviso.classList.toggle("hidden", !visible);
+  aviso.classList.toggle("is-visible", visible);
 }
 
 function renderGaleriaMamparas(detalle) {
@@ -969,41 +972,52 @@ function renderGaleriaMamparas(detalle) {
   if (!cont) return;
 
   cont.innerHTML = "";
-
   const imagenes = detalle?.imagenes;
   if (!imagenes || !Object.keys(imagenes).length) {
-    const empty = document.createElement("p");
-    empty.className = "text-sm text-gray-500";
-    empty.textContent = "Sin evidencias registradas aun.";
+    const empty = document.createElement("div");
+    empty.className = "form-feedback is-visible";
+    empty.dataset.tone = "info";
+    empty.textContent = "Aún no hay evidencias. Abre el detalle para agregar fotografías.";
     cont.appendChild(empty);
     return;
   }
 
-  const grid = document.createElement("div");
-  grid.className = "flex";
-  grid.style.cssText = "display:flex; gap:10px; align-items:flex-start; flex-wrap: nowrap;";
+  const labels = {
+    foto_panoramica_unidad: "Panorámica",
+    foto_altura_mampara: "Altura",
+    foto_lateral_central: "Lateral",
+    foto_observacion: "Observación",
+  };
 
-  Object.values(imagenes).forEach((url) => {
+  Object.entries(imagenes).forEach(([key, url]) => {
     if (!url) return;
-    const item = document.createElement("div");
-    item.className =
-      "rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition cursor-pointer";
-    item.style.flex = "0 0 auto";
-    item.style.width = "120px";
-    item.innerHTML = `<img src="${url}" alt="Evidencia" style="width:120px;height:72px;object-fit:cover;display:block;" />`;
+
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "evidence-card";
+    item.setAttribute("data-evidence-card", "1");
+    item.setAttribute("aria-label", `Abrir evidencia ${labels[key] || "fotográfica"}`);
+
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = labels[key] || "Evidencia de inspección";
+    img.loading = "lazy";
+
+    const caption = document.createElement("div");
+    caption.className = "evidence-caption";
+    caption.textContent = labels[key] || "Evidencia";
+
+    item.appendChild(img);
+    item.appendChild(caption);
     item.addEventListener("click", () => abrirPreviewImagenModal(url));
-    grid.appendChild(item);
+    cont.appendChild(item);
   });
 
-  if (!grid.childElementCount) {
+  if (!cont.childElementCount) {
     const empty = document.createElement("p");
-    empty.className = "text-sm text-gray-500";
-    empty.textContent = "Sin evidencias registradas aun.";
+    empty.textContent = "Sin evidencias registradas aún.";
     cont.appendChild(empty);
-    return;
   }
-
-  cont.appendChild(grid);
 }
 
 async function guardarDetalleJSON() {
@@ -1575,7 +1589,10 @@ function initFormulario() {
   initModalPlacaListeners();
   initValidacionPlaca();
 
+  let procesandoRegistro = false;
+
   const procesarRegistro = async () => {
+    if (procesandoRegistro) return;
     if (typeof form.reportValidity === "function" && !form.reportValidity()) {
       mostrarModal("error", "Completa los campos obligatorios antes de continuar.");
       return;
@@ -1620,8 +1637,14 @@ function initFormulario() {
 
     mostrarModalCorreo(datos, detalleCampo.value, {
       onFinalizar: async () => {
-        const exito = await guardarInspeccion(datos, detalleCampo.value);
-        if (exito) {
+        if (procesandoRegistro) return false;
+        procesandoRegistro = true;
+        const btnRegistrar = document.getElementById("btnRegistrarInspeccion");
+        if (btnRegistrar) btnRegistrar.disabled = true;
+
+        try {
+          const exito = await guardarInspeccion(datos, detalleCampo.value);
+          if (exito) {
           form.reset();
           detalleCampo.value = "";
           mostrarDetalleGuardadoAviso(false);
@@ -1634,8 +1657,12 @@ function initFormulario() {
           placaIgnorada = "";
           detallePrefill = null;
           placaPrefill = "";
+          }
+          return exito;
+        } finally {
+          procesandoRegistro = false;
+          if (btnRegistrar) btnRegistrar.disabled = false;
         }
-        return exito;
       },
     });
   };
