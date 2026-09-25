@@ -1,5 +1,6 @@
 let gallery = [];
 let activeIndex = 0;
+let currentPayload = {};
 let keyHandlerBound = false;
 
 const DETAIL_ID = "mampara-modal";
@@ -10,10 +11,9 @@ const safeText = (value, fallback = "—") => {
   return String(value);
 };
 
-const formatMeasure = (value, unit = "cm") => {
+const formatMeasure = (value) => {
   if (value === null || value === undefined || value === "") return "—";
-  const n = Number.parseFloat(value);
-  return Number.isFinite(n) ? `${n} ${unit}` : String(value);
+  return String(value);
 };
 
 const normalizeImages = (images) =>
@@ -87,13 +87,13 @@ function createThumbnail(img, index) {
     media.appendChild(image);
   } else {
     const empty = document.createElement("span");
-    empty.innerHTML = '<i class="fas fa-image"></i>';
+    empty.textContent = "Sin foto";
     media.appendChild(empty);
   }
 
   const caption = document.createElement("div");
   caption.className = "mampara-photo-caption";
-  caption.textContent = img.url ? img.label : `${img.label} · sin foto`;
+  caption.textContent = img.url ? img.label : img.label + " · sin foto";
 
   button.append(media, caption);
   if (img.url) button.addEventListener("click", () => openViewer(index));
@@ -115,19 +115,17 @@ function buildDetail(payload) {
 
   const copy = document.createElement("div");
   const eyebrow = document.createElement("p");
-  eyebrow.className = "ui-eyebrow";
+  eyebrow.className = "section-kicker";
   eyebrow.textContent = "Detalle de inspección";
   const title = document.createElement("h2");
-  title.textContent = safeText(payload?.tipo, "Mampara");
-  const subtitle = document.createElement("p");
-  subtitle.textContent = "Medidas registradas y evidencia fotográfica asociada.";
-  copy.append(eyebrow, title, subtitle);
+  title.textContent = safeText(payload?.meta?.placa, safeText(payload?.tipo, "Mampara"));
+  copy.append(eyebrow, title);
 
   const close = document.createElement("button");
   close.type = "button";
   close.className = "mampara-detail-close";
   close.setAttribute("aria-label", "Cerrar detalle");
-  close.innerHTML = '<i class="fas fa-xmark"></i>';
+  close.textContent = "Cerrar";
   close.addEventListener("click", closeDetail);
 
   header.append(copy, close);
@@ -149,7 +147,7 @@ function buildDetail(payload) {
   ghTitle.textContent = "Evidencias";
   const ghCount = document.createElement("span");
   const available = gallery.filter((item) => item.url).length;
-  ghCount.textContent = `${available} de ${gallery.length} disponibles`;
+  ghCount.textContent = String(available) + " de " + String(gallery.length) + " disponibles";
   galleryHead.append(ghTitle, ghCount);
 
   const grid = document.createElement("div");
@@ -167,6 +165,45 @@ function buildDetail(payload) {
   return overlay;
 }
 
+function createInfoRow(label, value) {
+  const row = document.createElement("div");
+  row.className = "mampara-viewer-info-row";
+  const k = document.createElement("span");
+  k.textContent = label;
+  const v = document.createElement("strong");
+  v.textContent = safeText(value);
+  row.append(k, v);
+  return row;
+}
+
+function buildViewerInfo() {
+  const aside = document.createElement("aside");
+  aside.className = "mampara-viewer-info";
+
+  const kicker = document.createElement("p");
+  kicker.className = "section-kicker";
+  kicker.textContent = "Evidencia fotográfica";
+
+  const plate = document.createElement("h2");
+  plate.textContent = safeText(currentPayload?.meta?.placa, safeText(currentPayload?.tipo, "Inspección"));
+
+  const group = document.createElement("div");
+  group.className = "mampara-viewer-info-group";
+  group.append(
+    createInfoRow("Empresa", currentPayload?.meta?.empresa),
+    createInfoRow("Fecha / hora", safeText(currentPayload?.meta?.fecha) + " · " + safeText(currentPayload?.meta?.hora)),
+    createInfoRow("Hallazgo", currentPayload?.tipo),
+    createInfoRow("Altura", formatMeasure(currentPayload?.altura)),
+    createInfoRow("Separación", formatMeasure(currentPayload?.separacion)),
+    createInfoRow("Responsable", currentPayload?.meta?.responsable),
+    createInfoRow("Chofer", currentPayload?.meta?.chofer),
+    createInfoRow("Lugar", currentPayload?.meta?.lugar)
+  );
+
+  aside.append(kicker, plate, group);
+  return aside;
+}
+
 function openViewer(index) {
   if (!gallery[index]?.url) return;
   activeIndex = index;
@@ -177,6 +214,9 @@ function openViewer(index) {
   overlay.className = "mampara-viewer";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
+
+  const stageWrap = document.createElement("section");
+  stageWrap.className = "mampara-viewer-stage-wrap";
 
   const top = document.createElement("div");
   top.className = "mampara-viewer-top";
@@ -192,7 +232,7 @@ function openViewer(index) {
   close.type = "button";
   close.className = "mampara-viewer-close";
   close.setAttribute("aria-label", "Cerrar visor");
-  close.innerHTML = '<i class="fas fa-xmark"></i>';
+  close.textContent = "×";
   close.addEventListener("click", closeViewer);
   top.append(meta, close);
 
@@ -208,14 +248,14 @@ function openViewer(index) {
     prev.type = "button";
     prev.className = "mampara-viewer-nav is-prev";
     prev.setAttribute("aria-label", "Foto anterior");
-    prev.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    prev.textContent = "‹";
     prev.addEventListener("click", () => move(-1));
 
     const next = document.createElement("button");
     next.type = "button";
     next.className = "mampara-viewer-nav is-next";
     next.setAttribute("aria-label", "Foto siguiente");
-    next.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    next.textContent = "›";
     next.addEventListener("click", () => move(1));
     stage.append(prev, next);
   }
@@ -239,10 +279,8 @@ function openViewer(index) {
     strip.appendChild(thumb);
   });
 
-  overlay.append(top, stage, strip);
-  overlay.addEventListener("click", (event) => {
-    if (event.target === overlay) closeViewer();
-  });
+  stageWrap.append(top, stage, strip);
+  overlay.append(stageWrap, buildViewerInfo());
   document.body.appendChild(overlay);
   updateViewer();
 }
@@ -266,6 +304,7 @@ function updateViewer() {
   const image = document.getElementById("mampara-viewer-image");
   const label = document.getElementById("mampara-viewer-label");
   const counter = document.getElementById("mampara-viewer-counter");
+
   if (image) {
     image.src = item.url;
     image.alt = item.label;
@@ -274,7 +313,7 @@ function updateViewer() {
 
   const indices = availableIndices();
   const position = indices.indexOf(activeIndex) + 1;
-  if (counter) counter.textContent = `${position} / ${indices.length}`;
+  if (counter) counter.textContent = String(position) + " / " + String(indices.length);
 
   document.querySelectorAll(".mampara-viewer-thumb").forEach((thumb) => {
     thumb.classList.toggle("is-active", Number(thumb.dataset.index) === activeIndex);
@@ -283,6 +322,7 @@ function updateViewer() {
 
 export function mostrarDetalleMampara(payload) {
   closeDetail();
+  currentPayload = payload || {};
   gallery = normalizeImages(payload?.imagenes);
   activeIndex = availableIndices()[0] ?? 0;
   document.body.appendChild(buildDetail(payload));
