@@ -15,6 +15,31 @@ let detallePrefill = null;
 let placaPrefill = "";
 let formularioInicializado = null;
 let fechaHoraListenerActivo = false;
+let registroEnProceso = false;
+
+function mostrarEstadoMamparas(tipo, mensaje, elemento = null) {
+  const status = document.getElementById("mamparasStatus");
+  if (status) {
+    status.className = `form-status form-status--${tipo} is-visible`;
+    status.textContent = mensaje;
+  }
+  if (elemento) {
+    elemento.setAttribute("aria-invalid", "true");
+    elemento.focus?.({ preventScroll: true });
+    elemento.scrollIntoView?.({ block: "center", behavior: "smooth" });
+  }
+}
+
+function limpiarEstadoMamparas() {
+  const status = document.getElementById("mamparasStatus");
+  if (status) {
+    status.className = "form-status";
+    status.textContent = "";
+  }
+  document.querySelectorAll('#form-inspeccion [aria-invalid="true"]').forEach((el) => {
+    el.removeAttribute("aria-invalid");
+  });
+}
 
 const toggleHidden = (el, hidden) => {
   if (!el) return;
@@ -50,6 +75,8 @@ if (feedbackCloseBtn) {
 }
 
 export function mostrarModal(tipo, mensaje) {
+  mostrarEstadoMamparas(tipo === "error" ? "error" : "success", mensaje);
+
   const feedbackModal = document.getElementById("feedbackModal");
   const loader = document.getElementById("loadingAnimation");
   const msg = document.getElementById("feedbackMessage");
@@ -59,17 +86,16 @@ export function mostrarModal(tipo, mensaje) {
   toggleHidden(loader, false);
   toggleHidden(msg, true);
 
-  setTimeout(() => {
+  window.setTimeout(() => {
     toggleHidden(loader, true);
     toggleHidden(msg, false);
     msg.textContent = mensaje;
-    const colorClass = tipo === "error" ? "text-red-600" : "text-green-600";
-    msg.className = `message text-sm font-medium ${colorClass}`;
-  }, 500);
+    msg.className = `message text-sm font-medium ${tipo === "error" ? "text-red-600" : "text-green-700"}`;
+  }, 220);
 
-  setTimeout(() => {
+  window.setTimeout(() => {
     hideModalOverlay(feedbackModal);
-  }, 4500);
+  }, 2600);
 }
 
 export function mostrarModalCorreo(datosFormulario = {}, detalleJSON, options = {}) {
@@ -591,13 +617,14 @@ function normalizarPlaca(valor) {
 export async function subirImagen(nombreCampo, archivo) {
   if (!archivo) return null;
 
-  if (archivo.size > 50 * 1024 * 1024) {
-    alert("La imagen excede los 50MB permitidos.");
+  const MAX_IMAGE_BYTES = 12 * 1024 * 1024;
+  if (archivo.size > MAX_IMAGE_BYTES) {
+    mostrarModal("error", "La imagen supera el máximo de 12 MB.");
     return null;
   }
 
   if (!archivo.type.startsWith("image/")) {
-    alert("Solo se permiten archivos de imagen.");
+    mostrarModal("error", "Solo se permiten archivos de imagen.");
     return null;
   }
 
@@ -610,14 +637,14 @@ export async function subirImagen(nombreCampo, archivo) {
 
   if (error) {
     console.error("Error al subir la imagen:", error.message);
-    mostrarModal("error", "Error al subir una imagen.");
+    mostrarModal("error", "No se pudo subir una de las imágenes.");
     return null;
   }
 
   const { data, error: errorUrl } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(rutaArchivo);
-  if (errorUrl) {
-    console.error("Error obteniendo URL p\u00FAblica:", errorUrl.message);
-    mostrarModal("error", "No se pudo obtener la URL p\u00FAblica.");
+  if (errorUrl || !data?.publicUrl) {
+    console.error("Error obteniendo URL pública:", errorUrl?.message || errorUrl);
+    mostrarModal("error", "No se pudo obtener la URL de la evidencia.");
     return null;
   }
 
@@ -664,7 +691,12 @@ export async function getImageBase64(url) {
 
 function arrayBufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
-  return btoa(String.fromCharCode(...bytes));
+  const chunkSize = 0x8000;
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
 }
 
 function parseDetalleJSON(detalleJSON) {
@@ -749,19 +781,26 @@ function obtenerInput(id) {
 
 function generarCampoImagen(label, inputId, previewId) {
   return `
-    <div class="space-y-1">
-      <label class="text-sm font-semibold text-gray-700">
-        ${label} <span class="text-red-500">*</span>
+    <div class="tpp-field">
+      <label for="${inputId}">
+        ${label} <span style="color:var(--tpp-danger)">*</span>
+      </label>
+      <label class="evidence-drop" for="${inputId}" style="min-height:88px;cursor:pointer">
+        <span>
+          <i class="fa-regular fa-image" style="font-size:20px;margin-bottom:6px" aria-hidden="true"></i>
+          <strong>Seleccionar foto</strong>
+          <span>JPG, PNG o WebP · máximo 12 MB</span>
+        </span>
       </label>
       <input
         type="file"
         id="${inputId}"
-        accept="image/*"
-        class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+        accept="image/jpeg,image/png,image/webp"
+        class="sr-only"
         data-preview-target="${previewId}"
         data-preview-name="${label}"
       />
-      <div id="${previewId}" class="flex flex-wrap gap-3 hidden" data-preview-container></div>
+      <div id="${previewId}" class="hidden" data-preview-container></div>
     </div>
   `;
 }
@@ -779,7 +818,7 @@ function generarDetalleMamparaMarkup() {
             type="number"
             min="0"
             step="0.01"
-            class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            class="tpp-control"
             placeholder="Ej. 25"
           />
         </div>
@@ -792,7 +831,7 @@ function generarDetalleMamparaMarkup() {
             type="number"
             min="0"
             step="0.01"
-            class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            class="tpp-control"
             placeholder="Ej. 180"
           />
         </div>
@@ -814,7 +853,7 @@ function generarDetalleOtrosMarkup() {
         <textarea
           id="observacionTexto"
           rows="4"
-          class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+          class="tpp-control"
           placeholder="Describe la observaci&oacute;n encontrada"
         ></textarea>
       </div>
@@ -858,22 +897,38 @@ function actualizarPreviewInput(input) {
     return;
   }
 
-  preview.classList.remove("hidden");
+  const file = files[0];
+  if (!file.type.startsWith("image/")) {
+    input.value = "";
+    toggleDetalleAlert(true, "Selecciona un archivo de imagen válido.");
+    preview.classList.add("hidden");
+    return;
+  }
 
-  files.forEach((file) => {
-    if (!file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className =
-        "w-20 h-20 rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:scale-105 transition";
-      button.innerHTML = `<img src="${reader.result}" alt="${input.dataset.previewName || "Imagen"}" class="w-full h-full object-cover" />`;
-      button.addEventListener("click", () => abrirPreviewImagenModal(reader.result));
-      preview.appendChild(button);
-    };
-    reader.readAsDataURL(file);
-  });
+  if (file.size > 12 * 1024 * 1024) {
+    input.value = "";
+    toggleDetalleAlert(true, "La imagen supera el máximo de 12 MB.");
+    preview.classList.add("hidden");
+    return;
+  }
+
+  preview.classList.remove("hidden");
+  const reader = new FileReader();
+  reader.onload = () => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "evidence-card";
+    button.style.cssText = "width:100%;text-align:left";
+    button.innerHTML = `
+      <img src="${reader.result}" alt="${input.dataset.previewName || "Imagen"}" />
+      <span class="evidence-card__footer">
+        <span class="evidence-card__name">${input.dataset.previewName || file.name}</span>
+      </span>
+    `;
+    button.addEventListener("click", () => abrirPreviewImagenModal(reader.result));
+    preview.appendChild(button);
+  };
+  reader.readAsDataURL(file);
 }
 
 function abrirPreviewImagenModal(src) {
@@ -884,15 +939,19 @@ function abrirPreviewImagenModal(src) {
   img.src = src;
   modal.classList.add("flex");
   modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
   document.addEventListener("keydown", escCloseHandler);
   modal.addEventListener("click", outsideClickHandler);
 }
 
 function cerrarModalPreview() {
   const modal = document.getElementById("modalPreview");
+  const img = document.getElementById("previewImagen");
   if (!modal) return;
   modal.classList.add("hidden");
   modal.classList.remove("flex");
+  document.body.style.overflow = "";
+  img?.removeAttribute("src");
   document.removeEventListener("keydown", escCloseHandler);
   modal.removeEventListener("click", outsideClickHandler);
 }
@@ -901,19 +960,18 @@ if (typeof window !== "undefined") {
   window.cerrarModalPreview = cerrarModalPreview;
 }
 
-function escCloseHandler(e) {
-  if (e.key === "Escape") cerrarModalPreview();
+function escCloseHandler(event) {
+  if (event.key === "Escape") cerrarModalPreview();
 }
 
-function outsideClickHandler(e) {
-  if (e.target?.id === "modalPreview") cerrarModalPreview();
+function outsideClickHandler(event) {
+  if (event.target?.id === "modalPreview") cerrarModalPreview();
 }
 
 function initPreviewModal() {
   const modal = document.getElementById("modalPreview");
   const btnClose = modal?.querySelector("button[onclick='cerrarModalPreview()']");
   if (!modal || !btnClose) return;
-
   btnClose.addEventListener("click", cerrarModalPreview);
 }
 
@@ -923,9 +981,9 @@ function toggleDetalleAlert(show, message) {
 
   if (show) {
     alerta.textContent = message || "Completa los campos marcados con * antes de continuar.";
-    alerta.classList.remove("hidden");
+    alerta.className = "form-status form-status--warning is-visible";
   } else {
-    alerta.classList.add("hidden");
+    alerta.className = "form-status form-status--warning hidden";
   }
 }
 
@@ -962,48 +1020,45 @@ function mostrarDetalleGuardadoAviso(visible) {
   const aviso = document.getElementById("detalleGuardadoAviso");
   if (!aviso) return;
   aviso.classList.toggle("hidden", !visible);
+  aviso.classList.toggle("is-visible", visible);
 }
 
 function renderGaleriaMamparas(detalle) {
   const cont = document.getElementById("galeriaMamparas");
   if (!cont) return;
-
   cont.innerHTML = "";
 
-  const imagenes = detalle?.imagenes;
-  if (!imagenes || !Object.keys(imagenes).length) {
-    const empty = document.createElement("p");
-    empty.className = "text-sm text-gray-500";
-    empty.textContent = "Sin evidencias registradas aun.";
+  const imagenes = detalle?.imagenes || {};
+  const labels = {
+    foto_panoramica_unidad: "Panorámica de unidad",
+    foto_altura_mampara: "Altura de mampara",
+    foto_lateral_central: "Vista lateral",
+    foto_observacion: "Observación",
+  };
+
+  const entries = Object.entries(imagenes).filter(([, url]) => Boolean(url));
+  if (!entries.length) {
+    const empty = document.createElement("div");
+    empty.className = "form-status form-status--info";
+    empty.textContent = "Las evidencias guardadas en el detalle aparecerán aquí.";
     cont.appendChild(empty);
     return;
   }
 
-  const grid = document.createElement("div");
-  grid.className = "flex";
-  grid.style.cssText = "display:flex; gap:10px; align-items:flex-start; flex-wrap: nowrap;";
-
-  Object.values(imagenes).forEach((url) => {
-    if (!url) return;
-    const item = document.createElement("div");
-    item.className =
-      "rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition cursor-pointer";
-    item.style.flex = "0 0 auto";
-    item.style.width = "120px";
-    item.innerHTML = `<img src="${url}" alt="Evidencia" style="width:120px;height:72px;object-fit:cover;display:block;" />`;
-    item.addEventListener("click", () => abrirPreviewImagenModal(url));
-    grid.appendChild(item);
+  entries.forEach(([key, url], index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "evidence-card";
+    button.setAttribute("aria-label", `Ver ${labels[key] || `evidencia ${index + 1}`}`);
+    button.innerHTML = `
+      <img src="${url}" alt="${labels[key] || "Evidencia"}" loading="lazy" />
+      <span class="evidence-card__footer">
+        <span class="evidence-card__name">${labels[key] || `Evidencia ${index + 1}`}</span>
+      </span>
+    `;
+    button.addEventListener("click", () => abrirPreviewImagenModal(url));
+    cont.appendChild(button);
   });
-
-  if (!grid.childElementCount) {
-    const empty = document.createElement("p");
-    empty.className = "text-sm text-gray-500";
-    empty.textContent = "Sin evidencias registradas aun.";
-    cont.appendChild(empty);
-    return;
-  }
-
-  cont.appendChild(grid);
 }
 
 async function guardarDetalleJSON() {
@@ -1576,8 +1631,11 @@ function initFormulario() {
   initValidacionPlaca();
 
   const procesarRegistro = async () => {
+    if (registroEnProceso) return;
+    limpiarEstadoMamparas();
+
     if (typeof form.reportValidity === "function" && !form.reportValidity()) {
-      mostrarModal("error", "Completa los campos obligatorios antes de continuar.");
+      mostrarEstadoMamparas("warning", "Completa los campos obligatorios antes de continuar.");
       return;
     }
 
@@ -1585,7 +1643,11 @@ function initFormulario() {
 
     const detalleCampo = obtenerInput("detalle");
     if (!detalleCampo || !detalleCampo.value) {
-      mostrarModal("error", "Debes registrar el detalle antes de guardar.");
+      mostrarEstadoMamparas(
+        "warning",
+        "Debes guardar el detalle técnico antes de registrar la inspección.",
+        obtenerInput("incorreccion")
+      );
       return;
     }
 
@@ -1595,8 +1657,17 @@ function initFormulario() {
       empresa?.value === "otra" ? (nuevaEmpresa?.value || "").trim() : empresa?.value || "";
 
     if (empresa?.value === "otra" && !empresaValor) {
-      mostrarModal("error", "Ingresa el nombre de la empresa.");
-      nuevaEmpresa?.focus();
+      mostrarEstadoMamparas("warning", "Ingresa el nombre de la empresa.", nuevaEmpresa);
+      return;
+    }
+
+    const placa = normalizarPlaca(obtenerInput("placa")?.value || "");
+    if (placa.length !== MAX_PLACA_LENGTH) {
+      mostrarEstadoMamparas(
+        "warning",
+        "La placa debe tener exactamente 6 caracteres alfanuméricos.",
+        obtenerInput("placa")
+      );
       return;
     }
 
@@ -1605,55 +1676,82 @@ function initFormulario() {
       hora: obtenerInput("hora")?.value || obtenerFechaHoraLocal().hora,
       responsable: obtenerInput("responsable")?.value || "",
       empresa: empresaValor,
-      placa: (obtenerInput("placa")?.value || "").trim().toUpperCase(),
-      chofer: obtenerInput("chofer")?.value || "",
+      placa,
+      chofer: (obtenerInput("chofer")?.value || "").trim(),
       lugar: obtenerInput("lugar")?.value || "",
       incorreccion: obtenerInput("incorreccion")?.value || "",
       observaciones: obtenerInput("observaciones")?.value || "",
     };
 
-    if (!datos.placa) {
-      mostrarModal("error", "Ingresa la placa del veh\u00EDculo.");
-      obtenerInput("placa")?.focus();
-      return;
+    registroEnProceso = true;
+    const btnRegistrar = form.querySelector("#btnRegistrarInspeccion");
+    if (btnRegistrar) {
+      btnRegistrar.disabled = true;
+      btnRegistrar.classList.add("opacity-60");
     }
 
-    mostrarModalCorreo(datos, detalleCampo.value, {
-      onFinalizar: async () => {
-        const exito = await guardarInspeccion(datos, detalleCampo.value);
-        if (exito) {
-          form.reset();
-          detalleCampo.value = "";
-          mostrarDetalleGuardadoAviso(false);
-          cerrarTodosLosModales();
-          autocompletarFechaHora();
-          actualizarEmpresaPersonalizadaFn?.();
-          actualizarBotonDetalleFn?.();
-          renderGaleriaMamparas(null);
-          registroPlacaDetectado = null;
-          placaIgnorada = "";
-          detallePrefill = null;
-          placaPrefill = "";
-        }
-        return exito;
-      },
-    });
+    mostrarEstadoMamparas("info", "Inspección validada. Revisa el resumen antes de finalizar.");
+
+    try {
+      mostrarModalCorreo(datos, detalleCampo.value, {
+        onFinalizar: async () => {
+          const exito = await guardarInspeccion(datos, detalleCampo.value);
+          if (exito) {
+            form.reset();
+            detalleCampo.value = "";
+            mostrarDetalleGuardadoAviso(false);
+            cerrarTodosLosModales();
+            autocompletarFechaHora();
+            actualizarEmpresaPersonalizadaFn?.();
+            actualizarBotonDetalleFn?.();
+            renderGaleriaMamparas(null);
+            registroPlacaDetectado = null;
+            placaIgnorada = "";
+            detallePrefill = null;
+            placaPrefill = "";
+            mostrarEstadoMamparas("success", "Inspección registrada correctamente.");
+          }
+          registroEnProceso = false;
+          if (btnRegistrar) {
+            btnRegistrar.disabled = false;
+            btnRegistrar.classList.remove("opacity-60");
+          }
+          return exito;
+        },
+        onCancelar: () => {
+          registroEnProceso = false;
+          if (btnRegistrar) {
+            btnRegistrar.disabled = false;
+            btnRegistrar.classList.remove("opacity-60");
+          }
+        },
+      });
+    } catch (error) {
+      registroEnProceso = false;
+      if (btnRegistrar) {
+        btnRegistrar.disabled = false;
+        btnRegistrar.classList.remove("opacity-60");
+      }
+      console.error("Error preparando registro:", error);
+      mostrarEstadoMamparas("error", "No se pudo preparar el registro. Inténtalo nuevamente.");
+    }
   };
+
+  form.addEventListener("input", (event) => {
+    limpiarEstadoMamparas();
+    event.target?.removeAttribute?.("aria-invalid");
+  });
+
+  form.addEventListener("change", (event) => {
+    limpiarEstadoMamparas();
+    event.target?.removeAttribute?.("aria-invalid");
+  });
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    procesarRegistro();
+    void procesarRegistro();
   });
 
-  const btnRegistrar =
-    form.querySelector("#btnRegistrarInspeccion") ||
-    form.querySelector("button[type='submit']");
-  if (btnRegistrar) {
-    btnRegistrar.addEventListener("click", (event) => {
-      event.preventDefault();
-      procesarRegistro();
-    });
-  }
 }
 
 function esperarFormulario() {
